@@ -51,11 +51,12 @@
 }
 
 :root {
-    color-scheme: light dark;
+    /* color-scheme: light dark; */
 
     --font-title: "Playfair Display", "Georgia", serif;
     --font-subtitle: "Lexend Exa", sans-serif;
     --font-heading: "Playfair Display", "Georgia", serif;
+    --font-link: "Lexend Exa", sans-serif;
     --font-default-sans-serif: "Aleo", "Arial", sans-serif;
     --font-size-large: 3rem;
 
@@ -80,7 +81,7 @@ body {
 
 h1 {
     font-family: var(--font-heading);
-    font-size: 4rem;
+    font-size: clamp(2rem, 3rem, 4rem);
     font-weight: 550;
     margin: 80px 0px 10px 0px;
 }
@@ -93,14 +94,14 @@ main {
 
 section.cards {
     align-self: center;
-    width: 50%;
-    max-width: 1000px;
+
+    margin: 0px clamp(10%, 25vw, 500px);
 
     transition: padding 0.25s ease;
 }
 
 search {
-    height: 100vh;
+    height: 100dvh;
     width: 100%;
     padding: min(30px, 10%) min(50px, 10%);
 
@@ -133,8 +134,6 @@ hgroup.title h1 {
     font-style: normal;
     text-align: center;
     letter-spacing: -0.075rem;
-
-    /* transition: font-size 0.25s ease-in-out;  */
 }
 
 hgroup.title span {
@@ -149,8 +148,6 @@ hgroup.title p {
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.35em;
-
-    /* transition: font-size 0.25s ease-in-out;  */
 }
 
 form.search-bar {
@@ -194,27 +191,87 @@ form.search-bar input[type="search"]:focus {
     outline: none;
 }
 
+.content-card {
+    width: clamp(300px, 50%, 500px);
+    padding: 30px 20px 20px 20px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    font-family: "Lexend", "Times New Roman", serif;
+    font-size: 1rem;
+    text-align: left;
+
+    border: 1px solid var(--accent-color);
+    border-radius: 5px;
+}
+
+.content-card-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.content-card h2 {
+    margin: 0;
+    padding: 0;
+
+    font-family: "Lexend Exa";
+    font-weight: 500;
+    font-size: 1.5rem;
+    letter-spacing: 0.15rem;
+    line-height: 1.2;
+
+    color: var(--primary-color);
+}
+
+.content-card span.numeral-and-series {
+    font-family: "Besley";
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0rem;
+}
+
+.content-card .preview-container {
+    box-sizing: content-box;
+    margin: 10px 0px;
+    padding: 10px 0px;
+    border-top: 2px solid black;
+    /* border-bottom: 2px solid black; */
+}
+
+.content-card .preview-text {
+    max-height: 100px;
+    overflow-y: hidden;
+
+    font-weight: 350;
+
+    background-image: linear-gradient(to bottom, #000000, rgb(0, 0, 0, 0));
+
+    background-clip: text;
+    -webkit-background-clip: text;
+
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+p.link {
+    margin: 0;
+    font-family: var(--font-link);
+    font-weight: 700;
+    letter-spacing: 0.2rem;
+    text-align: right;
+    text-transform: uppercase;
+
+    color: var(--accent-color)
+}
+
 footer {
     background-color: var(--primary-color);
 }
 
-@media screen and (max-width: 1024px) {
+@media screen and (max-width: 1440px) {
 
-    h1 {
-        font-size: 2.5rem;
-    }
-
-    hgroup.title h1 {
-        /* font-size: 2.5rem; */
-    }
-
-    hgroup.title p {
-        /* font-size: 1rem; */
-    }
-
-    section.cards {
-        width: 75%;
-    }
 }
 
 @media screen and (max-width: 425px) {
@@ -224,10 +281,10 @@ footer {
         justify-content: end;
     }
 
-    hgroup.title h1 {        
+    hgroup.title h1 {
         text-align: left;
     }
-    
+
     hgroup.title p {
         text-align: left;
         letter-spacing: 0.25rem;
@@ -245,13 +302,8 @@ footer {
         padding: 5px 10px;
     }
 
-    h1 {
-        font-size: 2rem;
-    }
-
     section.cards {
-        padding: 0px 30px;        
-        width: 100%;
+        padding: 0px 30px;
     }
 
 }
