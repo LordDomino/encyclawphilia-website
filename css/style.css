@@ -1,0 +1,257 @@
+@font-face {
+    font-family: "Aleo";
+    src: url("../fonts/Aleo-VariableFont_wght.ttf"),
+        url("../fonts/Aleo-Italic-VariableFont_wght.ttf")
+}
+
+@font-face {
+    font-family: "Besley";
+    src: url("../fonts/Besley-VariableFont_wght.ttf");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Besley";
+    src: url("../fonts/Besley-Italic-VariableFont_wght.ttf");
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/Montserrat-VariableFont_wght.ttf");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("../fonts/Montserrat-Italic-VariableFont_wght.ttf");
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Lexend";
+    src: url("../fonts/Lexend-VariableFont_wght.ttf");
+}
+
+@font-face {
+    font-family: "Lexend Exa";
+    src: url("../fonts/LexendExa-VariableFont_wght.ttf");
+}
+
+@font-face {
+    font-family: "Playfair Display";
+    src: url("../fonts/PlayfairDisplay-VariableFont_wght.ttf");
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Playfair Display";
+    src: url("../fonts/PlayfairDisplay-Italic-VariableFont_wght.ttf");
+    font-style: italic;
+}
+
+:root {
+    color-scheme: light dark;
+
+    --font-title: "Playfair Display", "Georgia", serif;
+    --font-subtitle: "Lexend Exa", sans-serif;
+    --font-heading: "Playfair Display", "Georgia", serif;
+    --font-default-sans-serif: "Aleo", "Arial", sans-serif;
+    --font-size-large: 3rem;
+
+    /* Colors */
+    --primary-color: #000A3C;
+    --secondary-color: #7db5ff;
+    --bg-color: light-dark(#FFFFFF, var(--primary-color));
+    --text-color: #333333;
+    --accent-color: #071E95;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-default-sans-serif);
+    background-color: var(--bg-color);
+}
+
+h1 {
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    font-weight: 550;
+    margin: 80px 0px 10px 0px;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+section.cards {
+    align-self: center;
+    width: 50%;
+    max-width: 1000px;
+
+    transition: padding 0.25s ease;
+}
+
+search {
+    height: 100vh;
+    width: 100%;
+    padding: min(30px, 10%) min(50px, 10%);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+
+    background-color: var(--primary-color);
+    color: #FFFFFF;
+}
+
+hgroup.title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    gap: 10px;
+}
+
+hgroup.title h1 {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: clamp(1.75rem, calc(3.5vw + 0.1rem), 6rem);
+    font-style: normal;
+    text-align: center;
+    letter-spacing: -0.075rem;
+
+    /* transition: font-size 0.25s ease-in-out;  */
+}
+
+hgroup.title span {
+    font-style: italic;
+}
+
+hgroup.title p {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-subtitle);
+    font-size: clamp(0.8rem, calc(1.35vw + 0.1rem), 2rem);
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.35em;
+
+    /* transition: font-size 0.25s ease-in-out;  */
+}
+
+form.search-bar {
+    display: flex;
+    gap: 10px;
+}
+
+form.search-bar input[type="search"] {
+    border: 2px solid var(--primary-color);
+    border-radius: 3px;
+    border-bottom: 2px solid #FFFFFF;
+    padding: 10px 20px;
+
+    width: 50vw;
+    max-width: 800px;
+    min-width: 365px;
+
+    font-family: "Lexend";
+    font-size: clamp(1.0rem, 1vw, 1.2em);
+    letter-spacing: 0.075rem;
+
+    background-color: var(--primary-color);
+    color: #FFFFFF;
+
+    transition: background 0.1s ease;
+}
+
+form.search-bar input[type="search"]::placeholder {
+    color: var(--secondary-color);
+    letter-spacing: 0.25rem;
+}
+
+form.search-bar input[type="search"]::-webkit-search-cancel-button {
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+    filter: invert(50%) sepia(100%) saturate(500%) hue-rotate(90deg);
+}
+
+form.search-bar input[type="search"]:focus {
+    outline: none;
+}
+
+footer {
+    background-color: var(--primary-color);
+}
+
+@media screen and (max-width: 1024px) {
+
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    hgroup.title h1 {
+        /* font-size: 2.5rem; */
+    }
+
+    hgroup.title p {
+        /* font-size: 1rem; */
+    }
+
+    section.cards {
+        width: 75%;
+    }
+}
+
+@media screen and (max-width: 425px) {
+
+    search {
+        align-items: flex-start;
+        justify-content: end;
+    }
+
+    hgroup.title h1 {        
+        text-align: left;
+    }
+    
+    hgroup.title p {
+        text-align: left;
+        letter-spacing: 0.25rem;
+    }
+
+    form.search-bar {
+        width: 100%;
+    }
+
+    form.search-bar input[type="search"] {
+        width: 100%;
+        min-width: 0px;
+        max-width: none;
+
+        padding: 5px 10px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    section.cards {
+        padding: 0px 30px;        
+        width: 100%;
+    }
+
+}
