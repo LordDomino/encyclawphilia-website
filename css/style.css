@@ -50,6 +50,18 @@
     font-style: italic;
 }
 
+@property --left-mask {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: black;
+}
+
+@property --right-mask {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
 :root {
     /* color-scheme: light dark; */
 
@@ -93,10 +105,7 @@ main {
 }
 
 section.cards {
-    align-self: center;
-
     margin: 0px clamp(10%, 25vw, 500px);
-
     transition: padding 0.25s ease;
 }
 
@@ -191,8 +200,72 @@ form.search-bar input[type="search"]:focus {
     outline: none;
 }
 
+.carousel-wrapper {
+    overflow-x: auto;
+    position: relative;
+    width: 100%; /* Simplified for clarity, adjust margins as needed */
+    
+    --mask-width: 80px;
+
+    /* Create the animation timeline based on the horizontal scroll */
+    scroll-timeline: --carouselTimeline x;
+
+    /* Initial mask state (we will animate the variables) */
+    mask-image: linear-gradient(
+        to right, 
+        var(--left-mask, transparent), 
+        black var(--mask-width), 
+        black calc(100% - var(--mask-width)), 
+        var(--right-mask, transparent)
+    );
+    -webkit-mask-image: linear-gradient(
+        to right, 
+        var(--left-mask, transparent), 
+        black var(--mask-width), 
+        black calc(100% - var(--mask-width)), 
+        var(--right-mask, transparent)
+    );
+
+    /* Apply the animations */
+    animation: mask-left-logic both, mask-right-logic both;
+    animation-timeline: --carouselTimeline;
+}
+
+@keyframes mask-left-logic {
+    /* At the very start (0% scroll), the left side is SOLID BLACK (no fade) */
+    0% { --left-mask: black; }
+    /* As soon as we start scrolling, it becomes TRANSPARENT (fade starts) */
+    5%, 100% { --left-mask: transparent; }
+}
+
+@keyframes mask-right-logic {
+    /* While scrolling, the right side is TRANSPARENT (fade active) */
+    0%, 95% { --right-mask: transparent; }
+    /* When we hit the  very end (100% scroll), it becomes SOLID BLACK (fade stops) */
+    100% { --right-mask: black; }
+}
+
+ul.carousel {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+    padding: 0; /* Changed from var(--mask-width) to 0 */
+    margin: 0;
+}
+
+ul.carousel li {
+    flex: 0 0 clamp(300px, 15vw, 500px);
+    /* Do not grow, do not shrink, stay 250px wide */
+    background: #eee;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Removed: scroll-snap-align */
+}
+
 .content-card {
-    width: clamp(300px, 50%, 500px);
+    /* width: ; */
     padding: 30px 20px 20px 20px;
 
     display: flex;
@@ -270,9 +343,7 @@ footer {
     background-color: var(--primary-color);
 }
 
-@media screen and (max-width: 1440px) {
-
-}
+@media screen and (max-width: 1440px) {}
 
 @media screen and (max-width: 425px) {
 
