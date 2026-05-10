@@ -94,10 +94,14 @@ main {
 
 section.cards {
     align-self: center;
-
     margin: 0px clamp(10%, 25vw, 500px);
-
     transition: padding 0.25s ease;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 10px;
 }
 
 search {
@@ -192,12 +196,12 @@ form.search-bar input[type="search"]:focus {
 }
 
 .content-card {
-    width: clamp(300px, 50%, 500px);
-    padding: 30px 20px 20px 20px;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    width: clamp(300px, 50%, 500px);
+    padding: 30px 20px 20px 20px;
 
     font-family: "Lexend", "Times New Roman", serif;
     font-size: 1rem;
