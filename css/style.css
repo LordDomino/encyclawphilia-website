@@ -51,15 +51,15 @@
 }
 
 @property --left-mask {
-  syntax: '<color>';
-  inherits: false;
-  initial-value: black;
+    syntax: '<color>';
+    inherits: false;
+    initial-value: black;
 }
 
 @property --right-mask {
-  syntax: '<color>';
-  inherits: false;
-  initial-value: transparent;
+    syntax: '<color>';
+    inherits: false;
+    initial-value: transparent;
 }
 
 :root {
@@ -78,6 +78,19 @@
     --bg-color: light-dark(#FFFFFF, var(--primary-color));
     --text-color: #333333;
     --accent-color: #071E95;
+
+    /* Search bar */
+    --search-bg-color: var(--primary-color);
+    --search-text-color: white;
+    --search-border-color: var(--primary-color);
+    --search-border-bottom-color: white;
+    --search-placeholder-color: var(--secondary-color);
+
+    /* Layout */
+    --header-height: 80px;
+    --sidebar-width: 30vw;
+    --cards-padding: 10px;
+    --content-side-padding: 20vw;
 }
 
 * {
@@ -98,15 +111,14 @@ h1 {
     margin: 80px 0px 10px 0px;
 }
 
-main {
-    display: flex;
+.homepage {
     flex-direction: column;
-    width: 100%;
+    padding-bottom: 50px;
 }
 
-section.cards {
+section.dashboard {
     align-self: center;
-    margin: 0px clamp(10%, 25vw, 500px);
+    margin: 0px clamp(10%, var(--content-side-padding), 500px);
     transition: padding 0.25s ease;
 }
 
@@ -141,18 +153,20 @@ hgroup.title {
 }
 
 hgroup.title h1 {
-    width: 100%;
+    font-size: clamp(1.75rem, calc(3.5vw + 0.1rem), 6rem);
+    letter-spacing: -0.075rem;
+}
+
+.brand-title :is(h1, h2, h3, h4, h5, h6) {
     margin: 0;
     padding: 0;
     font-family: var(--font-title);
     font-weight: 400;
-    font-size: clamp(1.75rem, calc(3.5vw + 0.1rem), 6rem);
     font-style: normal;
-    text-align: center;
     letter-spacing: -0.075rem;
 }
 
-hgroup.title span {
+.brand-title span {
     font-style: italic;
 }
 
@@ -166,15 +180,17 @@ hgroup.title p {
     letter-spacing: 0.35em;
 }
 
-form.search-bar {
+form.search-bar,
+form.mini-search-bar {
     display: flex;
     gap: 10px;
 }
 
-form.search-bar input[type="search"] {
-    border: 2px solid var(--primary-color);
+form.search-bar input[type="search"],
+form.mini-search-bar input[type="search"] {
+    /* border: 2px solid var(--search-border-color); */
     border-radius: 3px;
-    border-bottom: 2px solid #FFFFFF;
+    /* border-bottom: 2px solid var(--search-border-bottom-color); */
     padding: 10px 20px;
 
     width: 50vw;
@@ -185,22 +201,41 @@ form.search-bar input[type="search"] {
     font-size: clamp(1.0rem, 1vw, 1.2em);
     letter-spacing: 0.075rem;
 
-    background-color: var(--primary-color);
-    color: #FFFFFF;
+    /* background-color: var(--search-bg-color); */
+    /* color: var(--search-text-color); */
 
     transition: background 0.1s ease;
 }
 
-form.search-bar input[type="search"]::placeholder {
-    color: var(--secondary-color);
+form.search-bar input[type="search"] {
+    border: 2px solid var(--search-border-color);
+    border-bottom: 2px solid var(--search-border-bottom-color);
+    background-color: var(--search-bg-color);
+    color: var(--search-text-color);
+}
+
+form.mini-search-bar input[type="search"] {
+    border: 2px solid white;
+    border-bottom: 2px solid var(--primary-color);
+    background-color: white;
+    color: var(--primary-color);
+}
+
+form.search-bar input[type="search"]::placeholder,
+form.mini-search-bar input[type="search"]::placeholder {
+    color: var(--search-placeholder-color);
     letter-spacing: 0.25rem;
+}
+
+form.mini-search-bar {
+    width: 100%;
+    max-width: 700px;
 }
 
 form.search-bar input[type="search"]::-webkit-search-cancel-button {
     height: 20px;
     width: 20px;
     cursor: pointer;
-    filter: invert(50%) sepia(100%) saturate(500%) hue-rotate(90deg);
 }
 
 form.search-bar input[type="search"]:focus {
@@ -209,85 +244,85 @@ form.search-bar input[type="search"]:focus {
 
 .carousel-wrapper {
     overflow-x: auto;
+    overflow-y: hidden;
     position: relative;
-    width: 100%; /* Simplified for clarity, adjust margins as needed */
-    
-    --mask-width: 80px;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
 
-    /* Create the animation timeline based on the horizontal scroll */
-    scroll-timeline: --carouselTimeline x;
-
-    /* Initial mask state (we will animate the variables) */
-    mask-image: linear-gradient(
-        to right, 
-        var(--left-mask, transparent), 
-        black var(--mask-width), 
-        black calc(100% - var(--mask-width)), 
-        var(--right-mask, transparent)
-    );
-    -webkit-mask-image: linear-gradient(
-        to right, 
-        var(--left-mask, transparent), 
-        black var(--mask-width), 
-        black calc(100% - var(--mask-width)), 
-        var(--right-mask, transparent)
-    );
-
-    /* Apply the animations */
-    animation: mask-left-logic both, mask-right-logic both;
-    animation-timeline: --carouselTimeline;
+    /* Fade effect for edges */
+    mask-image: linear-gradient(to right,
+            transparent 0%,
+            black var(--cards-padding),
+            black 90%,
+            transparent 100%);
+    -webkit-mask-image: linear-gradient(to right,
+            transparent 0%,
+            black var(--cards-padding),
+            black calc(100% - var(--cards-padding)),
+            transparent 100%);
 }
 
-@keyframes mask-left-logic {
-    /* At the very start (0% scroll), the left side is SOLID BLACK (no fade) */
-    0% { --left-mask: black; }
-    /* As soon as we start scrolling, it becomes TRANSPARENT (fade starts) */
-    5%, 100% { --left-mask: transparent; }
+/* Hide scrollbar while maintaining functionality */
+.carousel-wrapper::-webkit-scrollbar {
+    height: 4px;
 }
 
-@keyframes mask-right-logic {
-    /* While scrolling, the right side is TRANSPARENT (fade active) */
-    0%, 95% { --right-mask: transparent; }
-    /* When we hit the  very end (100% scroll), it becomes SOLID BLACK (fade stops) */
-    100% { --right-mask: black; }
+.carousel-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.carousel-wrapper::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 2px;
+}
+
+.carousel-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
 }
 
 ul.carousel {
     display: flex;
-    gap: 15px;
     list-style: none;
-    padding: 0; /* Changed from var(--mask-width) to 0 */
+    padding: 0;
     margin: 0;
 }
 
 ul.carousel li {
-    flex: 0 0 clamp(300px, 15vw, 500px);
-    /* Do not grow, do not shrink, stay 250px wide */
-    background: #eee;
-    border-radius: 8px;
+    flex: 0 0 clamp(300px, 25vw, 500px);
+    padding: var(--cards-padding);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
-    /* Removed: scroll-snap-align */
+    transition: transform 0.2s ease;
+}
+
+ul.carousel li:hover {
+    transform: translateY(-4px);
 }
 
 .content-card {
-    /* width: ; */
-    padding: 30px 20px 20px 20px;
-
+    width: 100%;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-
-    width: clamp(300px, 50%, 500px);
-    padding: 30px 20px 20px 20px;
+    justify-content: space-between;
+    gap: 10px;
 
     font-family: "Lexend", "Times New Roman", serif;
     font-size: 1rem;
     text-align: left;
 
     border: 1px solid var(--accent-color);
-    border-radius: 5px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.1s ease;
+}
+
+.content-card:hover {
+    box-shadow: 0 3px 9px rgb(0, 0, 0);
 }
 
 .content-card-header {
@@ -351,9 +386,707 @@ p.link {
 
 footer {
     background-color: var(--primary-color);
+    color: white;
+    padding: 40px 20px 30px;
 }
 
-@media screen and (max-width: 1440px) {}
+footer .footer-content {
+    display: flex;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+    align-items: flex-start;
+    justify-content: space-between;
+    transition: margin 0.3s ease;
+}
+
+footer .footer-brand {
+    flex: 1 1 auto;
+    min-width: 200px;
+}
+
+footer .footer-links {
+    flex: 1 1 auto;
+    min-width: 200px;
+}
+
+footer .footer-brand h2 {
+    font-size: clamp(1.35rem, 2vw, 2rem);
+}
+
+footer .footer-brand p {
+    margin: 16px 0 0;
+    max-width: 420px;
+    line-height: 1.8;
+    color: #dfe7ff;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.footer-column h3 {
+    margin: 0 0 12px;
+    font-family: var(--font-link);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.18rem;
+    text-transform: uppercase;
+    color: var(--secondary-color);
+}
+
+.footer-column a {
+    display: block;
+    margin-bottom: 10px;
+    color: white;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+
+.footer-column a:hover {
+    color: var(--secondary-color);
+}
+
+.footer-note {
+    margin: 28px auto 0;
+    max-width: 1200px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #c9d5ff;
+}
+
+/* Header Styles */
+.site-header {
+    background-color: var(--primary-color);
+    color: white;
+    height: 80px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+}
+
+.brand-title h1 {
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.main-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.main-nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.main-nav a:hover {
+    color: var(--secondary-color);
+}
+
+/* Results Page Layout */
+.results-page {
+    display: flex;
+    align-items: stretch;
+    flex-direction: row;
+}
+
+.sidebar-column {
+    width: var(--sidebar-width);
+    border-right: 2px solid #ddd;
+}
+
+.sidebar-content {
+    position: -webkit-sticky;
+    /* Safari support */
+    position: sticky;
+    top: var(--header-height);
+    width: var(--sidebar-width);
+    padding: 2.5vw;
+    padding-left: 5vw;
+}
+
+.sidebar h2 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+
+.results-content {
+    position: relative;
+    margin: 10vh calc(var(--content-side-padding) / 2) 10vh calc(var(--content-side-padding) / 4);
+}
+
+.results-content h1 {
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    margin: 0px 0px 20px 0px;
+}
+
+.search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ========================================
+   CITY ORDINANCE PORTAL UTILITY CLASSES
+   ======================================== */
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: fit-content;
+}
+
+.status-badge.passed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-badge.rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-badge.in-progress {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Card Variants */
+.card-featured {
+    position: relative;
+    border: 2px solid var(--secondary-color);
+    background: linear-gradient(135deg, rgba(125, 181, 255, 0.05) 0%, rgba(125, 181, 255, 0.02) 100%);
+}
+
+.card-featured::before {
+    content: "FEATURED";
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.card-highlighted {
+    border-left: 4px solid var(--secondary-color);
+    background-color: rgba(7, 30, 149, 0.02);
+}
+
+.card-compact {
+    padding: 15px;
+}
+
+/* Breadcrumb Navigation */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.breadcrumb a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.breadcrumb span {
+    color: #666;
+}
+
+.breadcrumb span.separator {
+    margin: 0 4px;
+}
+
+/* Filter/Sidebar Components */
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.95rem;
+}
+
+.filter-group input[type="checkbox"],
+.filter-group input[type="radio"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.filter-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    background-color: white;
+}
+
+/* Timeline Component */
+.timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.timeline::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--secondary-color);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 30px;
+}
+
+.timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -32px;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    background-color: var(--accent-color);
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--secondary-color);
+}
+
+.timeline-item.completed::before {
+    background-color: #28a745;
+}
+
+.timeline-item h4 {
+    margin: 0 0 5px 0;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.timeline-item .timeline-date {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Document/Legislation Card */
+.legislation-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+.legislation-card .legislation-number {
+    font-family: "Besley", serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.legislation-card .legislation-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    line-height: 1.4;
+}
+
+.legislation-card .legislation-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.legislation-card .legislation-author {
+    font-weight: 500;
+}
+
+/* Committee/Department Badge */
+.committee-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background-color: rgba(7, 30, 149, 0.08);
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.committee-badge::before {
+    content: "⊙";
+    font-size: 1rem;
+}
+
+/* Bill/Ordinance Actions */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 8px 16px;
+    border: 1px solid var(--accent-color);
+    background-color: white;
+    color: var(--accent-color);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-action:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.btn-action.primary {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.btn-action.primary:hover {
+    background-color: var(--primary-color);
+}
+
+.btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-download::before {
+    content: "⬇";
+    font-size: 1rem;
+}
+
+/* Search Results Highlight */
+.search-result {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+
+    font-family: "Lexend", "Times New Roman", serif;
+    font-size: 1rem;
+    text-align: left;
+
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.1s ease;
+}
+
+.search-result:hover {
+    box-shadow: 0 3px 9px var(--secondary-color);
+}
+
+.search-result .content-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.search-result .result-title {
+    margin: 0;
+    font-family: "Lexend Exa";
+    font-weight: 500;
+    font-size: 1.25rem;
+    letter-spacing: 0.15rem;
+    line-height: 1.2;
+    color: var(--primary-color);
+}
+
+.search-result .preview-container {
+    box-sizing: content-box;
+    margin: 10px 0px;
+    padding: 10px 0px;
+    border-top: 2px solid black;
+}
+
+.search-result .result-snippet {
+    color: #333;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.search-result .result-meta {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.search-result .link {
+    margin-top: 10px;
+}
+
+/* Voting/Poll Component */
+.voting-record {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
+}
+
+.voting-record .vote-title {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.vote-tally {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.vote-item {
+    text-align: center;
+}
+
+.vote-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.vote-label {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Reading Navigation (1st, 2nd, 3rd Reading) */
+.reading-status {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.reading-step {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #666;
+}
+
+.reading-step.active {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.reading-step.completed {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.pagination a,
+.pagination button {
+    padding: 8px 12px;
+    border: 1px solid var(--accent-color);
+    background-color: white;
+    color: var(--accent-color);
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.pagination a:hover,
+.pagination button:hover {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.pagination .active {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+/* Table Styles for Legislation Lists */
+.table-legislation {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.table-legislation thead {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.table-legislation th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.table-legislation td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.table-legislation tbody tr:hover {
+    background-color: rgba(7, 30, 149, 0.02);
+}
+
+.table-legislation tbody tr:last-child td {
+    border-bottom: none;
+}
+
+@media screen and (min-width: 1440px) {
+    footer .footer-content {
+        margin: 0 auto;
+        max-width: 1200px;
+    }
+}
+
+@media screen and (max-width: 1440px) and (min-width: 1024px) {
+    .reading-status {
+        flex-direction: column;
+    }
+
+    footer .footer-content {
+        margin: 0 var(--content-side-padding);
+        max-width: none;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    footer .footer-content {
+        flex-direction: column;
+    }
+
+    footer .footer-brand p {
+        max-width: unset;
+    }
+
+}
+
+@media screen and (max-width: 768px) {
+    .legislation-card .legislation-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .vote-tally {
+        grid-template-columns: 1fr;
+    }
+
+    .table-legislation th,
+    .table-legislation td {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    footer .footer-brand {
+        min-width: 0px;
+    }
+
+    footer .footer-brand p {
+        max-width: unset;
+    }
+
+    .footer-links {
+        flex-direction: column;
+    }
+}
 
 @media screen and (max-width: 425px) {
 
@@ -383,8 +1116,71 @@ footer {
         padding: 5px 10px;
     }
 
-    section.cards {
+    section.dashboard {
         padding: 0px 30px;
+    }
+
+    ul.carousel li {
+        flex: 0 0 clamp(280px, 90vw, 500px);
+    }
+
+    .carousel-wrapper {
+        margin: 0 -30px;
+        padding: 0 30px;
+    }
+
+    .legislation-card {
+        padding: 15px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-action {
+        width: 100%;
+        text-align: center;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+
+    footer .footer-content {
+        margin: 0 5vw;
+    }
+
+    footer .footer-links {
+        flex-direction: column;
+        min-width: unset;
+    }
+
+    /* Header responsive */
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .main-nav {
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .site-header {
+        height: auto;
+        min-height: 80px;
+    }
+
+    /* Results page responsive */
+    .results-page {
+        /* flex-direction: column; */
+        padding: 0 10px;
+    }
+
+    .sidebar {
+        flex: none;
+        width: 100%;
     }
 
 }
