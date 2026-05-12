@@ -1,0 +1,21 @@
+name: Production Deployment
+on:
+  push:
+    branches:
+      - main # Deployment occurs only when changes are pushed to the main branch
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload to InfinityFree
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /htdocs/ # The standard root for InfinityFree
+          local-dir: ./        # Deploy everything from the repository root

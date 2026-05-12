@@ -471,7 +471,7 @@ ul.vertical-carousel li:last-child {
 }
 
 .card-banner:hover {
-    border: 2px solid var(--accent-color);
+    border-color: var(--accent-color);
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
     transform: translateX(4px);
 }
