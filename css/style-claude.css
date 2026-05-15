@@ -82,7 +82,7 @@
     --sidebar-width: 30vw;
     --cards-padding: 20px;
     --content-side-padding: 10vw;
-    --scroll-margin: 20px;
+    --scroll-margin: 10px;
 
     --padding-big: 10vw;
     --padding-medium: 2.5vw;
@@ -273,7 +273,7 @@ section.dashboard[id="browse-latest"] {
 }
 
 .flex-column:not(:last-child) {
-    border-right: 1px solid var(--accent-color);
+    border-right: 2px solid var(--accent-color);
     margin-right: 20px;
     padding-right: 20px;
 }
@@ -457,23 +457,42 @@ section.dashboard[id="browse-latest"] {
 
 /* --- Vertical carousel --- */
 
+.vertical-carousel-frame {
+    position: relative;
+    border-top: 2px solid var(--accent-color);
+    border-bottom: 2px solid var(--accent-color);
+    overflow: hidden;
+}
+
 .vertical-carousel-wrapper {
-    overflow-y: scroll;
     height: 800px;
+    overflow-y: auto;
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
-    padding: var(--cards-padding);
-    padding-left: 0;
-    mask-image: linear-gradient(to bottom,
-            transparent 0%,
-            black var(--scroll-margin),
-            black calc(100% - var(--scroll-margin)),
-            transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom,
-            transparent 0%,
-            black var(--scroll-margin),
-            black calc(100% - var(--scroll-margin)),
-            transparent 100%);
+    padding-right: var(--cards-padding);
+    margin: calc(var(--cards-padding) / 2) 0;
+}
+
+.vertical-carousel-frame::before,
+.vertical-carousel-frame::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 12px;
+    /* leave room for the scrollbar */
+    height: calc(var(--scroll-margin) * 2);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.vertical-carousel-frame::before {
+    top: 0;
+    background: linear-gradient(to bottom, var(--bg-color) 0%, var(--bg-color) 25%, transparent);
+}
+
+.vertical-carousel-frame::after {
+    bottom: 0;
+    background: linear-gradient(to top, var(--bg-color), var(--bg-color), transparent);
 }
 
 .vertical-carousel-wrapper::-webkit-scrollbar {
@@ -496,14 +515,14 @@ section.dashboard[id="browse-latest"] {
 ul.vertical-carousel {
     display: flex;
     flex-direction: column;
-    gap: var(--cards-padding);
+    gap: calc(var(--cards-padding) * 0.75);
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
 ul.vertical-carousel li {
-    scroll-margin: var(--scroll-margin);
+    scroll-margin-top: var(--scroll-margin);
     scroll-snap-align: start;
     scroll-snap-stop: always;
 }
@@ -516,6 +535,7 @@ ul.vertical-carousel li:first-child {
 ul.vertical-carousel li:last-child {
     padding-bottom: var(--scroll-margin);
     scroll-margin: 0;
+    scroll-snap-align: end;
 }
 
 /* --- Horizontal carousel --- */
@@ -966,7 +986,7 @@ footer .footer-brand p {
 
     .flex-column:not(:last-child) {
         border-right: none;
-        border-bottom: 1px solid var(--accent-color);
+        border-bottom: 2px solid var(--accent-color);
         margin-right: 0;
         margin-bottom: 15px;
         padding-right: 0;
@@ -983,6 +1003,16 @@ footer .footer-brand p {
 
     .card-banner .preview-text {
         font-size: 0.85rem;
+    }
+
+    .card-banner .preview-container {
+        max-height: 10vw;
+        overflow-y: hidden;
+    }
+
+    .card-banner .preview-text {
+        max-height: 10vw;
+        background-image: linear-gradient(to bottom, #000000, rgba(0, 0, 0, 0));
     }
 
     footer .footer-links {
@@ -1063,6 +1093,10 @@ footer .footer-brand p {
 
     ul.carousel li {
         flex: 0 0 clamp(280px, 90vw, 500px);
+    }
+
+    .card-banner .preview-container {
+        display: none;
     }
 
     .carousel-wrapper {
