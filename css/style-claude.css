@@ -175,6 +175,7 @@ hgroup.title {
     align-items: center;
     user-select: none;
     gap: 10px;
+    top: 0;
 }
 
 hgroup.title h1 {
@@ -195,6 +196,7 @@ hgroup.title p {
 form.search-bar {
     display: flex;
     gap: 10px;
+    position: sticky;
 }
 
 form.search-bar.mini {
@@ -313,6 +315,7 @@ section.dashboard[id="browse-latest"] {
 .preview-container {
     box-sizing: content-box;
     margin: 4px 0;
+    height: 100%;
 }
 
 
