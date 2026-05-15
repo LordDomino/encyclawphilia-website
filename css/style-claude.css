@@ -113,6 +113,7 @@ h1 {
 }
 
 h2 {
+   /* Header 2 */
     font-family: "Besley";
     font-size: clamp(1.5rem, 2rem, 3rem);
     font-weight: 650;
