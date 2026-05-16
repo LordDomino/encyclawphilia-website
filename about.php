@@ -1,28 +1,16 @@
+<?php
+$pageTitle = "About EncycLawPhilia Valenzuela";
+$currentPage = "about";
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EncycLawPhilia | Valenzuela</title>
-    <link rel="stylesheet" href="css/style-claude.css">
-</head>
+<?php require_once 'fragments/head.php'; ?>
 
 <body>
-    <header class="site-header">
-        <div class="header-content">
-            <div class="brand-title">
-                <h1>EncycLawPhilia | <span class="title-city">Valenzuela</span></h1>
-            </div>
-            <nav class="main-nav">
-                <a href="index.html">Home</a>
-                <a href="#browse-latest">Latest</a>
-                <a href="browse.html">Ordinances</a>
-                <a href="#about-us">About</a>
-                <a href="#contact">Contact</a>
-            </nav>
-        </div>
-    </header>
+    <?php require_once 'fragments/header.php'; ?>
+
     <main class="about-page">
         <div class="subhero">
             <h1>About EncycLawPhilia</h1>
@@ -142,35 +130,7 @@
         </section>
     </main>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-brand">
-                <div class="brand-title">
-                    <h2>EncycLawPhilia | <span class="title-city">Valenzuela</span></h2>
-                </div>
-                <p>Essential references for Valenzuela’s city ordinance portal, with fast access to About Us, policy
-                    browsing, and contact lines.</p>
-            </div>
-            <div class="footer-links">
-                <div class="footer-column">
-                    <h3>About</h3>
-                    <a href="#about-us">About Us</a>
-                    <a href="#mission">Our Mission</a>
-                </div>
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <a href="#browse-latest">Latest Ordinances</a>
-                    <a href="#browse-category">Browse by Category</a>
-                </div>
-                <div class="footer-column">
-                    <h3>Contact</h3>
-                    <a href="mailto:info@encyclawphilia.local">info@encyclawphilia.local</a>
-                    <a href="tel:+63212345678">+63 2 1234 5678</a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-note">© 2026 EncycLawPhilia. All rights reserved.</div>
-    </footer>
+    <?php require_once 'fragments/footer.php'; ?>
 </body>
 
 </html>

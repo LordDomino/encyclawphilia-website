@@ -922,7 +922,7 @@ ul.carousel li {
     align-items: center;
 }
 
-.site-header#home-header {
+body.home .site-header {
     /* Link the animation to the document scroll progress */
     animation-name: headerFade;
     animation-timing-function: linear;

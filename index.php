@@ -1,28 +1,16 @@
+<?php
+$pageTitle = "EncycLawPhilia Valenzuela";
+$currentPage = "home";
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EncycLawPhilia | Valenzuela</title>
-    <link rel="stylesheet" href="css/style-claude.css">
-</head>
+<?php require_once 'fragments/head.php'; ?>
 
-<body>
-    <header class="site-header" id="home-header">
-        <div class="header-content">
-            <div class="brand-title">
-                <h1>EncycLawPhilia | <span class="title-city">Valenzuela</span></h1>
-            </div>
-            <nav class="main-nav">
-                <a href="index.html">Home</a>
-                <a href="#browse-latest">Latest</a>
-                <a href="browse.html">Ordinances</a>
-                <a href="about.html">About</a>
-                <a href="#contact">Contact</a>
-            </nav>
-        </div>
-    </header>
+<body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'generic-view'; ?>">
+    <?php require_once 'fragments/header.php'; ?>
+    
     <search>
         <hgroup class="title">
             <div class="brand-title">
@@ -553,7 +541,7 @@
 
     </main>
 
-    <?php require 'fragments/footer.php'; ?>
+    <?php require_once 'fragments/footer.php'; ?>
 </body>
 
 </html>
