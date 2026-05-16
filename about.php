@@ -1,12 +1,9 @@
 <?php
 $pageTitle = "About EncycLawPhilia Valenzuela";
 $currentPage = "about";
+
+require_once 'fragments/head.php';
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<?php require_once 'fragments/head.php'; ?>
 
 <body>
     <?php require_once 'fragments/header.php'; ?>
@@ -22,9 +19,9 @@ $currentPage = "about";
                 <div class="mission-content">
                     <h2>Our Mission</h2>
                     <p>
-                        EncycLawPhilia is dedicated to democratizing access to Valenzuela City's legislative information. 
-                        We believe that an informed citizenry is essential for a functioning democracy. Our platform 
-                        provides residents, businesses, and government officials with a centralized, searchable repository 
+                        EncycLawPhilia is dedicated to democratizing access to Valenzuela City's legislative information.
+                        We believe that an informed citizenry is essential for a functioning democracy. Our platform
+                        provides residents, businesses, and government officials with a centralized, searchable repository
                         of city ordinances, making it easier to understand the rules and regulations that govern our community.
                     </p>
                 </div>
@@ -63,31 +60,31 @@ $currentPage = "about";
                 <div class="feature-item">
                     <h3>Comprehensive Database</h3>
                     <p>
-                        Browse through thousands of ordinances organized by category, year, and status. 
-                        Our extensive database covers Traffic & Transportation, Health & Sanitation, 
+                        Browse through thousands of ordinances organized by category, year, and status.
+                        Our extensive database covers Traffic & Transportation, Health & Sanitation,
                         Public Safety, Environment & Zoning, and more.
                     </p>
                 </div>
                 <div class="feature-item">
                     <h3>Advanced Search</h3>
                     <p>
-                        Use our powerful search functionality to quickly locate ordinances by keyword, 
-                        ordinance number, or date. Filter results by category, year, and status to narrow 
+                        Use our powerful search functionality to quickly locate ordinances by keyword,
+                        ordinance number, or date. Filter results by category, year, and status to narrow
                         your search.
                     </p>
                 </div>
                 <div class="feature-item">
                     <h3>Latest Updates</h3>
                     <p>
-                        Stay informed about the most recent ordinances passed by the Valenzuela City Council. 
+                        Stay informed about the most recent ordinances passed by the Valenzuela City Council.
                         Our homepage features the latest ordinances and highlights important legislative updates.
                     </p>
                 </div>
                 <div class="feature-item">
                     <h3>Easy Navigation</h3>
                     <p>
-                        Whether you're looking for information about traffic regulations, environmental 
-                        policies, or public safety measures, our intuitive interface makes finding what you 
+                        Whether you're looking for information about traffic regulations, environmental
+                        policies, or public safety measures, our intuitive interface makes finding what you
                         need simple and straightforward.
                     </p>
                 </div>

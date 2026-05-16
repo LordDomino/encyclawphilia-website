@@ -1,12 +1,9 @@
 <?php
 $pageTitle = "Browse | EncycLawPhilia Valenzuela";
 $currentPage = "browse";
+
+require_once 'fragments/head.php';
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<?php require_once 'fragments/head.php'; ?>
 
 <body>
     <?php require_once 'fragments/header.php'; ?>
@@ -15,7 +12,7 @@ $currentPage = "browse";
         <div class="subhero" id="browse-subhero">
             <div class="subhero-content">
                 <h1>Valenzuela City Ordinances</h1>
-                <p>Browse the latest Valenzuela City Ordinances</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque libero diam, imperdiet id leo eu, rutrum elementum orci. Sed eu odio mi. Vivamus porta nunc vitae facilisis aliquet. Sed pellentesque cursus massa, non lacinia odio mollis quis. Ut maximus, nisl id luctus placerat, neque mauris vehicula tortor, a condimentum metus velit at velit. Pellentesque nisl ex, luctus non sollicitudin a, varius efficitur turpis. Quisque nec neque commodo, aliquam odio sit amet, vestibulum nisl. Donec non arcu risus. Donec faucibus aliquam pharetra. Donec tellus erat, viverra feugiat turpis vitae, sodales dignissim erat. In tincidunt nibh eget gravida tincidunt. Mauris vitae ipsum lectus. Nulla cursus, ipsum tincidunt vestibulum facilisis, lorem ex iaculis libero, non tempus purus ligula et augue. Mauris fermentum ligula ac dolor placerat porta. Morbi et rhoncus tortor.</p>
             </div>
         </div>
         <div class="active-filters" id="active-filters" style="display: none;">

@@ -1,16 +1,13 @@
 <?php
 $pageTitle = "EncycLawPhilia Valenzuela";
 $currentPage = "home";
+
+require_once 'fragments/head.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<?php require_once 'fragments/head.php'; ?>
-
-<body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'generic-view'; ?>">
+<body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>">
     <?php require_once 'fragments/header.php'; ?>
-    
+
     <search>
         <hgroup class="title">
             <div class="brand-title">
@@ -23,8 +20,7 @@ $currentPage = "home";
                 placeholder="Search..." name="q" />
         </form>
     </search>
-    <main class="homepage">
-
+    <main class="home">
         <section class="dashboard" id="browse-latest">
             <div class="flex-column" id="featured">
                 <h2>Featured</h2>
@@ -180,7 +176,6 @@ $currentPage = "home";
 
         <section class="dashboard" id="browse-category">
             <h1>Browse by Category</h1>
-            <!-- <p>Read more of the latest city ordinances in Valenzuela.</p> -->
             <h2>Traffic and Transportation</h2>
             <div class="carousel-wrapper">
                 <ul class="carousel">
@@ -543,5 +538,4 @@ $currentPage = "home";
 
     <?php require_once 'fragments/footer.php'; ?>
 </body>
-
 </html>
