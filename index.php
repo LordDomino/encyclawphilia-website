@@ -10,9 +10,7 @@ require_once 'fragments/head.php';
 
     <search>
         <hgroup class="title">
-            <div class="brand-title">
-                <h1>EncycLawPhilia | <span class="title-city">Valenzuela</span></h1>
-            </div>
+            <?php require_once 'fragments/brand_title.php';?>
             <p>Wisdom Beyond Law and Order</p>
         </hgroup>
         <form class="search-bar" action="browse.html" method="get">

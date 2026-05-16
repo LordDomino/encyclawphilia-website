@@ -7,7 +7,7 @@ require_once 'fragments/head.php';
 
 <body>
     <?php require_once 'fragments/header.php'; ?>
-
+    
     <main class="browse">
         <div class="subhero" id="browse-subhero">
             <div class="subhero-content">

@@ -1,9 +1,7 @@
 <footer>
     <div class="footer-content">
         <div class="footer-brand">
-            <div class="brand-title">
-                <h2>EncycLawPhilia | <span class="title-city">Valenzuela</span></h2>
-            </div>
+            <?php include 'fragments/brand_title.php'; ?>
             <p>Essential references for Valenzuela’s city ordinance portal, with fast access to About Us, policy
                 browsing, and contact lines.</p>
         </div>
