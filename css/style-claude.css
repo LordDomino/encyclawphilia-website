@@ -373,7 +373,9 @@ form.search-bar {
     display: flex;
     gap: 10px;
     position: sticky;
+}
 
+body.home form.search-bar {
     animation-name: heroContentBlur;
     animation-timing-function: linear;
     animation-fill-mode: both;
@@ -481,10 +483,12 @@ form.search-bar input[type="search"]:focus {
     background-color: var(--color-primary-bg);
     color: white;
     padding: var(--spacing-7xl) var(--padding-lg);
+    padding-top: calc(var(--header-height) + var(--spacing-7xl));
     box-shadow: none;
     height: var(--height);
     backdrop-filter: blur(var(--blur-lg));
     -webkit-backdrop-filter: blur(var(--blur-lg));
+    margin-top: calc(var(--header-height) * -1);
     border-bottom: var(--border-width-thin) solid rgba(125, 181, 255, var(--opacity-15));
 }
 

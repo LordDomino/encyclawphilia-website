@@ -13,7 +13,7 @@ require_once 'fragments/head.php';
             <?php require_once 'fragments/brand_title.php';?>
             <p>Wisdom Beyond Law and Order</p>
         </hgroup>
-        <form class="search-bar" action="browse.html" method="get">
+        <form class="search-bar" action="browse.php" method="get">
             <input aria-label="Search for city legislations" autocomplete="off" inputmode="search" type="search"
                 placeholder="Search..." name="q" />
         </form>
