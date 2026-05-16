@@ -84,7 +84,7 @@
     /* ========== COLORS ========== */
     --transparent: rgba(0, 0, 0, 0);
     --primary-color: #000A3C;
-    --primary-color-hover-glass: rgba(0, 11, 66, 0.85);
+    --primary-color-hover-glass: rgba(0, 11, 66, 0.9);
     --secondary-color: #7db5ff;
     --accent-color: #071E95;
     --bg-color: light-dark(#FFFFFF, var(--primary-color));
@@ -150,7 +150,7 @@
     --spacing-7xl: 50px;
 
     /* Layout Spacing */
-    --header-height: 80px;
+    --header-height: 60px;
     --sidebar-width: 30vw;
     --cards-padding: 20px;
     --content-side-padding: 10vw;
@@ -365,7 +365,7 @@ form.search-bar.mini {
 }
 
 form.search-bar input[type="search"] {
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--border-radius-lg);
     padding: var(--spacing-lg) var(--spacing-3xl);
     width: 50vw;
     max-width: 800px;
@@ -375,7 +375,9 @@ form.search-bar input[type="search"] {
     letter-spacing: 0.075rem;
     transition: all var(--transition-speed) ease;
     border: var(--border-width-thin) solid rgba(255, 255, 255, var(--opacity-30));
-    border-bottom: var(--border-width-normal) solid var(--search-border-btm);
+    border-bottom-style: solid;
+    border-bottom-color: var(--search-border-btm);
+    border-bottom-width: var(--border-width-normal);
     background-color: rgba(255, 255, 255, var(--opacity-08));
     backdrop-filter: blur(var(--blur-md));
     -webkit-backdrop-filter: blur(var(--blur-md));
@@ -385,7 +387,7 @@ form.search-bar input[type="search"] {
 form.search-bar input[type="search"]:focus {
     outline: none;
     background-color: rgba(255, 255, 255, var(--opacity-15));
-    border: var(--border-width-thin) solid rgba(255, 255, 255, var(--opacity-50));
+    border-color: rgba(255, 255, 255, var(--opacity-50));
     box-shadow: 0 0 20px rgba(125, 181, 255, var(--opacity-20));
 }
 
@@ -863,7 +865,7 @@ section.browse {
     font-family: "Lexend", "Times New Roman", serif;
     font-size: var(--font-size-md);
     text-align: left;
-    border: var(--border-width-normal) solid rgba(125, 181, 255, var(--opacity-35));
+    border: var(--border-width-normal) solid rgba(125, 181, 255, var(--opacity-50));
     border-radius: var(--border-radius-lg);
     background: rgba(255, 255, 255, var(--opacity-02));
     backdrop-filter: blur(var(--blur-md));
@@ -1091,7 +1093,7 @@ ul.carousel {
 
 ul.carousel li {
     flex: 0 0 clamp(300px, 25vw, 500px);
-    padding: var(--cards-padding);
+    padding: calc(var(--cards-padding) * 0.75);
     scroll-snap-align: start;
     scroll-snap-stop: always;
     display: flex;
