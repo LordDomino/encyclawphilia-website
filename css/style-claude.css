@@ -113,6 +113,7 @@ h1 {
 }
 
 h2 {
+   /* Header 2 */
     font-family: "Besley";
     font-size: clamp(1.5rem, 2rem, 3rem);
     font-weight: 650;
@@ -2178,70 +2179,5 @@ main.about-page {
     .footer-note {
         font-size: 0.75rem;
         margin-top: 20px;
-    }
-
-    /* About page responsive mobile small */
-    .about-mission {
-        padding: 30px 12px;
-    }
-
-    .mission-content h2 {
-        font-size: 1.3rem;
-    }
-
-    .mission-content p {
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
-
-    .about-values h2,
-    .about-features h2,
-    .about-how-to h2 {
-        font-size: 1.3rem;
-        margin-bottom: 25px;
-    }
-
-    .values-grid,
-    .features-container,
-    .steps-container {
-        gap: 12px;
-    }
-
-    .value-card,
-    .feature-item,
-    .step {
-        padding: 15px 12px;
-    }
-
-    .value-card h3,
-    .feature-item h3,
-    .step h3 {
-        font-size: 1rem;
-    }
-
-    .value-icon {
-        font-size: 2rem;
-        margin-bottom: 10px;
-    }
-
-    .step-number {
-        width: 40px;
-        height: 40px;
-        font-size: 1.4rem;
-        margin-bottom: 12px;
-    }
-
-    .about-cta {
-        padding: 35px 12px;
-    }
-
-    .about-cta h3 {
-        font-size: 1.2rem;
-        margin-bottom: 12px;
-    }
-
-    .about-cta p {
-        font-size: 0.9rem;
-        margin-bottom: 25px;
     }
 }
