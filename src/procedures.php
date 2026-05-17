@@ -247,3 +247,71 @@ function getOrdinancesByTitle(PDO $pdo, string $searchKeyword): array
         throw $e;
     }
 }
+
+/**
+ * Retrieves the 20 most recent ordinances that are neither archived nor future-dated,
+ * along with their lifetime metric aggregates.
+ *
+ * @param PDO $pdo An active, authenticated database connection.
+ * @return array   A multi-dimensional array of normalized ordinance records.
+ * @throws PDOException If a structural database engine failure occurs.
+ */
+function getRecentOrdinances(PDO $pdo): array
+{
+    $sql = "
+        SELECT
+            o.ordinance_id,
+            REGEXP_REPLACE(o.ordinance_number, '[^0-9]', '') AS ordinance_number,
+            o.series_year,
+            DATE_FORMAT(o.date_enacted, '%d') AS enactment_day,
+            DATE_FORMAT(o.date_enacted, '%M') AS enactment_month,
+            DATE_FORMAT(o.date_enacted, '%Y') AS enactment_year,
+            o.title,
+            COALESCE(SUM(CASE WHEN rt.reaction_type = 'Like' THEN 1 ELSE 0 END), 0) AS like_count,
+            COALESCE(SUM(CASE WHEN rt.reaction_type = 'Dislike' THEN 1 ELSE 0 END), 0) AS dislike_count
+        FROM Ordinances o
+        LEFT JOIN Ordinance_Reactions orr ON orr.ordinance_id = o.ordinance_id
+        LEFT JOIN Reaction_Types rt ON rt.reaction_type_id = orr.reaction_type_id
+        WHERE o.deleted_at IS NULL
+          AND o.date_enacted IS NOT NULL
+          AND o.date_enacted <= NOW()
+        GROUP BY
+            o.ordinance_id,
+            o.ordinance_number,
+            o.series_year,
+            o.date_enacted,
+            o.title
+        ORDER BY 
+            o.date_enacted DESC,
+            o.ordinance_id DESC
+        LIMIT 20;
+    ";
+
+    try {
+        // Utilizing direct execution since no external user input requires parameter binding
+        $stmt = $pdo->query($sql);
+        $rawResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $normalizedResults = [];
+        foreach ($rawResults as $row) {
+            $normalizedResults[] = [
+                'ordinance_id'     => (int)$row['ordinance_id'],
+                'ordinance_number' => $row['ordinance_number'], // Preserved as string to handle leading zeros
+                'series_year'      => (int)$row['series_year'],
+                'enactment_day'    => (int)$row['enactment_day'],
+                'enactment_month'  => $row['enactment_month'],
+                'enactment_year'   => (int)$row['enactment_year'],
+                'title'            => $row['title'],
+                'like_count'       => (int)$row['like_count'],
+                'dislike_count'    => (int)$row['dislike_count']
+            ];
+        }
+
+        return $normalizedResults;
+
+    } catch (PDOException $e) {
+        // Log query state tracking locally for maintenance forensics
+        error_log("Database execution error within getRecentOrdinances: " . $e->getMessage());
+        throw $e;
+    }
+}

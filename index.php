@@ -2,6 +2,7 @@
 
 // Import structural dependencies
 require_once 'config/database.php';
+require_once 'src/procedures.php';
 
 // Phase 1: Ingestion and State Management
 $search_keyword      = isset($_GET['q']) ? trim($_GET['q']) : '';
@@ -12,14 +13,13 @@ $results_latest      = [];
 // Phase 2: Delegating Database Interrogation
 // These procedures take no parameters and always run on page load.
 $pdo = getDatabaseConnection();
-
-$stmt = $pdo->prepare("CALL sp_GetTrendingOrdinance()");
-$stmt->execute();
-$featured_ordinance = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
-
-$stmt = $pdo->prepare("CALL sp_GetRecentOrdinances()");
-$stmt->execute();
-$results_latest = $stmt->fetchAll(PDO::FETCH_ASSOC);
+/* 
+ * Refactored: Replaced 'CALL GetOrdinancesByTitle(:key)' statement compilation 
+ * with an explicit application routine invocation. The connection state ($pdo)
+ * is passed into the function context directly.
+ */
+$featured_ordinance = getTrendingOrdinance($pdo);
+$results_latest = getRecentOrdinances($pdo);
 
 // Debug output — remove before deploying to production
 echo "<script>console.log(" . json_encode($featured_ordinance) . ");</script>";
