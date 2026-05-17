@@ -7,7 +7,7 @@ require_once 'fragments/head.php';
 
 <body>
     <?php require_once 'fragments/header.php'; ?>
-    
+
     <main class="browse">
         <div class="subhero" id="browse-subhero">
             <div class="subhero-content">
@@ -76,70 +76,264 @@ require_once 'fragments/head.php';
                     <span class="result-count" id="result-count">(4 results)</span>
                 </div>
                 <div class="flex-grid" id="results-grid">
-                    <div class="content-card fixed">
+                    <div class="content-card">
                         <div class="content-card-header">
-                            <div class="card-title">City Ordinance<br /><span class="numeral-and-series">No. 3749 s.
-                                    2026</span></div>
-                            <div class="date">10 April 2026</div>
+                            <div class="card-label-group">
+                                <span class="card-type">City Ordinance</span>
+                                <span class="numeral-and-series">No. 3749 s. 2026</span>
+                            </div>
+                            <div class="date">
+                                <span class="date-day">10</span>
+                                <div class="date-meta">
+                                    <span class="date-month">April</span>
+                                    <span class="date-year">2026</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="preview-container">
                             <div class="preview-text">
-                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT SYSTEM IN HIGH-DENSITY
-                                AREAS OF VALENZUELA CITY, INCLUDING THE INSTALLATION OF TRAFFIC LIGHTS, PEDESTRIAN
-                                CROSSINGS, AND PARKING REGULATIONS TO IMPROVE ROAD SAFETY.
+                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
+                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
                             </div>
                         </div>
-                        <a href="results.html?q=Traffic%20Management">
-                            <p class="link">Read More</p>
-                        </a>
+                        <div class="card-footer">
+                            <div class="card-engagement">
+                                <span class="engagement-item likes">
+                                    <span class="engagement-icon">▲</span>
+                                    <span class="engagement-count">24</span>
+                                </span>
+                                <span class="engagement-divider"></span>
+                                <span class="engagement-item dislikes">
+                                    <span class="engagement-icon">▼</span>
+                                    <span class="engagement-count">3</span>
+                                </span>
+                            </div>
+                            <a href="ordinance.php?id=...">
+                                <p class="link">Read More</p>
+                            </a>
+                        </div>
                     </div>
-                    <div class="content-card fixed">
+                    <div class="content-card">
                         <div class="content-card-header">
-                            <div class="card-title">City Ordinance<br /><span class="numeral-and-series">No. 3751 s.
-                                    2026</span></div>
-                            <div class="date">12 April 2026</div>
+                            <div class="card-label-group">
+                                <span class="card-type">City Ordinance</span>
+                                <span class="numeral-and-series">No. 3749 s. 2026</span>
+                            </div>
+                            <div class="date">
+                                <span class="date-day">10</span>
+                                <div class="date-meta">
+                                    <span class="date-month">April</span>
+                                    <span class="date-year">2026</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="preview-container">
                             <div class="preview-text">
-                                AN ORDINANCE REGULATING THE PARKING OF MOTORCYCLES AND BICYCLES IN PUBLIC AREAS,
-                                ESTABLISHING DESIGNATED PARKING ZONES, AND IMPOSING FEES FOR PARKING VIOLATIONS.
+                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
+                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
                             </div>
                         </div>
-                        <a href="results.html?q=Parking">
-                            <p class="link">Read More</p>
-                        </a>
+                        <div class="card-footer">
+                            <div class="card-engagement">
+                                <span class="engagement-item likes">
+                                    <span class="engagement-icon">▲</span>
+                                    <span class="engagement-count">24</span>
+                                </span>
+                                <span class="engagement-divider"></span>
+                                <span class="engagement-item dislikes">
+                                    <span class="engagement-icon">▼</span>
+                                    <span class="engagement-count">3</span>
+                                </span>
+                            </div>
+                            <a href="ordinance.php?id=...">
+                                <p class="link">Read More</p>
+                            </a>
+                        </div>
                     </div>
-                    <div class="content-card fixed">
+                    <div class="content-card">
                         <div class="content-card-header">
-                            <div class="card-title">City Ordinance<br /><span class="numeral-and-series">No. 3751 s.
-                                    2026</span></div>
-                            <div class="date">12 April 2026</div>
+                            <div class="card-label-group">
+                                <span class="card-type">City Ordinance</span>
+                                <span class="numeral-and-series">No. 3749 s. 2026</span>
+                            </div>
+                            <div class="date">
+                                <span class="date-day">10</span>
+                                <div class="date-meta">
+                                    <span class="date-month">April</span>
+                                    <span class="date-year">2026</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="preview-container">
                             <div class="preview-text">
-                                AN ORDINANCE REGULATING THE PARKING OF MOTORCYCLES AND BICYCLES IN PUBLIC AREAS,
-                                ESTABLISHING DESIGNATED PARKING ZONES, AND IMPOSING FEES FOR PARKING VIOLATIONS.
+                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
+                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
                             </div>
                         </div>
-                        <a href="results.html?q=Parking">
-                            <p class="link">Read More</p>
-                        </a>
+                        <div class="card-footer">
+                            <div class="card-engagement">
+                                <span class="engagement-item likes">
+                                    <span class="engagement-icon">▲</span>
+                                    <span class="engagement-count">24</span>
+                                </span>
+                                <span class="engagement-divider"></span>
+                                <span class="engagement-item dislikes">
+                                    <span class="engagement-icon">▼</span>
+                                    <span class="engagement-count">3</span>
+                                </span>
+                            </div>
+                            <a href="ordinance.php?id=...">
+                                <p class="link">Read More</p>
+                            </a>
+                        </div>
                     </div>
-                    <div class="content-card fixed">
+                    <div class="content-card">
                         <div class="content-card-header">
-                            <div class="card-title">City Ordinance<br /><span class="numeral-and-series">No. 3751 s.
-                                    2026</span></div>
-                            <div class="date">12 April 2026</div>
+                            <div class="card-label-group">
+                                <span class="card-type">City Ordinance</span>
+                                <span class="numeral-and-series">No. 3749 s. 2026</span>
+                            </div>
+                            <div class="date">
+                                <span class="date-day">10</span>
+                                <div class="date-meta">
+                                    <span class="date-month">April</span>
+                                    <span class="date-year">2026</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="preview-container">
                             <div class="preview-text">
-                                AN ORDINANCE REGULATING THE PARKING OF MOTORCYCLES AND BICYCLES IN PUBLIC AREAS,
-                                ESTABLISHING DESIGNATED PARKING ZONES, AND IMPOSING FEES FOR PARKING VIOLATIONS.
+                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
+                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
                             </div>
                         </div>
-                        <a href="results.html?q=Parking">
-                            <p class="link">Read More</p>
-                        </a>
+                        <div class="card-footer">
+                            <div class="card-engagement">
+                                <span class="engagement-item likes">
+                                    <span class="engagement-icon">▲</span>
+                                    <span class="engagement-count">24</span>
+                                </span>
+                                <span class="engagement-divider"></span>
+                                <span class="engagement-item dislikes">
+                                    <span class="engagement-icon">▼</span>
+                                    <span class="engagement-count">3</span>
+                                </span>
+                            </div>
+                            <a href="ordinance.php?id=...">
+                                <p class="link">Read More</p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <div class="card-label-group">
+                                <span class="card-type">City Ordinance</span>
+                                <span class="numeral-and-series">No. 3749 s. 2026</span>
+                            </div>
+                            <div class="date">
+                                <span class="date-day">10</span>
+                                <div class="date-meta">
+                                    <span class="date-month">April</span>
+                                    <span class="date-year">2026</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="preview-container">
+                            <div class="preview-text">
+                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
+                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-engagement">
+                                <span class="engagement-item likes">
+                                    <span class="engagement-icon">▲</span>
+                                    <span class="engagement-count">24</span>
+                                </span>
+                                <span class="engagement-divider"></span>
+                                <span class="engagement-item dislikes">
+                                    <span class="engagement-icon">▼</span>
+                                    <span class="engagement-count">3</span>
+                                </span>
+                            </div>
+                            <a href="ordinance.php?id=...">
+                                <p class="link">Read More</p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <div class="card-label-group">
+                                <span class="card-type">City Ordinance</span>
+                                <span class="numeral-and-series">No. 3749 s. 2026</span>
+                            </div>
+                            <div class="date">
+                                <span class="date-day">10</span>
+                                <div class="date-meta">
+                                    <span class="date-month">April</span>
+                                    <span class="date-year">2026</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="preview-container">
+                            <div class="preview-text">
+                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
+                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-engagement">
+                                <span class="engagement-item likes">
+                                    <span class="engagement-icon">▲</span>
+                                    <span class="engagement-count">24</span>
+                                </span>
+                                <span class="engagement-divider"></span>
+                                <span class="engagement-item dislikes">
+                                    <span class="engagement-icon">▼</span>
+                                    <span class="engagement-count">3</span>
+                                </span>
+                            </div>
+                            <a href="ordinance.php?id=...">
+                                <p class="link">Read More</p>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <div class="card-label-group">
+                                <span class="card-type">City Ordinance</span>
+                                <span class="numeral-and-series">No. 3749 s. 2026</span>
+                            </div>
+                            <div class="date">
+                                <span class="date-day">10</span>
+                                <div class="date-meta">
+                                    <span class="date-month">April</span>
+                                    <span class="date-year">2026</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="preview-container">
+                            <div class="preview-text">
+                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
+                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-engagement">
+                                <span class="engagement-item likes">
+                                    <span class="engagement-icon">▲</span>
+                                    <span class="engagement-count">24</span>
+                                </span>
+                                <span class="engagement-divider"></span>
+                                <span class="engagement-item dislikes">
+                                    <span class="engagement-icon">▼</span>
+                                    <span class="engagement-count">3</span>
+                                </span>
+                            </div>
+                            <a href="ordinance.php?id=...">
+                                <p class="link">Read More</p>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>

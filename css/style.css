@@ -82,15 +82,15 @@
     --font-size-7xl: 3rem;
 
     /* ========== COLORS ========== */
-    --color-primary:        #0e004d;
-    --color-secondary:      #4c9aff;
-    --color-accent1:        #071e95;
+    --color-primary: #0e004d;
+    --color-secondary: #4c9aff;
+    --color-accent1: #071e95;
     --bg-color: light-dark(#FFFFFF, var(--color-primary));
-    --color-text:           #333333;
-    --text-light:           #666666;
-    --text-lighter:         #888888;
-    --white:                #FFFFFF;
-    --black:                #000000;
+    --color-text: #333333;
+    --text-light: #666666;
+    --text-lighter: #888888;
+    --white: #FFFFFF;
+    --black: #000000;
 
     /* Transparent variants */
     --color-primary-bg-transparent: rgba(from var(--color-primary) r g b / var(--opacity-90));
@@ -753,8 +753,66 @@ section.browse {
     animation: none;
 }
 
-.content-card.animate-in {
-    /* animation: fadeInScale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; */
+/* ============================================================
+   CARD ENGAGEMENT BAR
+   ============================================================ */
+
+.card-engagement {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-md) 0;
+    border-top: var(--border-width-thin) solid rgba(0, 10, 60, 0.1);
+    margin-top: auto;
+}
+
+.engagement-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-family: var(--font-link);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.04rem;
+    transition: color var(--transition-duration) var(--transition-easing);
+}
+
+.engagement-item.likes {
+    color: var(--color-accent1);
+}
+
+.engagement-item.dislikes {
+    color: var(--text-lighter);
+}
+
+.engagement-icon {
+    font-size: 0.65rem;
+    line-height: 1;
+    opacity: 0.75;
+}
+
+.engagement-count {
+    font-size: var(--font-size-sm);
+}
+
+.engagement-divider {
+    width: var(--border-width-thin);
+    height: 1rem;
+    background-color: rgba(0, 10, 60, 0.15);
+    flex-shrink: 0;
+}
+
+/* Subtle highlight on card hover, inheriting from parent */
+.content-card:hover .engagement-item.likes {
+    color: var(--color-primary);
+}
+
+.content-card:hover .engagement-item.dislikes {
+    color: var(--text-light);
+}
+
+.content-card:hover .card-engagement {
+    border-top-color: rgba(0, 10, 60, 0.18);
 }
 
 /* Back-to-top button */
@@ -843,38 +901,160 @@ section.browse {
    CARD SHARED STYLES
    ============================================================ */
 
-.card-title {
-    margin: 0;
-    padding: 0;
+/* --- Shared: date drop-cap treatment --- */
+
+.date {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.date-day {
+    font-family: "Playfair Display";
+    /* font-style: italic; */
+    font-weight: 700;
+    font-size: 2.8rem;
+    line-height: 1;
+    color: var(--color-primary);
+    letter-spacing: -0.04rem;
+}
+
+.date-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding-bottom: 3px;
+}
+
+.date-month {
+    font-family: "Besley";
+    font-style: italic;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14rem;
+    color: var(--color-primary);
+    line-height: 1.3;
+}
+
+.date-year {
+    font-family: "Lexend";
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--text-lighter);
+    letter-spacing: 0.06rem;
+    line-height: 1.3;
+}
+
+/* --- Shared: card label group --- */
+
+.card-label-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-width: 0;
+}
+
+.card-type {
     font-family: "Lexend Exa";
-    font-weight: 500;
-    font-size: 1.5rem;
-    letter-spacing: 0.15rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18rem;
+    color: var(--color-primary);
+    opacity: 0.55;
+    line-height: 1;
+}
+
+.card-label-group .numeral-and-series {
+    font-family: "Besley";
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: -0.01rem;
+    line-height: 1.1;
     color: var(--color-primary);
 }
 
-.card-title span.numeral-and-series {
+/* --- Shared: card-title (legacy alias) --- */
+
+.card-title {
+    margin: 0;
+    padding: 0;
+    font-family: "Besley";
     font-weight: 700;
-    letter-spacing: 0;
+    font-size: 1.3rem;
+    color: var(--color-primary);
 }
 
-.card-header {
+/* --- Shared: card header rule --- */
+
+.card-header,
+.content-card-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #000000;
-    padding-bottom: 4px;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: var(--border-width-thin) solid rgba(125, 181, 255, var(--opacity-30));
 }
 
-.date {
-    font-weight: 500;
-    font-size: 1.25rem;
-}
+/* --- Shared: preview container --- */
 
 .preview-container {
     box-sizing: content-box;
-    margin: var(--spacing-sm) 0;
-    height: 100%;
+    flex: 1;
+}
+
+/* --- Shared: card footer (engagement + read more) --- */
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--spacing-lg);
+    border-top: var(--border-width-thin) solid rgba(125, 181, 255, var(--opacity-20));
+    margin-top: auto;
+    gap: var(--spacing-md);
+}
+
+.card-engagement {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xl);
+}
+
+.engagement-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-family: "Lexend Exa";
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05rem;
+    transition: color var(--transition-duration) var(--transition-easing);
+}
+
+.engagement-item.likes    { color: var(--color-accent1); }
+.engagement-item.dislikes { color: var(--text-lighter); }
+
+.engagement-icon {
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.engagement-divider {
+    width: var(--border-width-thin);
+    height: 1rem;
+    background-color: rgba(125, 181, 255, var(--opacity-40));
+    flex-shrink: 0;
+}
+
+.card-footer p.link {
+    margin: 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.2rem;
 }
 
 
@@ -886,14 +1066,9 @@ section.browse {
     padding: var(--spacing-6xl);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
     gap: var(--spacing-lg);
-    font-family: "Lexend", "Times New Roman", serif;
-    border-width: var(--border-width-thick);
-    border-color: rgba(7, 30, 149, var(--opacity-40));
-    border-top-style: solid;
-    border-bottom-style: solid;
+    font-family: "Lexend", serif;
+    border: var(--border-width-normal) solid rgba(125, 181, 255, var(--opacity-50));
     border-radius: var(--border-radius-xl);
     background: linear-gradient(135deg, rgba(208, 228, 255, var(--opacity-08)) 0%, rgba(0, 96, 223, var(--opacity-10)) 100%);
     backdrop-filter: blur(var(--blur-lg));
@@ -902,20 +1077,31 @@ section.browse {
 }
 
 .card-featured:hover {
-    border-color: rgba(125, 181, 255, var(--opacity-60));
-    background: linear-gradient(135deg, rgba(208, 228, 255, var(--opacity-12)) 0%, rgba(0, 96, 223, var(--opacity-15)) 100%);
+    border-color: rgba(125, 181, 255, var(--opacity-70));
     box-shadow: var(--shadow-glass-xl);
     transform: translateY(calc(var(--spacing-md) * -1));
 }
 
-.card-featured .card-title {
-    text-align: center;
+.card-featured .card-type      { color: rgba(125, 181, 255, 0.78); opacity: 1; }
+.card-featured .numeral-and-series { color: var(--text-color); font-size: 1.6rem; }
+.card-featured .date-day       { color: var(--text-color); font-size: 3.4rem; }
+.card-featured .date-month     { color: var(--text-color); }
+.card-featured .date-year      { color: var(--text-color); }
+
+.card-featured .preview-text {
+    overflow-y: hidden;
+    font-size: 0.9rem;
+    font-weight: 350;
+    background-image: linear-gradient(to bottom, var(--text-color), rgba(255, 255, 255, 0));
+    background-clip: text;
+    -webkit-background-clip: text;
 }
 
-.card-featured .card-title span.numeral-and-series {
-    font-size: 2rem;
-}
-
+.card-featured .card-footer    { border-top-color: rgba(125, 181, 255, var(--opacity-20)); }
+.card-featured .engagement-item.likes    { color: var(--color-secondary); }
+.card-featured .engagement-item.dislikes { color: var(--color-secondary); }
+.card-featured .engagement-divider       { background-color: var(--color-primary); }
+.card-featured p.link                    { color: var(--color-secondary); }
 
 /* ============================================================
    BANNER CARD (vertical carousel items)
@@ -925,11 +1111,11 @@ section.browse {
     padding: var(--spacing-lg) var(--spacing-3xl);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    font-family: "Lexend", "Times New Roman", serif;
+    gap: var(--spacing-md);
+    font-family: "Lexend", serif;
     font-size: var(--font-size-md);
     text-align: left;
-    border: var(--border-width-normal) solid rgba(125, 181, 255, var(--opacity-50));
+    border: var(--border-width-normal) solid var(--color-secondary);
     border-radius: var(--border-radius-lg);
     background: rgba(255, 255, 255, var(--opacity-02));
     backdrop-filter: blur(var(--blur-md));
@@ -938,30 +1124,38 @@ section.browse {
 }
 
 .card-banner:hover {
-    border-color: rgba(125, 181, 255, var(--opacity-60));
+    border-color: rgba(125, 181, 255, var(--opacity-70));
     background: rgba(255, 255, 255, var(--opacity-05));
     box-shadow: var(--shadow-glass-lg);
     transform: translateX(var(--spacing-md));
 }
 
-.card-banner .card-header * {
-    font-size: 1.25rem;
-}
+.card-banner .card-type        { color: var(--color-secondary); opacity: 1; }
+.card-banner .numeral-and-series { color: var(--color-primary); }
+.card-banner .date-day         { color: var(--color-primary); opacity: 0.88; }
+.card-banner .date-month       { color: var(--color-primary); }
+.card-banner .date-year        { color: var(--color-primary); }
 
 .card-banner .preview-text {
     overflow-y: hidden;
     font-size: 0.9rem;
     font-weight: 350;
-    background-image: linear-gradient(to bottom, #000000, #000000, rgba(0, 0, 0, 0));
+    background-image: linear-gradient(to bottom, var(--color-primary), rgba(255, 255, 255, 0));
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
+    max-height: 60px;
 }
 
+.card-banner .card-footer      { border-top-color: rgba(125, 181, 255, var(--opacity-18)); }
+.card-banner .engagement-item.likes    { color: var(--color-secondary); }
+.card-banner .engagement-item.dislikes { color: var(--color-primary); }
+.card-banner .engagement-divider       { background-color: rgba(255, 255, 255, 0.22); }
+.card-banner p.link                    { color: var(--color-secondary); }
 
 /* ============================================================
-   CONTENT CARD (horizontal category carousels)
+   CONTENT CARD (horizontal category carousels + browse grid)
    ============================================================ */
 
 .content-card {
@@ -971,7 +1165,7 @@ section.browse {
     flex-direction: column;
     justify-content: space-between;
     gap: var(--spacing-lg);
-    font-family: "Lexend", "Times New Roman", serif;
+    font-family: "Lexend", serif;
     font-size: var(--font-size-md);
     text-align: left;
     border: var(--border-width-normal) solid rgba(125, 181, 255, var(--opacity-75));
@@ -984,45 +1178,27 @@ section.browse {
 }
 
 .content-card:hover {
-    border-color: rgba(125, 181, 255, var(--opacity-50));
-    background: linear-gradient(135deg, rgba(255, 255, 255, var(--opacity-80)) 0%, rgba(255, 255, 255, var(--opacity-70)) 100%);
+    border-color: rgba(125, 181, 255, var(--opacity-55));
+    background: linear-gradient(135deg, rgba(255, 255, 255, var(--opacity-82)) 0%, rgba(255, 255, 255, var(--opacity-72)) 100%);
     box-shadow: var(--shadow-glass-lg);
     transform: translateY(calc(var(--spacing-md) * -1));
 }
 
-.content-card h2 {
-    margin: 0;
-    padding: 0;
-    font-family: "Lexend Exa";
-    font-weight: 500;
-    font-size: 1.5rem;
-    letter-spacing: 0.15rem;
-    line-height: 1.2;
-    color: var(--color-primary);
-}
-
-.content-card span.numeral-and-series {
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: 0;
-}
-
-.content-card .preview-container {
-    margin: 10px 0;
-    padding: 10px 0;
-    border-top: 1px solid black;
-}
-
 .content-card .preview-text {
-    max-height: 100px;
+    max-height: 85px;
     overflow-y: hidden;
+    font-size: 0.9rem;
     font-weight: 350;
-    background-image: linear-gradient(to bottom, #000000, rgba(0, 0, 0, 0));
+    line-height: 1.6;
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
 }
+
+.content-card:hover .engagement-item.likes    { color: var(--color-primary); }
+.content-card:hover .engagement-item.dislikes { color: var(--text-light); }
 
 
 /* ============================================================
@@ -1297,7 +1473,7 @@ body.home .site-header .header-content {
 }
 
 .results-content {
-    position: relative;
+    width: 100%;
     padding: calc(var(--padding-md) - var(--padding-sm)) 0;
     padding-left: var(--padding-md);
     margin: var(--padding-sm) 0;
