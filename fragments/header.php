@@ -1,7 +1,7 @@
 <header class="site-header">
     <div class="header-content">
-        <a href="index.php" class="clickable">
-            <div class="brand-title" href="index.php">
+        <a href="index.php#top" class="clickable">
+            <div class="brand-title">
                 <h1>EncycLawPhilia | <span class="title-city">Valenzuela</span></h1>
             </div>
         </a>

@@ -26,7 +26,7 @@ require_once 'fragments/head.php';
             <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle filters">☰ Filters</button>
             <aside class="sidebar-column" id="sidebar-column">
                 <div class="sidebar-content">
-                    <form class="search-bar mini" action="browse.html" method="get">
+                    <form class="search-bar mini" action="browse.php" method="get">
                         <input aria-label="Search within results" autocomplete="off" inputmode="search" type="search"
                             name="q" placeholder="Search ordinances..." />
                     </form>

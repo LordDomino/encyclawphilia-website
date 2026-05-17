@@ -84,15 +84,19 @@
     /* ========== COLORS ========== */
     --transparent: rgba(0, 0, 0, 0);
     --color-primary-bg: rgba(0, 11, 66, 1);
-    --primary-color-hover-glass: rgba(0, 11, 66, 0.85);
-    --secondary-color: #7db5ff;
-    --accent-color: #071E95;
+    --secondary-color: rgb(125, 181, 255);
+    --accent-color: rgb(7, 30, 149);
     --bg-color: light-dark(#FFFFFF, var(--color-primary-bg));
     --text-color: #333333;
     --text-light: #666666;
     --text-lighter: #888888;
     --white: #FFFFFF;
     --black: #000000;
+
+    /* Transparent variants */
+    --color-primary-bg-transparent: rgba(0, 11, 66, var(--opacity-85));
+    --secondary-color-transparent: rgba(125, 181, 255, var(--opacity-85));
+    --accent-color-transparent: rgba(7, 30, 149, var(--opacity-85));
 
     /* Search-specific colors */
     --search-bg-color: var(--color-primary-bg);
@@ -209,6 +213,10 @@ body {
     background-color: var(--bg-color);
 }
 
+body.home {
+    scroll-behavior: smooth;
+}
+
 h1 {
     font-family: var(--font-heading);
     font-size: clamp(2rem, 3rem, 4rem);
@@ -288,11 +296,11 @@ p.link {
 
 @keyframes heroBgShift {
     from {
-        opacity: 0;
+        background-color: transparent;
     }
 
     to {
-        opacity: 1;
+        background-color: var(--color-primary-bg-transparent);
     }
 }
 
@@ -306,34 +314,67 @@ p.link {
     }
 }
 
-search {
-    position: relative;
-    height: 100dvh;
-    width: 100%;
-    padding: min(30px, 10%) min(50px, 10%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    background: linear-gradient(135deg, var(--color-primary-bg) 0%, var(--accent-color) 100%);
-    color: #FFFFFF;
-    margin-top: calc(var(--header-height) * -1);
+@keyframes heroContainerDisablePointers {
+    from {
+        pointer-events: none;
+    }
+
+    to {
+        pointer-events: auto;
+    }
 }
 
-search::before {
+.hero-container {
+    top: calc((100dvh - var(--header-height)) * -1);
+    position: sticky;
+    height: 100dvh;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(45deg, var(--color-primary-bg) 0%, var(--accent-color) 25%, var(--secondary-color));
+    backdrop-filter: blur(var(--blur-xs));
+    -webkit-backdrop-filter: blur(var(--blur-xs));
+    color: #FFFFFF;
+    z-index: 3;
+    transition: all var(--transition-speed);
+
+    animation-name: heroContainerDisablePointers;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+
+    animation-timeline: scroll(root);
+    animation-range: calc(100dvh - var(--header-height)) calc(100dvh - var(--header-height) + 1px);
+}
+
+.hero-container::before {
     content: "";
     position: absolute;
     inset: 0;
     background-color: var(--color-primary-bg);
-    opacity: 0;
+    transition: all var(--transition-speed);
 
     animation-name: heroBgShift;
     animation-timing-function: linear;
     animation-fill-mode: both;
 
     animation-timeline: scroll(root);
-    animation-range: 0px calc(100dvh - var(--header-height));
+    animation-range: 0dvh calc(100dvh - var(--header-height));
+}
+
+.hero-container:hover::before {
+    background-color: transparent;
+    opacity: 0;
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3xl);
+    padding: min(30px, 10%) min(50px, 10%);
+    align-items: center;
+    margin-top: calc(0px - var(--header-height));
+    height: 100%;
+    justify-content: center;
+    pointer-events: auto;
 }
 
 hgroup.title {
@@ -345,6 +386,7 @@ hgroup.title {
     user-select: none;
     gap: var(--spacing-lg);
     top: 0;
+    text-shadow: 0 0 10px var(--color-primary-bg);
 
     animation-name: heroContentBlur;
     animation-timing-function: linear;
@@ -465,17 +507,6 @@ form.search-bar input[type="search"]:focus {
     margin: 0px var(--content-side-padding);
 }
 
-/* Define the structural transition from start to finish */
-@keyframes shrinkHero {
-    from {
-        height: var(--height);
-    }
-
-    to {
-        height: 80px;
-    }
-}
-
 .subhero {
     align-content: center;
 
@@ -490,6 +521,20 @@ form.search-bar input[type="search"]:focus {
     -webkit-backdrop-filter: blur(var(--blur-lg));
     margin-top: calc(var(--header-height) * -1);
     border-bottom: var(--border-width-thin) solid rgba(125, 181, 255, var(--opacity-15));
+}
+
+.subhero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, var(--color-primary-bg) var(--header-height), var(--accent-color));
+    transition: all var(--transition-speed);
+    z-index: -1;
+    opacity: 0;
+}
+
+.subhero:hover::before {
+    opacity: 1;
 }
 
 .subhero.scrolled {
@@ -528,6 +573,7 @@ main {
 
 main.home {
     padding-bottom: var(--spacing-7xl);
+    z-index: 1;
 }
 
 section.dashboard {
@@ -1135,41 +1181,40 @@ ul.carousel li {
 
 @keyframes headerBgFade {
     from {
-        opacity: 0;
+        background-color: transparent;
+        border-bottom-color: transparent;
     }
 
-    to {
-        opacity: 1;
-    }
+    to {}
 }
 
 .site-header {
-    background-color: var(--color-primary-bg);
     color: white;
+    background-color: var(--color-primary-bg);
     height: var(--header-height);
     position: sticky;
     top: 0;
-    z-index: 3;
+    z-index: 5;
     display: flex;
     align-items: center;
     transition: all var(--transition-speed);
-    border-bottom: var(--border-width-normal) solid var(--transparent);
 }
 
-.site-header:hover {
-    background-color: var(--primary-color-hover-glass);
+/* .site-header:hover {
     backdrop-filter: blur(var(--blur-xs));
     -webkit-backdrop-filter: blur(var(--blur-xs));
-    border-bottom: var(--border-width-normal) solid var(--accent-color);
-}
+    } */
 
 body.home .site-header {
+    background-color: transparent;
+
+    pointer-events: none;
     animation-name: headerBgFade;
     animation-timing-function: linear;
     animation-fill-mode: both;
 
     animation-timeline: scroll(root);
-    animation-range: 50dvh calc(100dvh - var(--header-height));
+    animation-range: calc(100dvh - var(--header-height) - 1px) calc(100dvh - var(--header-height) - 1px);
 }
 
 .header-content {
@@ -1188,7 +1233,7 @@ body.home .site-header .header-content {
     animation-fill-mode: both;
 
     animation-timeline: scroll(root);
-    animation-range: 0dvh 80dvh;
+    animation-range: 35dvh 80dvh;
 }
 
 .header-content .brand-title h1 {
@@ -2467,7 +2512,7 @@ section.auth-hero {
         font-size: 1rem;
     }
 
-    search {
+    .hero {
         align-items: flex-start;
         justify-content: end;
     }

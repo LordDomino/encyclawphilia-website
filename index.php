@@ -5,19 +5,21 @@ $currentPage = "home";
 require_once 'fragments/head.php';
 ?>
 
-<body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>">
-    <?php require_once 'fragments/header.php'; ?>
+<body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>" id="top">
 
-    <search>
-        <hgroup class="title">
-            <?php require_once 'fragments/brand_title.php';?>
-            <p>Wisdom Beyond Law and Order</p>
-        </hgroup>
-        <form class="search-bar" action="browse.php" method="get">
-            <input aria-label="Search for city legislations" autocomplete="off" inputmode="search" type="search"
-                placeholder="Search..." name="q" />
-        </form>
-    </search>
+    <section class="hero-container">
+        <?php require_once 'fragments/header.php'; ?>
+        <div class="hero">
+            <hgroup class="title">
+                <?php require_once 'fragments/brand_title.php'; ?>
+                <p>Wisdom Beyond Law and Order</p>
+            </hgroup>
+            <form class="search-bar" action="browse.php" method="get">
+                <input aria-label="Search for city legislations" autocomplete="off" inputmode="search" type="search"
+                    placeholder="Search city ordinances..." name="q" />
+            </form>
+        </div>
+    </section>
     <main class="home">
         <section class="dashboard" id="browse-latest">
             <div class="flex-column" id="featured">
@@ -536,4 +538,5 @@ require_once 'fragments/head.php';
 
     <?php require_once 'fragments/footer.php'; ?>
 </body>
+
 </html>
