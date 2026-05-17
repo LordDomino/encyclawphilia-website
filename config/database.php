@@ -2,7 +2,7 @@
 // database.php
 function getDatabaseConnection() {
     try {
-        return new PDO('mysql:host=localhost;dbname=if0_41928864_encyclawphilia_db', 'root', '');
+        return new PDO('mysql:host=sql209.infinityfree.com;dbname=if0_41928864_encyclawphilia_db', '6WyumXiRAWG0', '');
     } catch (PDOException $e) {
         die("Database connection failed: " . $e->getMessage());
     }
