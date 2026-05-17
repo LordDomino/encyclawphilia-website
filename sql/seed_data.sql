@@ -14,6 +14,8 @@
 --   → Soft-delete test cases (Users, Ordinances)
 -- =============================================================
 
+USE EncycLawPhilia_db;
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 
@@ -139,7 +141,7 @@ INSERT INTO Tags (tag_name) VALUES
 -- created_at : random date within the past two years
 -- last_active_at : random date within the past 30 days
 -- -------------------------------------------------------------
-INSERT INTO Users (full_name, email, password_hash, role_id, created_at, last_active_at)
+INSERT INTO Users (full_name, email, password_hash, role_id, created_at)
 WITH RECURSIVE seq AS (
     SELECT 1 AS n
     UNION ALL
@@ -160,10 +162,9 @@ SELECT
             'Ramos', 'Gonzales', 'Castillo', 'Morales', 'Pascual')
     )                                                                   AS full_name,
     CONCAT('user', n, '@example.com')                                   AS email,
-    SHA2(CONCAT('seed_password_', n), 256)                             AS password_hash,
-    FLOOR(1 + RAND() * 5)                                              AS role_id,
-    DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 730) DAY)                  AS created_at,
-    DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 30)  DAY)                  AS last_active_at
+    SHA2(CONCAT('seed_password_', n), 256)                              AS password_hash,
+    FLOOR(1 + RAND() * 5)                                               AS role_id,
+    DATE_SUB(NOW(), INTERVAL FLOOR(RAND() * 730) DAY)                   AS created_at
 FROM seq;
 
 
