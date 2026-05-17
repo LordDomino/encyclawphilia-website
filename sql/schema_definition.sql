@@ -1,6 +1,9 @@
+CREATE DATABASE EncycLawPhilia_db;
+
+USE EncycLawPhilia_db;
+
 -- =============================================================
 -- DATABASE SCHEMA DEFINITION
--- Generated from: Database_Schema.pdf
 -- Dialect: MySQL 8.0+
 -- =============================================================
 
@@ -27,7 +30,6 @@ CREATE TABLE Users (
     password_hash   VARCHAR(255)    NOT NULL,
     role_id         INT             NOT NULL,
     created_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_active_at  DATETIME            NULL,
     deleted_at      DATETIME            NULL,
 
     CONSTRAINT pk_users PRIMARY KEY (user_id),
