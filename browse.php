@@ -1,24 +1,30 @@
+
 <?php
 
-// Import structural dependencies
-require_once 'config/database.php';
-
 // Phase 1: Ingestion and State Management
+require_once 'config/database.php';
+require_once 'src/procedures.php'; // Import the newly decoupled data routine
+
 $search_keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
 $safe_search_keyword = htmlspecialchars($search_keyword, ENT_QUOTES, 'UTF-8');
 $results = [];
 
 // Phase 2: Delegating Database Interrogation
 if ($search_keyword !== '') {
+    // Establish network boundary context
     $pdo = getDatabaseConnection();
 
-    $stmt = $pdo->prepare("CALL GetOrdinancesByTitle(:key)");
-    $stmt->execute([':key' => '%' . $search_keyword . '%']);
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    echo "<script>console.log(" . json_encode($results) . ");</script>";
-}
+    /* 
+     * Refactored: Replaced 'CALL GetOrdinancesByTitle(:key)' statement compilation 
+     * with an explicit application routine invocation. The connection state ($pdo)
+     * is passed into the function context directly.
+     */
+    $results = getOrdinancesByTitle($pdo, $safe_search_keyword);
 
+    // Debugging payload output
+    echo "<script>console.log(" . json_encode($results) . ");</script>";
+    echo "<script>console.log('Hello world');</script>";
+}
 
 // Phase 3: HTML Presentation begins below...
 ?>
