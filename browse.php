@@ -1,4 +1,29 @@
 <?php
+
+// Import structural dependencies
+require_once 'config/database.php';
+
+// Phase 1: Ingestion and State Management
+$search_keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
+$safe_search_keyword = htmlspecialchars($search_keyword, ENT_QUOTES, 'UTF-8');
+$results = [];
+
+// Phase 2: Delegating Database Interrogation
+if ($search_keyword !== '') {
+    $pdo = getDatabaseConnection();
+
+    $stmt = $pdo->prepare("SELECT * FROM ordinances WHERE title LIKE :key");
+    $stmt->execute([':key' => '%' . $search_keyword . '%']);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    echo "<script>console.log(" . json_encode($results) . ");</script>";
+}
+
+
+// Phase 3: HTML Presentation begins below...
+?>
+
+<?php
 $pageTitle = "Browse | EncycLawPhilia Valenzuela";
 $currentPage = "browse";
 
@@ -27,8 +52,14 @@ require_once 'fragments/head.php';
             <aside class="sidebar-column" id="sidebar-column">
                 <div class="sidebar-content">
                     <form class="search-bar mini" action="browse.php" method="get">
-                        <input aria-label="Search within results" autocomplete="off" inputmode="search" type="search"
-                            name="q" placeholder="Search ordinances..." />
+                        <input
+                            type="search"
+                            id="browse-pg-search-bar"
+                            name="q"
+                            placeholder="Search ordinances..."
+                            aria-label="Search within results"
+                            autocomplete="off"
+                            inputmode="search" />
                     </form>
                     <h2>Filters</h2>
                     <div class="filter-group">
@@ -72,269 +103,56 @@ require_once 'fragments/head.php';
             </aside>
             <section class="results-content" id="browse-all-ordinances">
                 <div class="results-header">
-                    <h2 class="results-header-title">Search Results for "ordinance"</h2>
+                    <h2 class="results-header-title">Search Results for <?php echo $safe_search_keyword; ?></h2>
                     <span class="result-count" id="result-count">(4 results)</span>
                 </div>
                 <div class="flex-grid" id="results-grid">
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <div class="card-label-group">
-                                <span class="card-type">City Ordinance</span>
-                                <span class="numeral-and-series">No. 3749 s. 2026</span>
-                            </div>
-                            <div class="date">
-                                <span class="date-day">10</span>
-                                <div class="date-meta">
-                                    <span class="date-month">April</span>
-                                    <span class="date-year">2026</span>
+                    <?php if (!empty($results)): ?>
+                        <?php foreach ($results as $row): ?>
+                            <div class="content-card">
+                                <div class="content-card-header">
+                                    <div class="card-label-group">
+                                        <span class="card-type">City Ordinance</span>
+                                        <span class="numeral-and-series">
+                                            No. <?php echo htmlspecialchars($row['ordinance_number'], ENT_QUOTES, 'UTF-8'); ?>
+                                            s. <?php echo htmlspecialchars($row['series_year'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                    </div>
+                                    <div class="date">
+                                        <span class="date-day">10</span>
+                                        <div class="date-meta">
+                                            <span class="date-month">April</span>
+                                            <span class="date-year"><?php echo htmlspecialchars($row['series_year'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="preview-container">
+                                    <div class="preview-text">
+                                        <?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-engagement">
+                                        <span class="engagement-item likes">
+                                            <span class="engagement-icon">▲</span>
+                                            <span class="engagement-count">24</span>
+                                        </span>
+                                        <span class="engagement-divider"></span>
+                                        <span class="engagement-item dislikes">
+                                            <span class="engagement-icon">▼</span>
+                                            <span class="engagement-count">3</span>
+                                        </span>
+                                    </div>
+                                    <a href="ordinance.php?id=...">
+                                        <p class="link">Read More</p>
+                                    </a>
                                 </div>
                             </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="no-results">
+                            <p>No matching items found. Try adjusting your keywords.</p>
                         </div>
-                        <div class="preview-container">
-                            <div class="preview-text">
-                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="card-engagement">
-                                <span class="engagement-item likes">
-                                    <span class="engagement-icon">▲</span>
-                                    <span class="engagement-count">24</span>
-                                </span>
-                                <span class="engagement-divider"></span>
-                                <span class="engagement-item dislikes">
-                                    <span class="engagement-icon">▼</span>
-                                    <span class="engagement-count">3</span>
-                                </span>
-                            </div>
-                            <a href="ordinance.php?id=...">
-                                <p class="link">Read More</p>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <div class="card-label-group">
-                                <span class="card-type">City Ordinance</span>
-                                <span class="numeral-and-series">No. 3749 s. 2026</span>
-                            </div>
-                            <div class="date">
-                                <span class="date-day">10</span>
-                                <div class="date-meta">
-                                    <span class="date-month">April</span>
-                                    <span class="date-year">2026</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-container">
-                            <div class="preview-text">
-                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="card-engagement">
-                                <span class="engagement-item likes">
-                                    <span class="engagement-icon">▲</span>
-                                    <span class="engagement-count">24</span>
-                                </span>
-                                <span class="engagement-divider"></span>
-                                <span class="engagement-item dislikes">
-                                    <span class="engagement-icon">▼</span>
-                                    <span class="engagement-count">3</span>
-                                </span>
-                            </div>
-                            <a href="ordinance.php?id=...">
-                                <p class="link">Read More</p>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <div class="card-label-group">
-                                <span class="card-type">City Ordinance</span>
-                                <span class="numeral-and-series">No. 3749 s. 2026</span>
-                            </div>
-                            <div class="date">
-                                <span class="date-day">10</span>
-                                <div class="date-meta">
-                                    <span class="date-month">April</span>
-                                    <span class="date-year">2026</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-container">
-                            <div class="preview-text">
-                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="card-engagement">
-                                <span class="engagement-item likes">
-                                    <span class="engagement-icon">▲</span>
-                                    <span class="engagement-count">24</span>
-                                </span>
-                                <span class="engagement-divider"></span>
-                                <span class="engagement-item dislikes">
-                                    <span class="engagement-icon">▼</span>
-                                    <span class="engagement-count">3</span>
-                                </span>
-                            </div>
-                            <a href="ordinance.php?id=...">
-                                <p class="link">Read More</p>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <div class="card-label-group">
-                                <span class="card-type">City Ordinance</span>
-                                <span class="numeral-and-series">No. 3749 s. 2026</span>
-                            </div>
-                            <div class="date">
-                                <span class="date-day">10</span>
-                                <div class="date-meta">
-                                    <span class="date-month">April</span>
-                                    <span class="date-year">2026</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-container">
-                            <div class="preview-text">
-                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="card-engagement">
-                                <span class="engagement-item likes">
-                                    <span class="engagement-icon">▲</span>
-                                    <span class="engagement-count">24</span>
-                                </span>
-                                <span class="engagement-divider"></span>
-                                <span class="engagement-item dislikes">
-                                    <span class="engagement-icon">▼</span>
-                                    <span class="engagement-count">3</span>
-                                </span>
-                            </div>
-                            <a href="ordinance.php?id=...">
-                                <p class="link">Read More</p>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <div class="card-label-group">
-                                <span class="card-type">City Ordinance</span>
-                                <span class="numeral-and-series">No. 3749 s. 2026</span>
-                            </div>
-                            <div class="date">
-                                <span class="date-day">10</span>
-                                <div class="date-meta">
-                                    <span class="date-month">April</span>
-                                    <span class="date-year">2026</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-container">
-                            <div class="preview-text">
-                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="card-engagement">
-                                <span class="engagement-item likes">
-                                    <span class="engagement-icon">▲</span>
-                                    <span class="engagement-count">24</span>
-                                </span>
-                                <span class="engagement-divider"></span>
-                                <span class="engagement-item dislikes">
-                                    <span class="engagement-icon">▼</span>
-                                    <span class="engagement-count">3</span>
-                                </span>
-                            </div>
-                            <a href="ordinance.php?id=...">
-                                <p class="link">Read More</p>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <div class="card-label-group">
-                                <span class="card-type">City Ordinance</span>
-                                <span class="numeral-and-series">No. 3749 s. 2026</span>
-                            </div>
-                            <div class="date">
-                                <span class="date-day">10</span>
-                                <div class="date-meta">
-                                    <span class="date-month">April</span>
-                                    <span class="date-year">2026</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-container">
-                            <div class="preview-text">
-                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="card-engagement">
-                                <span class="engagement-item likes">
-                                    <span class="engagement-icon">▲</span>
-                                    <span class="engagement-count">24</span>
-                                </span>
-                                <span class="engagement-divider"></span>
-                                <span class="engagement-item dislikes">
-                                    <span class="engagement-icon">▼</span>
-                                    <span class="engagement-count">3</span>
-                                </span>
-                            </div>
-                            <a href="ordinance.php?id=...">
-                                <p class="link">Read More</p>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="content-card">
-                        <div class="content-card-header">
-                            <div class="card-label-group">
-                                <span class="card-type">City Ordinance</span>
-                                <span class="numeral-and-series">No. 3749 s. 2026</span>
-                            </div>
-                            <div class="date">
-                                <span class="date-day">10</span>
-                                <div class="date-meta">
-                                    <span class="date-month">April</span>
-                                    <span class="date-year">2026</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="preview-container">
-                            <div class="preview-text">
-                                AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="card-engagement">
-                                <span class="engagement-item likes">
-                                    <span class="engagement-icon">▲</span>
-                                    <span class="engagement-count">24</span>
-                                </span>
-                                <span class="engagement-divider"></span>
-                                <span class="engagement-item dislikes">
-                                    <span class="engagement-icon">▼</span>
-                                    <span class="engagement-count">3</span>
-                                </span>
-                            </div>
-                            <a href="ordinance.php?id=...">
-                                <p class="link">Read More</p>
-                            </a>
-                        </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </section>
         </div>

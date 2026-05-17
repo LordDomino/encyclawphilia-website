@@ -14,9 +14,16 @@ require_once 'fragments/head.php';
                 <?php require_once 'fragments/brand_title.php'; ?>
                 <p>Wisdom Beyond Law and Order</p>
             </hgroup>
-            <form class="search-bar" action="browse.php" method="get">
-                <input aria-label="Search for city legislations" autocomplete="off" inputmode="search" type="search"
-                    placeholder="Search city ordinances..." name="q" />
+            <form action="browse.php" method="GET" class="search-bar">
+                <input
+                    type="search"
+                    id="home-pg-hero-search"
+                    name="q"
+                    placeholder="Search city ordinances..."
+                    aria-label="Search for city legislations"
+                    autocomplete="off"
+                    inputmode="search"
+                />
             </form>
         </div>
     </section>
@@ -944,5 +951,7 @@ require_once 'fragments/head.php';
 
     <?php require_once 'fragments/footer.php'; ?>
 </body>
+
+<script src="js/search.js"></script>
 
 </html>
