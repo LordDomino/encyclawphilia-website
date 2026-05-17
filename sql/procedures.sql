@@ -1,7 +1,7 @@
-USE EncycLawPhilia_db;
+USE if0_41928864_encyclawphilia_db;
 
 -- =============================================================
--- STORED PROCEDURES: EncycLawPhilia_db
+-- STORED PROCEDURES: if0_41928864_encyclawphilia_db
 -- Dialect: MariaDB 10.x+
 -- Fix applied: All LEAVE <proc_name> replaced with explicit
 --              block labels (proc_block: BEGIN ... END proc_block)

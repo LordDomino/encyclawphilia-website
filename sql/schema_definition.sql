@@ -1,6 +1,6 @@
-CREATE DATABASE EncycLawPhilia_db;
+CREATE DATABASE if0_41928864_encyclawphilia_db;
 
-USE EncycLawPhilia_db;
+USE if0_41928864_encyclawphilia_db;
 
 -- =============================================================
 -- DATABASE SCHEMA DEFINITION

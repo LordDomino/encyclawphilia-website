@@ -14,7 +14,7 @@
 --   → Soft-delete test cases (Users, Ordinances)
 -- =============================================================
 
-USE EncycLawPhilia_db;
+USE if0_41928864_encyclawphilia_db;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
