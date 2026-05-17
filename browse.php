@@ -12,7 +12,7 @@ $results = [];
 if ($search_keyword !== '') {
     $pdo = getDatabaseConnection();
 
-    $stmt = $pdo->prepare("SELECT * FROM ordinances WHERE title LIKE :key");
+    $stmt = $pdo->prepare("CALL GetOrdinancesByTitle(:key)");
     $stmt->execute([':key' => '%' . $search_keyword . '%']);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
@@ -118,10 +118,10 @@ require_once 'fragments/head.php';
                                             s. <?php echo htmlspecialchars($row['series_year'], ENT_QUOTES, 'UTF-8'); ?></span>
                                     </div>
                                     <div class="date">
-                                        <span class="date-day">10</span>
+                                        <span class="date-day"><?php echo htmlspecialchars($row['enactment_day'], ENT_QUOTES, 'UTF-8'); ?></span>
                                         <div class="date-meta">
-                                            <span class="date-month">April</span>
-                                            <span class="date-year"><?php echo htmlspecialchars($row['series_year'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                            <span class="date-month"><?php echo htmlspecialchars($row['enactment_month'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                            <span class="date-year"><?php echo htmlspecialchars($row['enactment_year'], ENT_QUOTES, 'UTF-8'); ?></span>
                                         </div>
                                     </div>
                                 </div>
@@ -134,12 +134,16 @@ require_once 'fragments/head.php';
                                     <div class="card-engagement">
                                         <span class="engagement-item likes">
                                             <span class="engagement-icon">▲</span>
-                                            <span class="engagement-count">24</span>
+                                            <span class="engagement-count">
+                                                <?php echo htmlspecialchars($row['like_count'], ENT_QUOTES, 'UTF-8'); ?>
+                                            </span>
                                         </span>
                                         <span class="engagement-divider"></span>
                                         <span class="engagement-item dislikes">
                                             <span class="engagement-icon">▼</span>
-                                            <span class="engagement-count">3</span>
+                                            <span class="engagement-count">
+                                                <?php echo htmlspecialchars($row['dislike_count'], ENT_QUOTES, 'UTF-8'); ?>
+                                            </span>
                                         </span>
                                     </div>
                                     <a href="ordinance.php?id=...">

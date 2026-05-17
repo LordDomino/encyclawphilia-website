@@ -599,6 +599,7 @@ section.browse {
 .flex-column {
     display: flex;
     flex-direction: column;
+    width: 100%;
 }
 
 .flex-column:not(:last-child) {

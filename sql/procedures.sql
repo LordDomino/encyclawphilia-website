@@ -2,7 +2,9 @@ USE EncycLawPhilia_db;
 
 -- =============================================================
 -- STORED PROCEDURES: EncycLawPhilia_db
--- Dialect: MySQL 8.0+
+-- Dialect: MariaDB 10.x+
+-- Fix applied: All LEAVE <proc_name> replaced with explicit
+--              block labels (proc_block: BEGIN ... END proc_block)
 -- Covers:
 --   1. sp_UserSignUp
 --   2. sp_UserLogin
@@ -10,6 +12,10 @@ USE EncycLawPhilia_db;
 --   4. sp_AddOrdinance
 --   5. sp_UpdateOrdinance
 --   6. sp_ArchiveOrdinance
+--   7. sp_ReactToOrdinance
+--   8. sp_AddComment
+--   9. sp_DeleteComment
+--  10. sp_GetOrdinanceReactionSummary
 -- =============================================================
 
 DELIMITER $$
@@ -23,7 +29,7 @@ CREATE TABLE IF NOT EXISTS User_Sessions (
     user_id         INT             NOT NULL,
     created_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expires_at      DATETIME        NOT NULL,
-    invalidated_at  DATETIME            NULL,   -- set on logout
+    invalidated_at  DATETIME            NULL,
 
     CONSTRAINT pk_user_sessions PRIMARY KEY (session_id),
     CONSTRAINT fk_sessions_user
@@ -34,17 +40,6 @@ CREATE TABLE IF NOT EXISTS User_Sessions (
 
 -- =============================================================
 -- 1. USER SIGN UP
---
--- Parameters:
---   p_full_name     – display name of the new user
---   p_email         – must be unique
---   p_password_hash – already-hashed password from the application
---                     layer (bcrypt / argon2 / sha256 etc.)
---   p_role_id       – FK to Roles; defaults to a "regular user" role
---
--- Out:
---   p_out_user_id   – newly created user_id (0 on failure)
---   p_out_message   – human-readable status
 -- =============================================================
 CREATE PROCEDURE sp_UserSignUp (
     IN  p_full_name     VARCHAR(100),
@@ -54,81 +49,56 @@ CREATE PROCEDURE sp_UserSignUp (
     OUT p_out_user_id   INT,
     OUT p_out_message   VARCHAR(255)
 )
-BEGIN
+proc_block: BEGIN
     DECLARE v_email_exists INT DEFAULT 0;
     DECLARE v_role_exists  INT DEFAULT 0;
 
-    -- Initialise outputs
     SET p_out_user_id = 0;
     SET p_out_message = '';
 
-    -- Guard: blank fields
     IF TRIM(p_full_name) = '' OR p_full_name IS NULL THEN
         SET p_out_message = 'ERROR: Full name is required.';
-        LEAVE sp_UserSignUp;
+        LEAVE proc_block;
     END IF;
 
     IF TRIM(p_email) = '' OR p_email IS NULL THEN
         SET p_out_message = 'ERROR: Email is required.';
-        LEAVE sp_UserSignUp;
+        LEAVE proc_block;
     END IF;
 
     IF TRIM(p_password_hash) = '' OR p_password_hash IS NULL THEN
         SET p_out_message = 'ERROR: Password hash is required.';
-        LEAVE sp_UserSignUp;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: email already registered (including soft-deleted accounts)
     SELECT COUNT(*) INTO v_email_exists
     FROM   Users
     WHERE  email = p_email;
 
     IF v_email_exists > 0 THEN
         SET p_out_message = 'ERROR: Email is already registered.';
-        LEAVE sp_UserSignUp;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: role must exist
     SELECT COUNT(*) INTO v_role_exists
     FROM   Roles
     WHERE  role_id = p_role_id;
 
     IF v_role_exists = 0 THEN
         SET p_out_message = 'ERROR: Invalid role_id provided.';
-        LEAVE sp_UserSignUp;
+        LEAVE proc_block;
     END IF;
 
-    -- Insert new user
     INSERT INTO Users (full_name, email, password_hash, role_id)
     VALUES (TRIM(p_full_name), LOWER(TRIM(p_email)), p_password_hash, p_role_id);
 
     SET p_out_user_id = LAST_INSERT_ID();
     SET p_out_message = CONCAT('SUCCESS: User registered with ID ', p_out_user_id, '.');
-END $$
+END proc_block $$
 
 
 -- =============================================================
 -- 2. USER LOGIN
---
--- The application layer is responsible for:
---   a) Fetching the stored password_hash via a plain SELECT on email.
---   b) Verifying the plain-text password against that hash.
---   c) Calling this procedure only after successful verification.
---
--- This procedure:
---   • Confirms the account is active (not soft-deleted).
---   • Creates a session token (UUID-based) valid for p_ttl_hours.
---   • Returns the session_id so the app can store it in a cookie/header.
---
--- Parameters:
---   p_email       – the user's email
---   p_ttl_hours   – session lifetime in hours (e.g. 8)
---
--- Out:
---   p_out_session_id – new session token (empty string on failure)
---   p_out_user_id    – authenticated user_id (0 on failure)
---   p_out_role_id    – role of the user (0 on failure)
---   p_out_message    – human-readable status
 -- =============================================================
 CREATE PROCEDURE sp_UserLogin (
     IN  p_email          VARCHAR(150),
@@ -138,19 +108,17 @@ CREATE PROCEDURE sp_UserLogin (
     OUT p_out_role_id    INT,
     OUT p_out_message    VARCHAR(255)
 )
-BEGIN
+proc_block: BEGIN
     DECLARE v_user_id    INT      DEFAULT 0;
     DECLARE v_role_id    INT      DEFAULT 0;
     DECLARE v_deleted_at DATETIME DEFAULT NULL;
     DECLARE v_session_id VARCHAR(64);
 
-    -- Initialise outputs
     SET p_out_session_id = '';
     SET p_out_user_id    = 0;
     SET p_out_role_id    = 0;
     SET p_out_message    = '';
 
-    -- Look up the user
     SELECT user_id, role_id, deleted_at
     INTO   v_user_id, v_role_id, v_deleted_at
     FROM   Users
@@ -159,21 +127,16 @@ BEGIN
 
     IF v_user_id = 0 THEN
         SET p_out_message = 'ERROR: No account found for that email.';
-        LEAVE sp_UserLogin;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: account must not be soft-deleted
     IF v_deleted_at IS NOT NULL THEN
         SET p_out_message = 'ERROR: This account has been deactivated.';
-        LEAVE sp_UserLogin;
+        LEAVE proc_block;
     END IF;
 
-    -- Generate a session token
-    SET v_session_id = CONCAT(
-        UUID(), '-', UNIX_TIMESTAMP()
-    );
+    SET v_session_id = CONCAT(UUID(), '-', UNIX_TIMESTAMP());
 
-    -- Persist session
     INSERT INTO User_Sessions (session_id, user_id, expires_at)
     VALUES (
         v_session_id,
@@ -185,33 +148,22 @@ BEGIN
     SET p_out_user_id    = v_user_id;
     SET p_out_role_id    = v_role_id;
     SET p_out_message    = 'SUCCESS: Login successful.';
-END $$
+END proc_block $$
 
 
 -- =============================================================
 -- 3. USER LOGOUT
---
--- Invalidates (soft-deletes) the specified session token so it
--- can no longer be used. Does NOT delete the row so audit
--- trails remain intact.
---
--- Parameters:
---   p_session_id – the session token to invalidate
---
--- Out:
---   p_out_message – human-readable status
 -- =============================================================
 CREATE PROCEDURE sp_UserLogout (
     IN  p_session_id  VARCHAR(64),
     OUT p_out_message VARCHAR(255)
 )
-BEGIN
-    DECLARE v_session_exists INT     DEFAULT 0;
+proc_block: BEGIN
+    DECLARE v_session_exists INT      DEFAULT 0;
     DECLARE v_already_out    DATETIME DEFAULT NULL;
 
     SET p_out_message = '';
 
-    -- Check session exists
     SELECT COUNT(*), invalidated_at
     INTO   v_session_exists, v_already_out
     FROM   User_Sessions
@@ -220,46 +172,24 @@ BEGIN
 
     IF v_session_exists = 0 THEN
         SET p_out_message = 'ERROR: Session not found.';
-        LEAVE sp_UserLogout;
+        LEAVE proc_block;
     END IF;
 
     IF v_already_out IS NOT NULL THEN
         SET p_out_message = 'INFO: Session was already invalidated.';
-        LEAVE sp_UserLogout;
+        LEAVE proc_block;
     END IF;
 
-    -- Invalidate
     UPDATE User_Sessions
     SET    invalidated_at = NOW()
     WHERE  session_id = p_session_id;
 
     SET p_out_message = 'SUCCESS: Logged out successfully.';
-END $$
+END proc_block $$
 
 
 -- =============================================================
 -- 4. ADD ORDINANCE
---
--- All text fields are entered manually by the client (admin /
--- editor). The PDF path is optional – it can be supplied later
--- via sp_UpdateOrdinance.
---
--- Parameters (all IN):
---   p_ordinance_number  – unique identifier (e.g. "ORD-2024-001")
---   p_title             – full title of the ordinance
---   p_author_sponsor    – name of the author/sponsor
---   p_series_year       – e.g. "2024"
---   p_category_id       – FK to Categories (NULL allowed)
---   p_barangay_id       – FK to Barangays   (NULL allowed)
---   p_status            – e.g. "Active", "Pending", "Repealed"
---   p_date_enacted      – DATE string 'YYYY-MM-DD' (NULL allowed)
---   p_pdf_file          – file path / URL  (NULL allowed)
---   p_summary           – short summary    (NULL allowed)
---   p_full_text         – full ordinance text (NULL allowed)
---
--- Out:
---   p_out_ordinance_id  – newly created ordinance_id (0 on failure)
---   p_out_message       – human-readable status
 -- =============================================================
 CREATE PROCEDURE sp_AddOrdinance (
     IN  p_ordinance_number  VARCHAR(50),
@@ -276,7 +206,7 @@ CREATE PROCEDURE sp_AddOrdinance (
     OUT p_out_ordinance_id  INT,
     OUT p_out_message       VARCHAR(255)
 )
-BEGIN
+proc_block: BEGIN
     DECLARE v_num_exists  INT DEFAULT 0;
     DECLARE v_cat_exists  INT DEFAULT 0;
     DECLARE v_bar_exists  INT DEFAULT 0;
@@ -284,23 +214,21 @@ BEGIN
     SET p_out_ordinance_id = 0;
     SET p_out_message      = '';
 
-    -- Guard: required fields
     IF TRIM(p_ordinance_number) = '' OR p_ordinance_number IS NULL THEN
         SET p_out_message = 'ERROR: Ordinance number is required.';
-        LEAVE sp_AddOrdinance;
+        LEAVE proc_block;
     END IF;
 
     IF TRIM(p_title) = '' OR p_title IS NULL THEN
         SET p_out_message = 'ERROR: Title is required.';
-        LEAVE sp_AddOrdinance;
+        LEAVE proc_block;
     END IF;
 
     IF TRIM(p_status) = '' OR p_status IS NULL THEN
         SET p_out_message = 'ERROR: Status is required.';
-        LEAVE sp_AddOrdinance;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: duplicate ordinance number
     SELECT COUNT(*) INTO v_num_exists
     FROM   Ordinances
     WHERE  ordinance_number = TRIM(p_ordinance_number)
@@ -308,10 +236,9 @@ BEGIN
 
     IF v_num_exists > 0 THEN
         SET p_out_message = 'ERROR: Ordinance number already exists.';
-        LEAVE sp_AddOrdinance;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: category FK (only if provided)
     IF p_category_id IS NOT NULL THEN
         SELECT COUNT(*) INTO v_cat_exists
         FROM   Categories
@@ -319,11 +246,10 @@ BEGIN
 
         IF v_cat_exists = 0 THEN
             SET p_out_message = 'ERROR: Invalid category_id.';
-            LEAVE sp_AddOrdinance;
+            LEAVE proc_block;
         END IF;
     END IF;
 
-    -- Guard: barangay FK (only if provided)
     IF p_barangay_id IS NOT NULL THEN
         SELECT COUNT(*) INTO v_bar_exists
         FROM   Barangays
@@ -331,11 +257,10 @@ BEGIN
 
         IF v_bar_exists = 0 THEN
             SET p_out_message = 'ERROR: Invalid barangay_id.';
-            LEAVE sp_AddOrdinance;
+            LEAVE proc_block;
         END IF;
     END IF;
 
-    -- Insert
     INSERT INTO Ordinances (
         ordinance_number, title, author_sponsor, series_year,
         category_id, barangay_id, status, date_enacted,
@@ -349,22 +274,11 @@ BEGIN
 
     SET p_out_ordinance_id = LAST_INSERT_ID();
     SET p_out_message = CONCAT('SUCCESS: Ordinance added with ID ', p_out_ordinance_id, '.');
-END $$
+END proc_block $$
 
 
 -- =============================================================
 -- 5. UPDATE ORDINANCE
---
--- Updates any subset of editable fields. Only non-NULL IN
--- parameters overwrite the existing value. Pass NULL to leave
--- a column unchanged.
---
--- Parameters:
---   p_ordinance_id      – PK of the ordinance to update (required)
---   All other IN params  – new values (NULL = keep existing)
---
--- Out:
---   p_out_message – human-readable status
 -- =============================================================
 CREATE PROCEDURE sp_UpdateOrdinance (
     IN  p_ordinance_id      INT,
@@ -381,14 +295,13 @@ CREATE PROCEDURE sp_UpdateOrdinance (
     IN  p_full_text         LONGTEXT,
     OUT p_out_message       VARCHAR(255)
 )
-BEGIN
+proc_block: BEGIN
     DECLARE v_exists          INT      DEFAULT 0;
     DECLARE v_is_archived     DATETIME DEFAULT NULL;
     DECLARE v_num_conflict    INT      DEFAULT 0;
 
     SET p_out_message = '';
 
-    -- Guard: ordinance must exist and must not be archived
     SELECT COUNT(*), deleted_at
     INTO   v_exists, v_is_archived
     FROM   Ordinances
@@ -397,15 +310,14 @@ BEGIN
 
     IF v_exists = 0 THEN
         SET p_out_message = 'ERROR: Ordinance not found.';
-        LEAVE sp_UpdateOrdinance;
+        LEAVE proc_block;
     END IF;
 
     IF v_is_archived IS NOT NULL THEN
         SET p_out_message = 'ERROR: Cannot update an archived ordinance.';
-        LEAVE sp_UpdateOrdinance;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: new ordinance_number must not collide with another record
     IF p_ordinance_number IS NOT NULL THEN
         SELECT COUNT(*) INTO v_num_conflict
         FROM   Ordinances
@@ -415,11 +327,10 @@ BEGIN
 
         IF v_num_conflict > 0 THEN
             SET p_out_message = 'ERROR: That ordinance number is already used by another record.';
-            LEAVE sp_UpdateOrdinance;
+            LEAVE proc_block;
         END IF;
     END IF;
 
-    -- Selective update using COALESCE (keeps old value when IN param is NULL)
     UPDATE Ordinances
     SET
         ordinance_number = COALESCE(TRIM(p_ordinance_number), ordinance_number),
@@ -436,33 +347,22 @@ BEGIN
     WHERE  ordinance_id = p_ordinance_id;
 
     SET p_out_message = CONCAT('SUCCESS: Ordinance ID ', p_ordinance_id, ' updated successfully.');
-END $$
+END proc_block $$
 
 
 -- =============================================================
--- 6. ARCHIVE ORDINANCE  (soft-delete)
---
--- Sets deleted_at to the current timestamp, effectively hiding
--- the ordinance from normal queries without losing data.
--- Archived ordinances cannot be updated (see sp_UpdateOrdinance).
---
--- Parameters:
---   p_ordinance_id – PK of the ordinance to archive
---
--- Out:
---   p_out_message – human-readable status
+-- 6. ARCHIVE ORDINANCE (soft-delete)
 -- =============================================================
 CREATE PROCEDURE sp_ArchiveOrdinance (
     IN  p_ordinance_id  INT,
     OUT p_out_message   VARCHAR(255)
 )
-BEGIN
+proc_block: BEGIN
     DECLARE v_exists      INT      DEFAULT 0;
     DECLARE v_deleted_at  DATETIME DEFAULT NULL;
 
     SET p_out_message = '';
 
-    -- Confirm the ordinance exists
     SELECT COUNT(*), deleted_at
     INTO   v_exists, v_deleted_at
     FROM   Ordinances
@@ -471,125 +371,24 @@ BEGIN
 
     IF v_exists = 0 THEN
         SET p_out_message = 'ERROR: Ordinance not found.';
-        LEAVE sp_ArchiveOrdinance;
+        LEAVE proc_block;
     END IF;
 
     IF v_deleted_at IS NOT NULL THEN
         SET p_out_message = 'INFO: Ordinance is already archived.';
-        LEAVE sp_ArchiveOrdinance;
+        LEAVE proc_block;
     END IF;
 
-    -- Soft-delete
     UPDATE Ordinances
     SET    deleted_at = NOW()
     WHERE  ordinance_id = p_ordinance_id;
 
     SET p_out_message = CONCAT('SUCCESS: Ordinance ID ', p_ordinance_id, ' has been archived.');
-END $$
-
-
-DELIMITER ;
+END proc_block $$
 
 
 -- =============================================================
--- SAMPLE USAGE
--- =============================================================
-
-/*
--- 1. Sign up
-CALL sp_UserSignUp(
-    'Juan dela Cruz',
-    'juan@example.com',
-    '$2b$12$hashedPasswordHere',
-    1,           -- role_id
-    @uid, @msg
-);
-SELECT @uid AS new_user_id, @msg AS message;
-
--- 2. Login  (call AFTER verifying password on the app layer)
-CALL sp_UserLogin('juan@example.com', 8, @sid, @uid, @rid, @msg);
-SELECT @sid AS session_id, @uid AS user_id, @rid AS role_id, @msg AS message;
-
--- 3. Logout
-CALL sp_UserLogout(@sid, @msg);
-SELECT @msg AS message;
-
--- 4. Add ordinance
-CALL sp_AddOrdinance(
-    'ORD-2024-001',
-    'An Ordinance Regulating Noise Pollution in Barangay X',
-    'Hon. Maria Santos',
-    '2024',
-    2,                  -- category_id
-    3,                  -- barangay_id
-    'Active',
-    '2024-03-15',
-    NULL,               -- pdf_file (none yet)
-    'Regulates noise levels in residential areas.',
-    'WHEREAS, the Sangguniang Barangay of Barangay X...',
-    @oid, @msg
-);
-SELECT @oid AS new_ordinance_id, @msg AS message;
-
--- 5. Update ordinance (only fields passed as non-NULL change)
-CALL sp_UpdateOrdinance(
-    @oid,
-    NULL,               -- keep same ordinance_number
-    NULL,               -- keep same title
-    NULL,               -- keep same author
-    NULL,               -- keep same series_year
-    NULL,               -- keep same category
-    NULL,               -- keep same barangay
-    NULL,               -- keep same status
-    NULL,               -- keep same date
-    '/uploads/ord2024001.pdf',  -- update pdf_file
-    NULL,               -- keep same summary
-    NULL,               -- keep same full_text
-    @msg
-);
-SELECT @msg AS message;
-
--- 6. Archive ordinance
-CALL sp_ArchiveOrdinance(@oid, @msg);
-SELECT @msg AS message;
-*/
-
--- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
--- =============================================================
--- STORED PROCEDURES: EncycLawPhilia_db  (Addendum)
--- Dialect: MySQL 8.0+
--- Covers:
---   7. sp_ReactToOrdinance   – Like / Dislike (toggle-aware)
---   8. sp_AddComment         – Post a comment on an ordinance
---   9. sp_GetOrdinanceReactionSummary  – Reaction counts helper
--- =============================================================
-
-DELIMITER $$
-
-
--- =============================================================
--- 7. REACT TO ORDINANCE  (Like / Dislike)
---
--- Business rules
--- ──────────────
---  • A user may hold only ONE reaction per ordinance at a time
---    (enforced by the UNIQUE constraint on Ordinance_Reactions).
---  • Calling with the SAME reaction_type the user already has
---    REMOVES it  (toggle off / "un-like").
---  • Calling with a DIFFERENT reaction_type SWITCHES the reaction
---    (e.g. Like → Dislike).
---  • Calling when no prior reaction exists ADDS it.
---
--- Parameters:
---   p_ordinance_id      – target ordinance
---   p_user_id           – reacting user
---   p_reaction_type_id  – FK to Reaction_Types
---                         (e.g. 1 = Like, 2 = Dislike)
---
--- Out:
---   p_out_action  – 'ADDED' | 'REMOVED' | 'SWITCHED' | 'ERROR'
---   p_out_message – human-readable status
+-- 7. REACT TO ORDINANCE (Like / Dislike)
 -- =============================================================
 CREATE PROCEDURE sp_ReactToOrdinance (
     IN  p_ordinance_id      INT,
@@ -598,18 +397,17 @@ CREATE PROCEDURE sp_ReactToOrdinance (
     OUT p_out_action        VARCHAR(10),
     OUT p_out_message       VARCHAR(255)
 )
-BEGIN
+proc_block: BEGIN
     DECLARE v_ord_exists      INT      DEFAULT 0;
     DECLARE v_ord_archived    DATETIME DEFAULT NULL;
     DECLARE v_user_exists     INT      DEFAULT 0;
     DECLARE v_rtype_exists    INT      DEFAULT 0;
-    DECLARE v_existing_rid    INT      DEFAULT 0;   -- existing reaction_id
-    DECLARE v_existing_rtype  INT      DEFAULT 0;   -- existing reaction_type_id
+    DECLARE v_existing_rid    INT      DEFAULT 0;
+    DECLARE v_existing_rtype  INT      DEFAULT 0;
 
     SET p_out_action  = 'ERROR';
     SET p_out_message = '';
 
-    -- Guard: ordinance must exist and not be archived
     SELECT COUNT(*), deleted_at
     INTO   v_ord_exists, v_ord_archived
     FROM   Ordinances
@@ -618,36 +416,33 @@ BEGIN
 
     IF v_ord_exists = 0 THEN
         SET p_out_message = 'ERROR: Ordinance not found.';
-        LEAVE sp_ReactToOrdinance;
+        LEAVE proc_block;
     END IF;
 
     IF v_ord_archived IS NOT NULL THEN
         SET p_out_message = 'ERROR: Cannot react to an archived ordinance.';
-        LEAVE sp_ReactToOrdinance;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: user must exist and not be soft-deleted
     SELECT COUNT(*) INTO v_user_exists
     FROM   Users
-    WHERE  user_id   = p_user_id
+    WHERE  user_id    = p_user_id
       AND  deleted_at IS NULL;
 
     IF v_user_exists = 0 THEN
         SET p_out_message = 'ERROR: User not found or account is deactivated.';
-        LEAVE sp_ReactToOrdinance;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: reaction type must exist
     SELECT COUNT(*) INTO v_rtype_exists
     FROM   Reaction_Types
     WHERE  reaction_type_id = p_reaction_type_id;
 
     IF v_rtype_exists = 0 THEN
         SET p_out_message = 'ERROR: Invalid reaction_type_id.';
-        LEAVE sp_ReactToOrdinance;
+        LEAVE proc_block;
     END IF;
 
-    -- Check whether the user already has a reaction on this ordinance
     SELECT reaction_id, reaction_type_id
     INTO   v_existing_rid, v_existing_rtype
     FROM   Ordinance_Reactions
@@ -656,7 +451,6 @@ BEGIN
     LIMIT  1;
 
     IF v_existing_rid = 0 THEN
-        -- ── No prior reaction → INSERT ────────────────────────────
         INSERT INTO Ordinance_Reactions (ordinance_id, user_id, reaction_type_id)
         VALUES (p_ordinance_id, p_user_id, p_reaction_type_id);
 
@@ -667,7 +461,6 @@ BEGIN
         );
 
     ELSEIF v_existing_rtype = p_reaction_type_id THEN
-        -- ── Same reaction → TOGGLE OFF (DELETE) ───────────────────
         DELETE FROM Ordinance_Reactions
         WHERE  reaction_id = v_existing_rid;
 
@@ -677,7 +470,6 @@ BEGIN
         );
 
     ELSE
-        -- ── Different reaction → SWITCH (UPDATE) ──────────────────
         UPDATE Ordinance_Reactions
         SET    reaction_type_id = p_reaction_type_id,
                created_at       = NOW()
@@ -689,29 +481,11 @@ BEGIN
             ' on ordinance ID ', p_ordinance_id, '.'
         );
     END IF;
-END $$
+END proc_block $$
 
 
 -- =============================================================
 -- 8. ADD COMMENT
---
--- Business rules
--- ──────────────
---  • The ordinance must be active (not archived).
---  • The user must be active (not soft-deleted).
---  • Comment text must not be blank.
---  • The new comment_id is returned so the caller can display
---    the comment immediately without a second query.
---
--- Parameters:
---   p_ordinance_id  – target ordinance
---   p_user_id       – commenting user
---   p_comment_text  – comment body (plain text / HTML sanitised
---                     on the application layer before calling)
---
--- Out:
---   p_out_comment_id – newly created comment_id (0 on failure)
---   p_out_message    – human-readable status
 -- =============================================================
 CREATE PROCEDURE sp_AddComment (
     IN  p_ordinance_id   INT,
@@ -720,7 +494,7 @@ CREATE PROCEDURE sp_AddComment (
     OUT p_out_comment_id INT,
     OUT p_out_message    VARCHAR(255)
 )
-BEGIN
+proc_block: BEGIN
     DECLARE v_ord_exists   INT      DEFAULT 0;
     DECLARE v_ord_archived DATETIME DEFAULT NULL;
     DECLARE v_user_exists  INT      DEFAULT 0;
@@ -728,13 +502,11 @@ BEGIN
     SET p_out_comment_id = 0;
     SET p_out_message    = '';
 
-    -- Guard: comment text must not be blank
     IF p_comment_text IS NULL OR TRIM(p_comment_text) = '' THEN
         SET p_out_message = 'ERROR: Comment text cannot be empty.';
-        LEAVE sp_AddComment;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: ordinance must exist and not be archived
     SELECT COUNT(*), deleted_at
     INTO   v_ord_exists, v_ord_archived
     FROM   Ordinances
@@ -743,15 +515,14 @@ BEGIN
 
     IF v_ord_exists = 0 THEN
         SET p_out_message = 'ERROR: Ordinance not found.';
-        LEAVE sp_AddComment;
+        LEAVE proc_block;
     END IF;
 
     IF v_ord_archived IS NOT NULL THEN
         SET p_out_message = 'ERROR: Cannot comment on an archived ordinance.';
-        LEAVE sp_AddComment;
+        LEAVE proc_block;
     END IF;
 
-    -- Guard: user must exist and not be soft-deleted
     SELECT COUNT(*) INTO v_user_exists
     FROM   Users
     WHERE  user_id    = p_user_id
@@ -759,10 +530,9 @@ BEGIN
 
     IF v_user_exists = 0 THEN
         SET p_out_message = 'ERROR: User not found or account is deactivated.';
-        LEAVE sp_AddComment;
+        LEAVE proc_block;
     END IF;
 
-    -- Insert the comment
     INSERT INTO Comments (ordinance_id, user_id, comment_text)
     VALUES (p_ordinance_id, p_user_id, TRIM(p_comment_text));
 
@@ -771,90 +541,61 @@ BEGIN
         'SUCCESS: Comment posted with ID ', p_out_comment_id,
         ' on ordinance ID ', p_ordinance_id, '.'
     );
-END $$
+END proc_block $$
+
 
 -- =============================================================
--- DELETE COMMENT
---
--- Business rules
--- ──────────────
---  • Only the user who wrote the comment may delete it.
---  • If p_user_id does not match the comment's owner, the
---    procedure returns an UNAUTHORIZED error — no deletion
---    occurs, and no hint is given about whether the comment
---    belongs to someone else (security-safe message).
---  • The comment must actually exist.
---  • Deleting a comment also cascades and removes all
---    Comment_Reactions tied to it (handled by the ON DELETE
---    CASCADE FK already defined in the schema).
---
--- Parameters:
---   p_comment_id – PK of the comment to delete
---   p_user_id    – ID of the user requesting the deletion
---
--- Out:
---   p_out_message – human-readable status
+-- 9. DELETE COMMENT
 -- =============================================================
 CREATE PROCEDURE sp_DeleteComment (
     IN  p_comment_id  INT,
     IN  p_user_id     INT,
     OUT p_out_message VARCHAR(255)
 )
-BEGIN
+proc_block: BEGIN
     DECLARE v_comment_exists INT DEFAULT 0;
     DECLARE v_owner_id       INT DEFAULT 0;
     DECLARE v_user_active    INT DEFAULT 0;
- 
+
     SET p_out_message = '';
- 
-    -- Guard: user must exist and not be soft-deleted
+
     SELECT COUNT(*) INTO v_user_active
     FROM   Users
     WHERE  user_id    = p_user_id
       AND  deleted_at IS NULL;
- 
+
     IF v_user_active = 0 THEN
         SET p_out_message = 'ERROR: User not found or account is deactivated.';
-        LEAVE sp_DeleteComment;
+        LEAVE proc_block;
     END IF;
- 
-    -- Guard: comment must exist
+
     SELECT COUNT(*), user_id
     INTO   v_comment_exists, v_owner_id
     FROM   Comments
     WHERE  comment_id = p_comment_id
     LIMIT  1;
- 
+
     IF v_comment_exists = 0 THEN
         SET p_out_message = 'ERROR: Comment not found.';
-        LEAVE sp_DeleteComment;
+        LEAVE proc_block;
     END IF;
- 
-    -- Guard: requesting user must be the comment owner
+
     IF v_owner_id <> p_user_id THEN
         SET p_out_message = 'ERROR: Unauthorized. You can only delete your own comments.';
-        LEAVE sp_DeleteComment;
+        LEAVE proc_block;
     END IF;
- 
-    -- Delete the comment (Comment_Reactions cascade automatically)
+
     DELETE FROM Comments
     WHERE  comment_id = p_comment_id;
- 
+
     SET p_out_message = CONCAT(
         'SUCCESS: Comment ID ', p_comment_id, ' has been deleted.'
     );
-END $$
+END proc_block $$
 
 
 -- =============================================================
--- 9. GET ORDINANCE REACTION SUMMARY  (convenience read helper)
---
--- Returns one result-set row per reaction type showing the
--- count for a given ordinance — useful for rendering the
--- Like / Dislike counters in the UI.
---
--- Parameters:
---   p_ordinance_id – the ordinance to summarise
+-- 10. GET ORDINANCE REACTION SUMMARY
 -- =============================================================
 CREATE PROCEDURE sp_GetOrdinanceReactionSummary (
     IN p_ordinance_id INT
@@ -872,6 +613,219 @@ BEGIN
     ORDER BY   rt.reaction_type_id;
 END $$
 
+-- =============================================================
+-- GET ORDINANCES BY TITLE
+-- =============================================================
+CREATE PROCEDURE GetOrdinancesByTitle(
+    IN p_search_keyword VARCHAR(255)
+)
+BEGIN
+    DECLARE v_search_pattern VARCHAR(257);
+    SET v_search_pattern = CONCAT('%', p_search_keyword, '%');
+
+    -- CTE: Pre-aggregate metrics per ordinance item
+    WITH MetricAggregations AS (
+        SELECT 
+            rel.ordinance_id,
+            SUM(CASE WHEN typ.reaction_type = 'like' THEN 1 ELSE 0 END) AS total_likes,
+            SUM(CASE WHEN typ.reaction_type = 'dislike' THEN 1 ELSE 0 END) AS total_dislikes
+        FROM 
+            Ordinance_Reactions rel
+        INNER JOIN 
+            Reaction_Types typ ON rel.reaction_type_id = typ.reaction_type_id
+        GROUP BY 
+            rel.ordinance_id
+    )
+
+    -- Primary Query Expression
+    SELECT 
+        ord.ordinance_id,
+        SUBSTRING(ord.ordinance_number, 5) AS ordinance_number,
+        ord.title,
+        ord.series_year,
+        IFNULL(DAY(ord.date_enacted), '') AS enactment_day,
+        IFNULL(MONTHNAME(ord.date_enacted), '') AS enactment_month,
+        IFNULL(YEAR(ord.date_enacted), ord.series_year) AS enactment_year,
+        ord.status,
+        -- Use COALESCE to gracefully map missing metrics to a baseline zero state
+        COALESCE(metrics.total_likes, 0) AS like_count,
+        COALESCE(metrics.total_dislikes, 0) AS dislike_count
+    FROM 
+        Ordinances ord
+    LEFT JOIN 
+        MetricAggregations metrics ON ord.ordinance_id = metrics.ordinance_id
+    WHERE 
+        ord.title LIKE v_search_pattern
+        AND ord.deleted_at IS NULL
+    ORDER BY 
+        ord.date_enacted DESC, 
+        ord.ordinance_id DESC;
+END $$
+
+
+-- =============================================================
+-- GET TRENDING ORDINANCE
+--
+-- Selects the single ordinance with the highest activity score
+-- over a rolling 7-day window ending at the current timestamp.
+--
+-- Trending score (tunable):
+--   score = likes - dislikes + (comment_count * 0.5)
+--
+-- Only reactions and comments created within the last 7 days
+-- contribute to the score, but the ordinance itself may have
+-- been enacted at any point in the past.
+--
+-- Exclusions:
+--   • Archived ordinances (deleted_at IS NOT NULL) are ignored.
+--
+-- Result set (single row):
+--   ordinance_id       – PK, for frontend routing
+--   ordinance_number   – digits only, affixes stripped
+--   series_year
+--   date_enacted_fmt   – "DD Month YYYY"  e.g. "15 April 2026"
+--   title
+--   trending_score     – numeric score used for ranking
+--                        (exposed so the UI can display it or
+--                         log it; can be omitted in the view layer)
+-- =============================================================
+CREATE PROCEDURE sp_GetTrendingOrdinance ()
+BEGIN
+    -- Window boundary computed once
+    SET @window_start = DATE_SUB(NOW(), INTERVAL 7 DAY);
+
+    SELECT
+        o.ordinance_id,
+
+        -- Strip every non-digit character from ordinance_number
+        REGEXP_REPLACE(o.ordinance_number, '[^0-9]', '')   AS ordinance_number,
+
+        o.series_year,
+
+        -- Format enactment date as "DD Month YYYY"
+        DATE_FORMAT(o.date_enacted, '%d %M %Y')            AS date_enacted_fmt,
+
+        o.title,
+
+        -- Trending score: likes - dislikes + (comments * 0.5)
+        (
+            -- Likes within window
+            COALESCE((
+                SELECT COUNT(*)
+                FROM   Ordinance_Reactions  r
+                JOIN   Reaction_Types       rt
+                       ON rt.reaction_type_id = r.reaction_type_id
+                       AND rt.reaction_type   = 'Like'
+                WHERE  r.ordinance_id = o.ordinance_id
+                  AND  r.created_at  >= @window_start
+            ), 0)
+            -
+            -- Dislikes within window
+            COALESCE((
+                SELECT COUNT(*)
+                FROM   Ordinance_Reactions  r
+                JOIN   Reaction_Types       rt
+                       ON rt.reaction_type_id = r.reaction_type_id
+                       AND rt.reaction_type   = 'Dislike'
+                WHERE  r.ordinance_id = o.ordinance_id
+                  AND  r.created_at  >= @window_start
+            ), 0)
+            +
+            -- Comments within window (weighted 0.5)
+            COALESCE((
+                SELECT COUNT(*) * 0.5
+                FROM   Comments c
+                WHERE  c.ordinance_id = o.ordinance_id
+                  AND  c.created_at  >= @window_start
+            ), 0)
+        )                                                   AS trending_score
+
+    FROM  Ordinances o
+    WHERE o.deleted_at IS NULL
+
+    ORDER BY trending_score DESC,
+             -- Tie-break: most recently enacted ordinance wins
+             o.date_enacted  DESC,
+             o.ordinance_id  DESC
+
+    LIMIT 1;
+END $$
+
+
+-- =============================================================
+-- GET RECENT ORDINANCES
+--
+-- Returns the 20 most recently enacted active ordinances whose
+-- enactment date is on or before today (no future-dated rows).
+--
+-- Like / Dislike counts are lifetime totals (not windowed),
+-- as the intent here is a recency list, not a trending list.
+--
+-- Exclusions:
+--   • Archived ordinances (deleted_at IS NOT NULL) are ignored.
+--   • Ordinances with a NULL or future date_enacted are ignored.
+--
+-- Result set (up to 20 rows):
+--   ordinance_id        – PK, for frontend routing
+--   ordinance_number    – digits only, affixes stripped
+--   series_year
+--   enactment_day       – "DD"   (zero-padded), own column
+--   enactment_month     – "Month" full name,    own column
+--   enactment_year      – "YYYY",               own column
+--   title
+--   like_count          – lifetime Like reactions
+--   dislike_count       – lifetime Dislike reactions
+-- =============================================================
+CREATE PROCEDURE sp_GetRecentOrdinances ()
+BEGIN
+    SELECT
+        o.ordinance_id,
+
+        -- Digits-only ordinance number
+        REGEXP_REPLACE(o.ordinance_number, '[^0-9]', '')   AS ordinance_number,
+
+        o.series_year,
+
+        -- Enactment date split into three separate columns
+        DATE_FORMAT(o.date_enacted, '%d')                  AS enactment_day,
+        DATE_FORMAT(o.date_enacted, '%M')                  AS enactment_month,
+        DATE_FORMAT(o.date_enacted, '%Y')                  AS enactment_year,
+
+        o.title,
+
+        -- Lifetime Like count
+        COALESCE(SUM(
+            CASE WHEN rt.reaction_type = 'Like'    THEN 1 ELSE 0 END
+        ), 0)                                              AS like_count,
+
+        -- Lifetime Dislike count
+        COALESCE(SUM(
+            CASE WHEN rt.reaction_type = 'Dislike' THEN 1 ELSE 0 END
+        ), 0)                                              AS dislike_count
+
+    FROM       Ordinances        o
+    LEFT JOIN  Ordinance_Reactions  orr
+                   ON  orr.ordinance_id = o.ordinance_id
+    LEFT JOIN  Reaction_Types       rt
+                   ON  rt.reaction_type_id = orr.reaction_type_id
+
+    WHERE  o.deleted_at   IS NULL
+      AND  o.date_enacted IS NOT NULL
+      AND  o.date_enacted <= NOW()   -- exclude any future-dated ordinances
+
+    GROUP BY
+        o.ordinance_id,
+        o.ordinance_number,
+        o.series_year,
+        o.date_enacted,
+        o.title
+
+    ORDER BY o.date_enacted  DESC,
+             o.ordinance_id  DESC   -- stable tie-break for same-day entries
+
+    LIMIT 20;
+END $$
+
 
 DELIMITER ;
 
@@ -881,62 +835,66 @@ DELIMITER ;
 -- =============================================================
 
 /*
--- Seed reaction types (run once)
-INSERT IGNORE INTO Reaction_Types (reaction_type) VALUES ('Like'), ('Dislike');
+-- 11. Trending ordinance (last 7 days)
+CALL sp_GetTrendingOrdinance();
+-- Returns one row, e.g.:
+-- ordinance_id | ordinance_number | series_year | date_enacted_fmt | title                        | trending_score
+-- 42           | 2024001          | 2024        | 15 March 2024    | An Ordinance Regulating ...  | 7.5
 
--- ── 7. React to an ordinance ──────────────────────────────────
 
--- First call: adds a Like
-CALL sp_ReactToOrdinance(1, 5, 1, @action, @msg);
-SELECT @action AS action, @msg AS message;
--- action: ADDED | message: SUCCESS: Reaction (type 1) added to ordinance ID 1.
+-- 12. Top 20 most recent ordinances
+CALL sp_GetRecentOrdinances();
+-- Returns up to 20 rows, e.g.:
+-- ordinance_id | ordinance_number | series_year | enactment_day | enactment_month | enactment_year | title | like_count | dislike_count
+-- 42           | 2024001          | 2024        | 15            | March           | 2024           | An Ordinance... | 10 | 2
+*/
 
--- Second call with same type: removes it (toggle off)
-CALL sp_ReactToOrdinance(1, 5, 1, @action, @msg);
-SELECT @action AS action, @msg AS message;
--- action: REMOVED | message: SUCCESS: Reaction removed from ordinance ID 1.
+-- =============================================================
+-- SAMPLE USAGE
+-- =============================================================
 
--- Add a Like, then switch to Dislike
-CALL sp_ReactToOrdinance(1, 5, 1, @action, @msg);   -- Like added
-CALL sp_ReactToOrdinance(1, 5, 2, @action, @msg);   -- switched to Dislike
-SELECT @action AS action, @msg AS message;
--- action: SWITCHED | message: SUCCESS: Reaction switched to type 2 on ordinance ID 1.
+/*
+-- 1. Sign up
+CALL sp_UserSignUp('Juan dela Cruz', 'juan@example.com', '$2b$12$hashedPasswordHere', 1, @uid, @msg);
+SELECT @uid AS new_user_id, @msg AS message;
 
--- ── 8. Post a comment ─────────────────────────────────────────
-CALL sp_AddComment(
-    1,                                          -- ordinance_id
-    5,                                          -- user_id
-    'This ordinance greatly benefits our community.',
-    @cid, @msg
+-- 2. Login
+CALL sp_UserLogin('juan@example.com', 8, @sid, @uid, @rid, @msg);
+SELECT @sid AS session_id, @uid AS user_id, @rid AS role_id, @msg AS message;
+
+-- 3. Logout
+CALL sp_UserLogout(@sid, @msg);
+SELECT @msg AS message;
+
+-- 4. Add ordinance
+CALL sp_AddOrdinance(
+    'ORD-2024-001', 'An Ordinance Regulating Noise Pollution in Barangay X',
+    'Hon. Maria Santos', '2024', 2, 3, 'Active', '2024-03-15',
+    NULL, 'Regulates noise levels in residential areas.',
+    'WHEREAS, the Sangguniang Barangay of Barangay X...', @oid, @msg
 );
+SELECT @oid AS new_ordinance_id, @msg AS message;
+
+-- 5. Update ordinance
+CALL sp_UpdateOrdinance(@oid, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '/uploads/ord2024001.pdf', NULL, NULL, @msg);
+SELECT @msg AS message;
+
+-- 6. Archive ordinance
+CALL sp_ArchiveOrdinance(@oid, @msg);
+SELECT @msg AS message;
+
+-- 7. React to ordinance
+CALL sp_ReactToOrdinance(1, 5, 1, @action, @msg);
+SELECT @action AS action, @msg AS message;
+
+-- 8. Add comment
+CALL sp_AddComment(1, 5, 'This ordinance greatly benefits our community.', @cid, @msg);
 SELECT @cid AS new_comment_id, @msg AS message;
 
--- ── 9. Delete a comment ─────────────────────────────────────────
-
--- User 5 deletes their own comment (comment_id = 3)
+-- 9. Delete comment
 CALL sp_DeleteComment(3, 5, @msg);
 SELECT @msg AS message;
--- SUCCESS: Comment ID 3 has been deleted.
- 
--- User 7 tries to delete a comment that belongs to user 5
-CALL sp_DeleteComment(3, 7, @msg);
-SELECT @msg AS message;
--- ERROR: Unauthorized. You can only delete your own comments.
- 
--- Comment does not exist
-CALL sp_DeleteComment(999, 5, @msg);
-SELECT @msg AS message;
--- ERROR: Comment not found.
- 
--- Deactivated / non-existent user attempts deletion
-CALL sp_DeleteComment(3, 99, @msg);
-SELECT @msg AS message;
--- ERROR: User not found or account is deactivated.
 
--- ── 10. Get reaction summary for ordinance 1 ───────────────────
+-- 10. Get reaction summary
 CALL sp_GetOrdinanceReactionSummary(1);
--- Returns:
--- reaction_type_id | reaction_type | reaction_count
--- 1                | Like          | 3
--- 2                | Dislike       | 1
 */

@@ -1,4 +1,4 @@
-const searchBar = document.getElementById('hero-search-bar');
+const searchBar = document.getElementById('home-pg-hero-search');
 const resultsDiv = document.getElementById('results');
 
 searchBar.addEventListener('input', async function () {
