@@ -1,5 +1,25 @@
 <?php
 
+// ------------------------------------------------------------
+// INTERNAL HELPER: reaction-count subexpression
+//
+// Returns the two COALESCE(SUM(CASE …)) column expressions
+// shared by several queries so the SQL stays DRY.
+//
+// @param  string $join_alias  The Ordinance_Reactions table alias
+//                             used in the surrounding query.
+// @param  string $rt_alias    The Reaction_Types table alias.
+// @return string              Two comma-separated SQL column
+//                             expressions with trailing comma.
+// ------------------------------------------------------------
+function _reactionCountColumns(string $join_alias = 'orr', string $rt_alias = 'rt'): string
+{
+    return "
+        COALESCE(SUM(CASE WHEN LOWER({$rt_alias}.reaction_type) = 'like'    THEN 1 ELSE 0 END), 0) AS like_count,
+        COALESCE(SUM(CASE WHEN LOWER({$rt_alias}.reaction_type) = 'dislike' THEN 1 ELSE 0 END), 0) AS dislike_count
+    ";
+}
+
 /**
  * Executes user registration logic previously handled by sp_UserSignUp.
  *
@@ -314,4 +334,187 @@ function getRecentOrdinances(PDO $pdo): array
         error_log("Database execution error within getRecentOrdinances: " . $e->getMessage());
         throw $e;
     }
+}
+
+// ------------------------------------------------------------
+// getOrdinanceById
+//
+// Retrieves the full detail record for a single active
+// ordinance identified by its primary key.
+//
+// Joins:
+//   Categories  — resolves category_id  → category_name
+//   Barangays   — resolves barangay_id  → barangay_name
+//   Ordinance_Reactions + Reaction_Types — lifetime like /
+//     dislike totals
+//
+// Returns null when:
+//   • The ordinance_id does not exist.
+//   • The record has been soft-deleted (deleted_at IS NOT NULL).
+//
+// @param  PDO        $pdo           Active database connection.
+// @param  int        $ordinance_id  PK of the requested record.
+// @return array|null                Associative row or null.
+// ------------------------------------------------------------
+function getOrdinanceById(PDO $pdo, int $ordinance_id): ?array
+{
+    $sql = "
+        SELECT
+            -- Identity
+            o.ordinance_id,
+            REGEXP_REPLACE(o.ordinance_number, '[^0-9]', '')   AS ordinance_number,
+            o.series_year,
+ 
+            -- Content
+            o.title,
+            o.author_sponsor,
+            o.summary,
+            o.full_text,
+            o.pdf_file,
+            o.status,
+ 
+            -- Related entity names (NULL-safe: LEFT JOIN)
+            c.category_name,
+            b.barangay_name,
+ 
+            -- Enactment date — split for card rendering
+            DATE_FORMAT(o.date_enacted, '%d')                  AS enactment_day,
+            DATE_FORMAT(o.date_enacted, '%M')                  AS enactment_month,
+            DATE_FORMAT(o.date_enacted, '%Y')                  AS enactment_year,
+ 
+            -- Enactment date — formatted prose label
+            DATE_FORMAT(o.date_enacted, '%d %M %Y')            AS date_enacted_fmt,
+ 
+            -- Lifetime engagement totals
+            " . _reactionCountColumns('orr', 'rt') . "
+ 
+        FROM       Ordinances           o
+ 
+        -- Category may be NULL; keep the row with LEFT JOIN
+        LEFT JOIN  Categories           c
+                       ON  c.category_id  = o.category_id
+ 
+        -- Barangay may be NULL; keep the row with LEFT JOIN
+        LEFT JOIN  Barangays            b
+                       ON  b.barangay_id  = o.barangay_id
+ 
+        -- Reactions — aggregate after join; absent rows → 0
+        LEFT JOIN  Ordinance_Reactions  orr
+                       ON  orr.ordinance_id    = o.ordinance_id
+        LEFT JOIN  Reaction_Types       rt
+                       ON  rt.reaction_type_id = orr.reaction_type_id
+ 
+        WHERE  o.ordinance_id = :ordinance_id
+          AND  o.deleted_at   IS NULL
+ 
+        -- GROUP BY all non-aggregated columns to allow SUM()
+        GROUP BY
+            o.ordinance_id,
+            o.ordinance_number,
+            o.series_year,
+            o.title,
+            o.author_sponsor,
+            o.summary,
+            o.full_text,
+            o.pdf_file,
+            o.status,
+            o.date_enacted,
+            c.category_name,
+            b.barangay_name
+ 
+        LIMIT 1
+    ";
+ 
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':ordinance_id' => $ordinance_id]);
+ 
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+ 
+    return $row !== false ? $row : null;
+}
+
+// ------------------------------------------------------------
+// getOrdinanceComments
+//
+// Retrieves comments for a given ordinance, newest-first,
+// with per-comment like and dislike counts.
+//
+// Joins:
+//   Users             — resolves user_id → full_name
+//   Comment_Reactions + Reaction_Types — per-comment
+//     like / dislike totals
+//
+// Soft-deleted user accounts are still included so that
+// comments authored before account deletion remain visible;
+// the display layer should handle anonymisation if needed.
+//
+// Pagination is offset-based.  Pass $limit = 0 to fetch all
+// comments without a LIMIT clause (use with caution on large
+// datasets).
+//
+// @param  PDO   $pdo           Active database connection.
+// @param  int   $ordinance_id  FK of the parent ordinance.
+// @param  int   $limit         Max rows to return (default 50).
+// @param  int   $offset        Row offset for pagination (default 0).
+// @return array                Indexed array of associative rows.
+//                              Empty array when no comments exist.
+// ------------------------------------------------------------
+function getOrdinanceComments(PDO $pdo, int $ordinance_id, int $limit = 50, int $offset = 0): array
+{
+    // Build the LIMIT / OFFSET clause conditionally so callers
+    // can pass $limit = 0 to retrieve the full unbounded set.
+    $pagination = $limit > 0
+        ? ' LIMIT ' . $limit . ' OFFSET ' . $offset
+        : '';
+ 
+    $sql = "
+        SELECT
+            -- Comment identity
+            cm.comment_id,
+            cm.ordinance_id,
+            cm.created_at,
+ 
+            -- Comment content
+            cm.comment_text,
+ 
+            -- Author details
+            cm.user_id,
+            u.full_name,
+ 
+            -- Per-comment engagement totals
+            COALESCE(SUM(CASE WHEN LOWER(rt.reaction_type) = 'like'    THEN 1 ELSE 0 END), 0) AS like_count,
+            COALESCE(SUM(CASE WHEN LOWER(rt.reaction_type) = 'dislike' THEN 1 ELSE 0 END), 0) AS dislike_count
+ 
+        FROM       Comments          cm
+ 
+        -- Author — every comment has a user_id FK, so INNER JOIN is safe.
+        -- Using LEFT JOIN preserves comments if the user row was hard-deleted
+        -- (should not happen given ON DELETE CASCADE, but defensive is better).
+        LEFT JOIN  Users             u
+                       ON  u.user_id        = cm.user_id
+ 
+        -- Per-comment reactions (may be absent → 0 via COALESCE)
+        LEFT JOIN  Comment_Reactions cr
+                       ON  cr.comment_id    = cm.comment_id
+        LEFT JOIN  Reaction_Types    rt
+                       ON  rt.reaction_type_id = cr.reaction_type_id
+ 
+        WHERE  cm.ordinance_id = :ordinance_id
+ 
+        GROUP BY
+            cm.comment_id,
+            cm.ordinance_id,
+            cm.created_at,
+            cm.comment_text,
+            cm.user_id,
+            u.full_name
+ 
+        ORDER BY cm.created_at ASC,
+                 cm.comment_id ASC
+    " . $pagination;
+ 
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':ordinance_id' => $ordinance_id]);
+ 
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
