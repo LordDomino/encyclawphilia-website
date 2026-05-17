@@ -26,14 +26,12 @@ if ($search_keyword !== '') {
     echo "<script>console.log('Hello world');</script>";
 }
 
-// Phase 3: HTML Presentation begins below...
-?>
-
-<?php
+// HTML Assembly
 $pageTitle = "Browse | EncycLawPhilia Valenzuela";
 $currentPage = "browse";
 
 require_once 'fragments/head.php';
+require_once 'php/helpers/view_components.php';
 ?>
 
 <body>
@@ -152,9 +150,7 @@ require_once 'fragments/head.php';
                                             </span>
                                         </span>
                                     </div>
-                                    <a href="ordinance.php?id=...">
-                                        <p class="link">Read More</p>
-                                    </a>
+                                    <?php renderOrdinanceRedirectLink((int)$row['ordinance_id']); ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>

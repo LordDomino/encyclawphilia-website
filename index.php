@@ -25,14 +25,12 @@ $results_latest = getRecentOrdinances($pdo);
 echo "<script>console.log(" . json_encode($featured_ordinance) . ");</script>";
 echo "<script>console.log(" . json_encode($results_latest) . ");</script>";
 
-// Phase 3: HTML Presentation begins below...
-?>
-
-<?php
+// Phase 3: HTML Presentation
 $pageTitle = "EncycLawPhilia Valenzuela";
 $currentPage = "home";
 
 require_once 'fragments/head.php';
+require_once 'php/helpers/view_components.php';
 ?>
 
 <body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>" id="top">
@@ -136,9 +134,7 @@ require_once 'fragments/head.php';
                                                         </span>
                                                     </span>
                                                 </div>
-                                                <a href="ordinance.php?id=...">
-                                                    <p class="link">Read More</p>
-                                                </a>
+                                                <?php renderOrdinanceRedirectLink((int)$row['ordinance_id']); ?>
                                             </div>
                                         </div>
                                     </li>
@@ -193,9 +189,7 @@ require_once 'fragments/head.php';
                                         <span class="engagement-count">3</span>
                                     </span>
                                 </div>
-                                <a href="ordinance.php?id=...">
-                                    <p class="link">Read More</p>
-                                </a>
+                                <?php renderOrdinanceRedirectLink((int)$row['ordinance_id']); ?>
                             </div>
                         </div>
                     </li>
