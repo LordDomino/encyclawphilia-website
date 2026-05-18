@@ -1,5 +1,10 @@
 <?php
 
+namespace App\Views\pages;
+
+use function App\Models\getOrdinanceById;
+use function App\Models\getOrdinanceComments;
+
 session_start();
 $loggedIn = isset($_SESSION['user_id']);
 
@@ -388,7 +393,7 @@ require_once __DIR__ . '/../../view_components.php';
                 formData.append('reaction_type', reaction);
 
                 // Send authenticated POST request to react.php
-                fetch('../src/react.php', {
+                fetch('react', {
                         method: 'POST',
                         body: formData
                         // Note: Browsers automatically include session cookies for authentication

@@ -1,4 +1,9 @@
 <?php
+
+namespace App\Views\pages;
+
+use function App\Models\getOrdinancesByTitle;
+
 session_start();
 $loggedIn = isset($_SESSION['user_id']);
 
@@ -66,7 +71,7 @@ require_once __DIR__ . '/../../view_components.php';
             <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle filters">☰ Filters</button>
             <aside class="sidebar-column" id="sidebar-column">
                 <div class="sidebar-content">
-                    <form class="search-bar mini" action="browse.php" method="get">
+                    <form class="search-bar mini" action="/browse" method="get">
                         <input
                             type="search"
                             id="browse-pg-search-bar"

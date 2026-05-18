@@ -1,7 +1,10 @@
 <?php
 
-require_once '../config/database.php';
-require_once 'procedures.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/Models/User.php';
+
+use App\Models\User;
+
 // 1. Start session to check authentication
 session_start();
 
@@ -21,11 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reaction_type'])) {
     $reaction = $_POST['reaction_type'];
 
     $pdo = getDatabaseConnection();
-    $success = reactToOrdinance($pdo, $ordinanceId, $userId, $reaction);
-    // $success = true; // Temporary placeholder
+    $user = new User($pdo);
+    $success = $user->reactToOrdinance($ordinanceId, $userId, $reaction);
 
     if ($success) {
-        echo json_encode(['success' => true]);
+        echo $success;
     } else {
         echo json_encode(['success' => false, 'message' => 'Database error.']);
     }

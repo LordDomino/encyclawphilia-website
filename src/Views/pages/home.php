@@ -1,5 +1,10 @@
 <?php
 
+namespace App\Views\pages;
+
+use function App\Models\getTrendingOrdinance;
+use function App\Models\getRecentOrdinances;
+
 // Session tracking for user credentials persistence
 session_start();
 $loggedIn = isset($_SESSION['user_id']);

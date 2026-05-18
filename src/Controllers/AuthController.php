@@ -16,4 +16,9 @@ class AuthController
         echo "Securing filesystem access... Fetching context for user ID: " . htmlspecialchars($id);
         // Perform database operations: SELECT * FROM users WHERE id = :id
     }
+
+    public function handleSignupSubmit(): void
+    {
+        require_once __DIR__ . '/../register_process.php';
+    }
 }

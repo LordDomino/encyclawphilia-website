@@ -1,0 +1,48 @@
+<?php
+
+namespace Controllers;
+
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../Models/User.php';
+
+use App\Models\User;
+
+class UserController
+{
+    public function handleUserReactToOrdinance(): void
+    { 
+        // 1. Start session to check authentication
+        session_start();
+
+        // 2. Set response header to JSON
+        header('Content-Type: application/json');
+
+        // 3. Verify user authentication
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Unauthorized. Please log in.']);
+            exit;
+        }
+
+        // 4. Validate the incoming POST data
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reaction_type'])) {
+            $ordinanceId = $_POST['ordinance_id'];
+            $userId = $_SESSION['user_id'];
+            $reaction = $_POST['reaction_type'];
+
+            $pdo = getDatabaseConnection();
+            $user = new User($pdo);
+            $success = $user->reactToOrdinance($ordinanceId, $userId, $reaction);
+
+            if ($success['status'] === 'success')
+            {
+                echo json_encode([
+                    'likes' => $success['data']['aggregates']['likes'],
+                    'likes' => $success['data']['aggregates']['likes']
+                ]);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid request.']);
+        }
+        exit;
+    }
+}
