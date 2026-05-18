@@ -802,7 +802,7 @@ require_once __DIR__ . '/../src/view_components.php';
 
     </main>
 
-    <?php require_once 'fragments/footer.php'; ?>
+    <?php require_once __DIR__ . '/../src/Views/footer.php'; ?>
 </body>
 
 <script src="js/search.js"></script>

@@ -6,11 +6,11 @@ $loggedIn = isset($_SESSION['user_id']);
 $pageTitle = "About EncycLawPhilia Valenzuela";
 $currentPage = "about";
 
-require_once 'fragments/head.php';
+require_once __DIR__ . '/../src/Views/head.php';
 ?>
 
 <body>
-    <?php require_once 'fragments/header.php'; ?>
+    <?php require_once __DIR__ . '/../src/Views/header.php'; ?>
 
     <main class="about-page">
         <div class="subhero">
@@ -131,7 +131,7 @@ require_once 'fragments/head.php';
         </section>
     </main>
 
-    <?php require_once 'fragments/footer.php'; ?>
+    <?php require_once __DIR__ . '/../src/Views/footer.php'; ?>
 </body>
 
 </html>

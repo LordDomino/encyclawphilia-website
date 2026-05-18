@@ -3,8 +3,8 @@ session_start();
 $loggedIn = isset($_SESSION['user_id']);
 
 // Phase 1: Ingestion and State Management
-require_once 'config/database.php';
-require_once 'php/procedures.php'; // Import the newly decoupled data routine
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../src/Models/procedures.php'; // Import the newly decoupled data routine
 
 $search_keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
 $safe_search_keyword = htmlspecialchars($search_keyword, ENT_QUOTES, 'UTF-8');
@@ -41,12 +41,12 @@ if ($search_keyword !== '') {
 $pageTitle = "Browse | EncycLawPhilia Valenzuela";
 $currentPage = "browse";
 
-require_once 'fragments/head.php';
-require_once 'php/helpers/view_components.php';
+require_once __DIR__ . '/../src/Views/head.php';
+require_once __DIR__ . '/../src/view_components.php';
 ?>
 
 <body>
-    <?php require_once 'fragments/header.php'; ?>
+    <?php require_once __DIR__ . '/../src/Views/header.php'; ?>
 
     <main class="browse">
         <div class="subhero" id="browse-subhero">
@@ -176,7 +176,7 @@ require_once 'php/helpers/view_components.php';
         <button class="back-to-top" id="back-to-top" aria-label="Back to top">↑</button>
     </main>
 
-    <?php require_once 'fragments/footer.php'; ?>
+    <?php require_once __DIR__ . '/../src/Views/footer.php'; ?>
 </body>
 <script>
     // ============================================================

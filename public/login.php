@@ -9,14 +9,14 @@ $authError  = $_SESSION['auth_error'] ?? null;
 $activeTab  = $authError['tab'] ?? 'login';
 unset($_SESSION['auth_error']);   // clear it so it doesn't persist on refresh
 
-require_once 'fragments/head.php';
+require_once __DIR__ . '/../src/Views/head.php';
 ?>
 
 <body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>">
     <main class="auth-page">
         <div class="login-hero">
             <div class="flex-column" id="login-hero">
-                <?php require_once 'fragments/brand_title.php'; ?>
+                <?php require_once __DIR__ . '/../src/Views/brand_title.php'; ?>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus posuere magna congue consectetur pharetra. Etiam a nibh quis tellus gravida egestas. Ut eget dictum massa, in accumsan nulla.</p>
                 <p>Just want anonymous browsing? <a href="index.php" class="clickable emphasis">Go back to home page.</a></p>
             </div>

@@ -1,7 +1,7 @@
 <footer>
     <div class="footer-content">
         <div class="footer-brand">
-            <?php include 'fragments/brand_title.php'; ?>
+            <?php include 'brand_title.php'; ?>
             <p>Essential references for Valenzuela’s city ordinance portal, with fast access to About Us, policy
                 browsing, and contact lines.</p>
         </div>
