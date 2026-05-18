@@ -116,7 +116,7 @@ try {
     $_SESSION['auth_error'] = [
         'type'  => 'error',           // error | warning | info | success
         'title' => 'Signup failed',
-        'body'  => 'System fault',
+        'body'  => 'An unexpected error occured: ' . $e->getMessage(),
         'tab'   => 'signup'
     ];
     header('Location: ../login.php');
