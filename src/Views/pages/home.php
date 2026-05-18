@@ -6,7 +6,7 @@ $loggedIn = isset($_SESSION['user_id']);
 
 // Import structural dependencies
 require_once __DIR__ . '/../../../config/database.php';
-require_once __DIR__ . '/../../models/procedures.php';
+require_once __DIR__ . '/../../Models/procedures.php';
 
 // Phase 1: Ingestion and State Management
 $search_keyword      = isset($_GET['q']) ? trim($_GET['q']) : '';
