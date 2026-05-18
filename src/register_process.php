@@ -98,6 +98,9 @@ try {
             'body'  => 'You may now log in with your credentials.',
             'tab'   => 'login'
         ];
+
+        require_once __DIR__ . '/logout_process.php';
+
         // Direct execution path to the secure application workspace
         header('Location: login');
         exit();

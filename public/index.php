@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 
 // ROUTING
 // Manually require dependencies
@@ -19,7 +23,9 @@ $router->get('/browse', 'PagesNavigationController@browse');
 $router->get('/about', 'PagesNavigationController@about');
 $router->get('/login', 'PagesNavigationController@login');
 $router->get('/ordinance', 'PagesNavigationController@ordinance');
+$router->get('/account', 'PagesNavigationController@account');
 $router->post('/login-submit', 'AuthController@handleLoginSubmit');
+$router->get('/logout-submit', 'AuthController@handleLogoutSubmit');
 $router->post('/signup-submit', 'AuthController@handleSignupSubmit');
 $router->post('/react', 'UserController@handleOrdinanceReact');
 $router->get('/profile/{id}', 'AuthController@showProfile'); // Dynamic parameter route

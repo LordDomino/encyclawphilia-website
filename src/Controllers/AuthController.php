@@ -17,8 +17,16 @@ class AuthController
         // Perform database operations: SELECT * FROM users WHERE id = :id
     }
 
+    public function handleLogoutSubmit(): void
+    {
+        require_once __DIR__ . '/../logout_process.php';
+    }
+
     public function handleSignupSubmit(): void
     {
         require_once __DIR__ . '/../register_process.php';
+
+        header('Location: home');
+        exit();
     }
 }
