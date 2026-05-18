@@ -1,4 +1,6 @@
 <?php
+
+namespace App;
 // register_process.php (Controller Layer)
 
 // Initialize session handling boundaries
@@ -8,6 +10,8 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/Models/User.php';
 
 use App\Models\User;
+use PDO;
+use Exception;
 
 // Assert the entry trajectory is strictly an HTTP POST method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -85,7 +89,7 @@ try {
 
         // Persist identity state metrics globally inside the server heap
         $_SESSION['user_id']   = $authOutcome['user_id'];
-        $_SESSION['full_name'] = $username;
+        $_SESSION['username'] = $username;
         $_SESSION['role_id']   = $roleId;
 
         $_SESSION['auth_error'] = [

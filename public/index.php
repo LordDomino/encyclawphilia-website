@@ -2,9 +2,9 @@
 declare(strict_types=1);
 
 
-
 // ROUTING
-// Manually require dependencies (or utilize a PSR-4 Autoloader)
+// Manually require dependencies
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../src/Core/Router.php';
 require_once __DIR__ . '/../src/Controllers/AuthController.php';
 require_once __DIR__ . '/../src/Controllers/UserController.php';
@@ -21,7 +21,7 @@ $router->get('/login', 'PagesNavigationController@login');
 $router->get('/ordinance', 'PagesNavigationController@ordinance');
 $router->post('/login-submit', 'AuthController@handleLoginSubmit');
 $router->post('/signup-submit', 'AuthController@handleSignupSubmit');
-$router->post('/react', 'UserController@handleUserReactToOrdinance');
+$router->post('/react', 'UserController@handleOrdinanceReact');
 $router->get('/profile/{id}', 'AuthController@showProfile'); // Dynamic parameter route
 
 // Catch incoming request context

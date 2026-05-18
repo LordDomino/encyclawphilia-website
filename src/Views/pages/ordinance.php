@@ -365,77 +365,7 @@ require_once __DIR__ . '/../../view_components.php';
 
     <?php require_once __DIR__ . '/../footer.php'; ?>
 
-    <script>
-        // ============================================================
-        // COMMENT TEXTAREA CHAR COUNT
-        // ============================================================
-        const textarea = document.getElementById('comment-input');
-        const charCount = document.getElementById('char-count');
-
-        textarea?.addEventListener('input', () => {
-            const len = textarea.value.length;
-            charCount.textContent = `${len} / 1000`;
-            charCount.classList.toggle('ord-comment-char-count--warn', len > 900);
-        });
-
-        // ============================================================
-        // ORDINANCE REACTION BUTTONS (optimistic UI — no auth yet)
-        // Replace alert stubs with fetch() calls once the API exists.
-        // ============================================================
-        document.querySelectorAll('.ord-reaction-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const ordinanceId = btn.dataset.ordinanceId;
-                const reaction = btn.dataset.reaction;
-
-                // Prepare the data to send
-                const formData = new FormData();
-                formData.append('ordinance_id', ordinanceId);
-                formData.append('reaction_type', reaction);
-
-                // Send authenticated POST request to react.php
-                fetch('react', {
-                        method: 'POST',
-                        body: formData
-                        // Note: Browsers automatically include session cookies for authentication
-                    })
-                    .then(response => response.json()) // Expecting a JSON response from PHP
-                    .then(data => {
-                        if (data.success) {
-                            // Toggle active state on success
-                            btn.classList.toggle('ord-reaction-btn--active');
-
-                            // Deactivate the sibling button
-                            const sibling = btn.closest('.ord-reaction-buttons')
-                                ?.querySelector(`.ord-reaction-btn:not([data-reaction="${reaction}"])`);
-                            sibling?.classList.remove('ord-reaction-btn--active');
-                        } else {
-                            alert(data.message || 'Failed to save reaction.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('A network error occurred.\n' + error);
-                    });
-            });
-        });
-
-        // ============================================================
-        // COMMENT REACTION BUTTONS (optimistic UI)
-        // ============================================================
-        document.querySelectorAll('.ord-comment-react-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // TODO: Replace with authenticated POST to react.php
-                btn.classList.toggle('ord-comment-react-btn--active');
-
-                const siblingSelector = btn.classList.contains('ord-comment-react-btn--like') ?
-                    '.ord-comment-react-btn--dislike' :
-                    '.ord-comment-react-btn--like';
-                btn.closest('.ord-comment-reactions')
-                    ?.querySelector(siblingSelector)
-                    ?.classList.remove('ord-comment-react-btn--active');
-            });
-        });
-    </script>
+    <script src="js/react_ordinance.js"></script>
 
 </body>
 

@@ -38,6 +38,8 @@ require_once __DIR__ . '/../head.php';
 require_once __DIR__ . '/../../view_components.php';
 ?>
 
+
+
 <body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>" id="top">
 
     <section class="hero-container">
@@ -805,8 +807,10 @@ require_once __DIR__ . '/../../view_components.php';
     </main>
 
     <?php require_once __DIR__ . '/../footer.php'; ?>
+    
+    <script src="js/search.js"></script>
+    <script src="js/home.js" defer></script>
 </body>
 
-<script src="js/search.js"></script>
 
 </html>

@@ -249,8 +249,8 @@ class User
             // ----------------------------------------------------------------
             $aggregateStmt = $this->db->prepare("
             SELECT
-                COALESCE(SUM(reaction_type = 'LIKE'),    0) AS likes,
-                COALESCE(SUM(reaction_type = 'DISLIKE'), 0) AS dislikes
+                COALESCE(SUM(reaction_type = 'like'),    0) AS likes,
+                COALESCE(SUM(reaction_type = 'dislike'), 0) AS dislikes
             FROM  Ordinance_Reactions
             WHERE ordinance_id = :ordinance_id
         ");

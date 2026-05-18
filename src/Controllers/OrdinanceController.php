@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers;
+namespace App\Controllers;
 
 require_once __DIR__ . '/../Models/User.php';
 require_once __DIR__ . '/../Models/Ordinance.php';
@@ -10,7 +10,7 @@ use Core\ApiResponse;
 use App\Models\Ordinance;
 use PDOException;
 
-class UserController
+class OrdinanceController
 {
     public function handleOrdinanceReact(): void
     {
