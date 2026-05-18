@@ -93,7 +93,7 @@ require_once __DIR__ . '/../head.php';
                         <!-- Sign Up Form -->
                         <form class="auth-form <?= $activeTab === 'signup'  ? 'active' : '' ?>"
                             id="signup-form"
-                            action="php/register_process.php"
+                            action="/signup-submit"
                             method="POST"
                             data-form="signup">
 

@@ -1,5 +1,10 @@
 <?php
 
+namespace App\Views\pages;
+
+use function App\Models\getTrendingOrdinance;
+use function App\Models\getRecentOrdinances;
+
 // Session tracking for user credentials persistence
 session_start();
 $loggedIn = isset($_SESSION['user_id']);
@@ -32,6 +37,8 @@ $currentPage = "home";
 require_once __DIR__ . '/../head.php';
 require_once __DIR__ . '/../../view_components.php';
 ?>
+
+
 
 <body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>" id="top">
 
@@ -800,8 +807,10 @@ require_once __DIR__ . '/../../view_components.php';
     </main>
 
     <?php require_once __DIR__ . '/../footer.php'; ?>
+    
+    <script src="js/search.js"></script>
+    <script src="js/home.js" defer></script>
 </body>
 
-<script src="js/search.js"></script>
 
 </html>

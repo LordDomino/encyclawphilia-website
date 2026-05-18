@@ -1,15 +1,21 @@
 <?php
+
+namespace App;
 // register_process.php (Controller Layer)
 
 // Initialize session handling boundaries
 session_start();
 
-require_once '../config/database.php';
-require_once 'procedures.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/Models/User.php';
+
+use App\Models\User;
+use PDO;
+use Exception;
 
 // Assert the entry trajectory is strictly an HTTP POST method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../login.php');
+    header('Location: login');
     exit();
 }
 
@@ -28,7 +34,7 @@ if ($username === '' || $email === '' || $password === '') {
         'body'  => 'All authentication fields are required.',
         'tab'   => 'signup'
     ];
-    header('Location: ../login.php');
+    header('Location: login');
     exit();
 }
 
@@ -39,7 +45,7 @@ if ($password !== $confirmPassword) {
         'body'  => 'Password confirmation parameters do not match.',
         'tab'   => 'signup'
     ];
-    header('Location: ../login.php');
+    header('Location: login');
     exit();
 }
 
@@ -50,7 +56,7 @@ if (!$termsAccepted) {
         'body'  => 'You must accept the Terms of Service to proceed.',
         'tab'   => 'signup'
     ];
-    header('Location: ../login.php');
+    header('Location: login');
     exit();
 }
 
@@ -73,7 +79,8 @@ try {
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
     // 3. Execution Phase: Invoke Procedure
-    $authOutcome = registerUser($pdo, $username, $email, $passwordHash, $roleId);
+    $user = new User($pdo);
+    $authOutcome = $user->register($username, $email, $passwordHash, $roleId);
 
     // 4. Evaluation Layer: Aligning with the procedure's actual return signature
     if (isset($authOutcome['user_id']) && $authOutcome['user_id'] > 0) {
@@ -82,7 +89,7 @@ try {
 
         // Persist identity state metrics globally inside the server heap
         $_SESSION['user_id']   = $authOutcome['user_id'];
-        $_SESSION['full_name'] = $username;
+        $_SESSION['username'] = $username;
         $_SESSION['role_id']   = $roleId;
 
         $_SESSION['auth_error'] = [
@@ -92,7 +99,7 @@ try {
             'tab'   => 'login'
         ];
         // Direct execution path to the secure application workspace
-        header('Location: ../login.php');
+        header('Location: login');
         exit();
     } else {
         // Capture specific error responses thrown back by the procedure layer
@@ -102,7 +109,7 @@ try {
             'body'  => $authOutcome['message'] ?? "An unhandled exception occurred during registration.",
             'tab'   => 'signup'
         ];
-        header('Location: ../login.php');
+        header('Location: login');
         // In your login.php file
         if (isset($_SESSION['error'])) {
             echo '<p style="color:red">' . $_SESSION['error'] . '</p>';
@@ -119,6 +126,6 @@ try {
         'body'  => 'An unexpected error occured: ' . $e->getMessage(),
         'tab'   => 'signup'
     ];
-    header('Location: ../login.php');
+    header('Location: login');
     exit();
 }

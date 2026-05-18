@@ -1,5 +1,8 @@
 <?php
+namespace App\Models;
 
+use PDO;
+use PDOException;
 
 /**
  * Translates PDO Exceptions into application level responses based on MariaDB error codes.
