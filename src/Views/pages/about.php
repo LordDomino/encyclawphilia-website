@@ -6,11 +6,11 @@ $loggedIn = isset($_SESSION['user_id']);
 $pageTitle = "About EncycLawPhilia Valenzuela";
 $currentPage = "about";
 
-require_once __DIR__ . '/../src/Views/head.php';
+require_once __DIR__ . '/../head.php';
 ?>
 
 <body>
-    <?php require_once __DIR__ . '/../src/Views/header.php'; ?>
+    <?php require_once __DIR__ . '/../header.php'; ?>
 
     <main class="about-page">
         <div class="subhero">

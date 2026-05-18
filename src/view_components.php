@@ -10,7 +10,7 @@
 function renderOrdinanceRedirectLink(int $ordinanceId): void
 {
     ?>
-    <a href="ordinance.php?id=<?= $ordinanceId ?>">
+    <a href="/ordinance?id=<?= $ordinanceId ?>">
         <p class="link">Read More</p>
     </a>
     <?php

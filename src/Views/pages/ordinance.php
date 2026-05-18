@@ -8,8 +8,8 @@ $loggedIn = isset($_SESSION['user_id']);
 // Phase 1: Ingestion and State Management
 // ============================================================
 
-require_once 'config/database.php';
-require_once 'php/procedures.php';
+require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/../../Models/procedures.php';
 
 $ordinance_id = isset($_GET['id']) ? (int) trim($_GET['id']) : 0;
 
@@ -47,13 +47,13 @@ $status_map = [
 ];
 $status_display = $status_map[$ordinance['status']] ?? ['label' => ucfirst($ordinance['status']), 'class' => 'pending'];
 
-require_once 'fragments/head.php';
-require_once 'php/helpers/view_components.php';
+require_once __DIR__ . '/../head.php';
+require_once __DIR__ . '/../../view_components.php';
 ?>
 
 <body class="<?php echo htmlspecialchars($currentPage, ENT_QUOTES, 'UTF-8'); ?>">
 
-    <?php require_once 'fragments/header.php'; ?>
+    <?php require_once __DIR__ . '/../header.php'; ?>
 
     <main class="ordinance-page">
 
@@ -358,7 +358,7 @@ require_once 'php/helpers/view_components.php';
 
     </main>
 
-    <?php require_once 'fragments/footer.php'; ?>
+    <?php require_once __DIR__ . '/../footer.php'; ?>
 
     <script>
         // ============================================================
@@ -388,7 +388,7 @@ require_once 'php/helpers/view_components.php';
                 formData.append('reaction_type', reaction);
 
                 // Send authenticated POST request to react.php
-                fetch('php/react.php', {
+                fetch('../src/react.php', {
                         method: 'POST',
                         body: formData
                         // Note: Browsers automatically include session cookies for authentication

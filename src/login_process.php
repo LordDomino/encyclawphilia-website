@@ -4,12 +4,15 @@
 // Initialize session handling boundaries
 session_start();
 
-require_once '../config/database.php';
-require_once 'procedures.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/Models/User.php';
+
+use App\Models\User;
 
 // Assert the entry trajectory is strictly an HTTP POST method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: login.php');
+    header('Location: login');
+    echo "<script>console.log('Exiting');</script>";
     exit();
 }
 
@@ -24,13 +27,14 @@ if ($email === '' || $password === '') {
         'body'  => 'All authentication fields are required.',
         'tab'   => 'login'
     ];
-    header('Location: login.php');
+    header('Location: login');
     exit();
 }
 
 // Inject connection dependency to resolve data validation
 $pdo = getDatabaseConnection();
-$authOutcome = verifyUserLogin($pdo, $email, $password);
+$user = new User($pdo);
+$authOutcome = $user->verifyLogin($email, $password);
 
 if ($authOutcome['authenticated']) {
     // Prevent Session Fixation attacks by regenerating the identifier token
@@ -42,7 +46,7 @@ if ($authOutcome['authenticated']) {
     $_SESSION['role_id']   = $authOutcome['user']['role_id'];
 
     // Direct execution path to the secure application workspace
-    header('Location: ../index.php');
+    header('Location: home');
     exit();
 } else {
     // Stage failure metrics and return execution focus back to presentation layout
@@ -53,6 +57,6 @@ if ($authOutcome['authenticated']) {
         'body'  => 'Incorrect email or password. Please try again.',
         'tab'   => 'login'
     ];
-    header('Location: ../login.php');
+    header('Location: login');
     exit();
 }
