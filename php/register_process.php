@@ -28,7 +28,7 @@ if ($username === '' || $email === '' || $password === '') {
         'body'  => 'All authentication fields are required.',
         'tab'   => 'signup'
     ];
-    header('Location: ../login.php?tab=signup');
+    header('Location: ../login.php');
     exit();
 }
 
@@ -39,7 +39,7 @@ if ($password !== $confirmPassword) {
         'body'  => 'Password confirmation parameters do not match.',
         'tab'   => 'signup'
     ];
-    header('Location: ../login.php?tab=signup');
+    header('Location: ../login.php');
     exit();
 }
 
@@ -50,7 +50,7 @@ if (!$termsAccepted) {
         'body'  => 'You must accept the Terms of Service to proceed.',
         'tab'   => 'signup'
     ];
-    header('Location: ../login.php?tab=signup');
+    header('Location: ../login.php');
     exit();
 }
 
@@ -85,12 +85,23 @@ try {
         $_SESSION['full_name'] = $username;
         $_SESSION['role_id']   = $roleId;
 
+        $_SESSION['auth_error'] = [
+            'type'  => 'success',           // error | warning | info | success
+            'title' => 'Registration Successful',
+            'body'  => 'You may now log in with your credentials.',
+            'tab'   => 'login'
+        ];
         // Direct execution path to the secure application workspace
         header('Location: ../login.php');
         exit();
     } else {
         // Capture specific error responses thrown back by the procedure layer
-        $_SESSION['auth_error'] = $authOutcome['message'] ?? "An unhandled exception occurred during registration.";
+        $_SESSION['auth_error'] = [
+            'type'  => 'error',           // error | warning | info | success
+            'title' => 'Signup failed',
+            'body'  => $authOutcome['message'] ?? "An unhandled exception occurred during registration.",
+            'tab'   => 'signup'
+        ];
         header('Location: ../login.php');
         // In your login.php file
         if (isset($_SESSION['error'])) {
@@ -102,7 +113,12 @@ try {
     }
 } catch (Exception $e) {
     // Stage failure metrics for system anomalies and redirect safely
-    $_SESSION['auth_error'] = "System Fault: " . $e->getMessage();
+    $_SESSION['auth_error'] = [
+        'type'  => 'error',           // error | warning | info | success
+        'title' => 'Signup failed',
+        'body'  => 'System fault',
+        'tab'   => 'signup'
+    ];
     header('Location: ../login.php');
     exit();
 }

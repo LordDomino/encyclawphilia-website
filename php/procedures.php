@@ -37,7 +37,7 @@ function registerUser(PDO $pdo, string $username, string $email, string $passwor
     $trimmedEmail = strtolower(trim($email));
     $cleanPassword = trim($passwordHash);
 
-    // 1. Structural Validation Phase (Guard Clauses)
+    // Structural Validation Phase (Guard Clauses)
     if ($trimmedName === '') {
         return ['user_id' => 0, 'message' => 'ERROR: Full name is required.'];
     }
@@ -61,7 +61,7 @@ function registerUser(PDO $pdo, string $username, string $email, string $passwor
         ");
         
         $insertStmt->execute([
-            ':username'     => $trimmedName,
+            ':username'      => $trimmedName,
             ':email'         => $trimmedEmail,
             ':password_hash' => $passwordHash, // Retaining original hash structure
             ':role_id'       => $roleId
