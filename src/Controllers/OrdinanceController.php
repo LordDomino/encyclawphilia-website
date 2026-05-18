@@ -16,7 +16,7 @@ class OrdinanceController
     {
         session_start();
 
-        // Guard: authentication
+        // GUARD: authentication
         if (empty($_SESSION['user_id'])) {
             ApiResponse::send(ApiResponse::error('You must be logged in to react.', 401), 401);
         }
