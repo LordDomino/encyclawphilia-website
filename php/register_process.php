@@ -59,7 +59,7 @@ try {
     $pdo = getDatabaseConnection();
 
     // Default role validation for Users
-    $stmt = $pdo->query("SELECT role_id FROM roles WHERE role_name='Citizen';");
+    $stmt = $pdo->query("SELECT role_id FROM Roles WHERE role_name='Citizen';");
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($results)) {
