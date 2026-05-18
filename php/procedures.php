@@ -24,16 +24,16 @@ function _reactionCountColumns(string $join_alias = 'orr', string $rt_alias = 'r
  * Executes user registration logic previously handled by sp_UserSignUp.
  *
  * @param PDO    $pdo          Authenticated PDO instance.
- * @param string $fullName     Raw name string.
+ * @param string $username     Raw name string.
  * @param string $email        Raw email address string.
  * @param string $passwordHash Pre-hashed password string.
  * @param int    $roleId       Target role identifier.
  * @return array Contains 'user_id' (int) and 'message' (string).
  */
-function registerUser(PDO $pdo, string $fullName, string $email, string $passwordHash, int $roleId): array
+function registerUser(PDO $pdo, string $username, string $email, string $passwordHash, int $roleId): array
 {
     // Replicating SQL local variable initialization & data transformation
-    $trimmedName  = trim($fullName);
+    $trimmedName  = trim($username);
     $trimmedEmail = strtolower(trim($email));
     $cleanPassword = trim($passwordHash);
 
@@ -47,7 +47,7 @@ function registerUser(PDO $pdo, string $fullName, string $email, string $passwor
     }
 
     if ($cleanPassword === '') {
-        return ['user_id' => 0, 'message' => 'ERROR: Password hash is required.'];
+        return ['user_id' => 0, 'message' => 'ERROR: Password is required.'];
     }
 
     try {
@@ -56,12 +56,12 @@ function registerUser(PDO $pdo, string $fullName, string $email, string $passwor
 
         // 4. Execution Phase: Mutating Schema State
         $insertStmt = $pdo->prepare("
-            INSERT INTO Users (full_name, email, password_hash, role_id)
-            VALUES (:full_name, :email, :password_hash, :role_id)
+            INSERT INTO Users (username, email, password_hash, role_id)
+            VALUES (:username, :email, :password_hash, :role_id)
         ");
         
         $insertStmt->execute([
-            ':full_name'     => $trimmedName,
+            ':username'     => $trimmedName,
             ':email'         => $trimmedEmail,
             ':password_hash' => $passwordHash, // Retaining original hash structure
             ':role_id'       => $roleId
@@ -92,6 +92,60 @@ function registerUser(PDO $pdo, string $fullName, string $email, string $passwor
     }
 }
 
+/**
+ * Validates user credentials against stored relational identities.
+ *
+ * @param PDO    $pdo      Active connection instance.
+ * @param string $email    Raw client-supplied identification string.
+ * @param string $password Raw client-supplied credential string.
+ * @return array           An associative array denoting outcome status and user context.
+ */
+function verifyUserLogin(PDO $pdo, string $email, string $password): array
+{
+    $sql = "
+        SELECT 
+            user_id, 
+            username, 
+            password_hash, 
+            role_id 
+        FROM Users 
+        WHERE email = :email 
+          AND deleted_at IS NULL 
+        LIMIT 1;
+    ";
+
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':email' => strtolower(trim($email))]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Terminate early if the identification string does not match any records
+        if (!$user) {
+            return ['authenticated' => false, 'message' => 'ERROR: Invalid credentials.'];
+        }
+
+        // Cryptographic evaluation of the plaintext input against the storage hash
+        if (!password_verify($password, $user['password_hash'])) {
+            return ['authenticated' => false, 'message' => 'ERROR: Invalid credentials.'];
+        }
+
+        // Return a safe subset of the identity payload on successful matching
+        return [
+            'authenticated' => true,
+            'message'       => 'SUCCESS: Authentication verified.',
+            'user'          => [
+                'id'        => (int)$user['user_id'],
+                'username' => $user['username'],
+                'role_id'   => (int)$user['role_id']
+            ]
+        ];
+
+    } catch (PDOException $e) {
+        error_log("Authentication routine system fault: " . $e->getMessage());
+        return ['authenticated' => false, 'message' => 'ERROR: System infrastructure failure.'];
+    }
+}
+
 
 
 /**
@@ -109,36 +163,33 @@ function getTrendingOrdinance(PDO $pdo): ?array
     $sql = "
         SELECT
             o.ordinance_id,
-            
+
             -- String normalization: Strip non-digit characters at the storage engine layer
             REGEXP_REPLACE(o.ordinance_number, '[^0-9]', '') AS ordinance_number,
-            
+
             o.series_year,
-            
+
             -- Temporal formatting: Standardize date representation
             DATE_FORMAT(o.date_enacted, '%d %M %Y') AS date_enacted_fmt,
-            
+
             o.title,
-            
-            -- Algorithmic Aggregation: Compute the rolling activity score
+
+            -- Algorithmic Aggregation: Compute the rolling activity score.
+            -- reaction_type is a direct ENUM('like','dislike') column; no Reaction_Types join.
             (
                 COALESCE((
                     SELECT COUNT(*)
                     FROM Ordinance_Reactions r
-                    JOIN Reaction_Types rt 
-                      ON rt.reaction_type_id = r.reaction_type_id
-                     AND rt.reaction_type = 'Like'
                     WHERE r.ordinance_id = o.ordinance_id
+                      AND r.reaction_type = 'like'
                       AND r.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
                 ), 0)
                 -
                 COALESCE((
                     SELECT COUNT(*)
                     FROM Ordinance_Reactions r
-                    JOIN Reaction_Types rt 
-                      ON rt.reaction_type_id = r.reaction_type_id
-                     AND rt.reaction_type = 'Dislike'
                     WHERE r.ordinance_id = o.ordinance_id
+                      AND r.reaction_type = 'dislike'
                       AND r.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
                 ), 0)
                 +
@@ -149,21 +200,22 @@ function getTrendingOrdinance(PDO $pdo): ?array
                       AND c.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
                 ), 0)
             ) AS trending_score
+
         FROM Ordinances o
-        WHERE o.deleted_at IS NULL
-        ORDER BY 
+        WHERE o.archived_at IS NULL
+        ORDER BY
             trending_score DESC,
-            o.date_enacted   DESC,
-            o.ordinance_id   DESC
+            o.date_enacted  DESC,
+            o.ordinance_id  DESC
         LIMIT 1;
     ";
 
     try {
         $stmt = $pdo->query($sql);
-        
+
         // Fetch the single row as an associative array
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         // Return null if the result set is completely empty
         if ($result === false) {
             return null;
@@ -180,7 +232,7 @@ function getTrendingOrdinance(PDO $pdo): ?array
         ];
 
     } catch (PDOException $e) {
-        // Engineering Note: Log the exact error context ($e->getMessage()) locally 
+        // Engineering Note: Log the exact error context ($e->getMessage()) locally
         // to a secure error tracking service before failing gracefully.
         throw $e;
     }
@@ -201,12 +253,10 @@ function getOrdinancesByTitle(PDO $pdo, string $searchKeyword): array
         WITH MetricAggregations AS (
             SELECT 
                 rel.ordinance_id,
-                SUM(CASE WHEN typ.reaction_type = 'like' THEN 1 ELSE 0 END) AS total_likes,
-                SUM(CASE WHEN typ.reaction_type = 'dislike' THEN 1 ELSE 0 END) AS total_dislikes
+                SUM(CASE WHEN rel.reaction_type = 'like' THEN 1 ELSE 0 END) AS total_likes,
+                SUM(CASE WHEN rel.reaction_type = 'dislike' THEN 1 ELSE 0 END) AS total_dislikes
             FROM 
                 Ordinance_Reactions rel
-            INNER JOIN 
-                Reaction_Types typ ON rel.reaction_type_id = typ.reaction_type_id
             GROUP BY 
                 rel.ordinance_id
         )
@@ -227,7 +277,7 @@ function getOrdinancesByTitle(PDO $pdo, string $searchKeyword): array
             MetricAggregations metrics ON ord.ordinance_id = metrics.ordinance_id
         WHERE 
             ord.title LIKE :search_pattern
-            AND ord.deleted_at IS NULL
+            AND ord.archived_at IS NULL
         ORDER BY 
             ord.date_enacted DESC, 
             ord.ordinance_id DESC;
@@ -287,12 +337,12 @@ function getRecentOrdinances(PDO $pdo): array
             DATE_FORMAT(o.date_enacted, '%M') AS enactment_month,
             DATE_FORMAT(o.date_enacted, '%Y') AS enactment_year,
             o.title,
-            COALESCE(SUM(CASE WHEN rt.reaction_type = 'Like' THEN 1 ELSE 0 END), 0) AS like_count,
-            COALESCE(SUM(CASE WHEN rt.reaction_type = 'Dislike' THEN 1 ELSE 0 END), 0) AS dislike_count
+            -- reaction_type is a direct ENUM('like','dislike') column; no Reaction_Types join.
+            COALESCE(SUM(CASE WHEN orr.reaction_type = 'like'    THEN 1 ELSE 0 END), 0) AS like_count,
+            COALESCE(SUM(CASE WHEN orr.reaction_type = 'dislike' THEN 1 ELSE 0 END), 0) AS dislike_count
         FROM Ordinances o
         LEFT JOIN Ordinance_Reactions orr ON orr.ordinance_id = o.ordinance_id
-        LEFT JOIN Reaction_Types rt ON rt.reaction_type_id = orr.reaction_type_id
-        WHERE o.deleted_at IS NULL
+        WHERE o.archived_at IS NULL
           AND o.date_enacted IS NOT NULL
           AND o.date_enacted <= NOW()
         GROUP BY
@@ -301,7 +351,7 @@ function getRecentOrdinances(PDO $pdo): array
             o.series_year,
             o.date_enacted,
             o.title
-        ORDER BY 
+        ORDER BY
             o.date_enacted DESC,
             o.ordinance_id DESC
         LIMIT 20;
@@ -311,7 +361,7 @@ function getRecentOrdinances(PDO $pdo): array
         // Utilizing direct execution since no external user input requires parameter binding
         $stmt = $pdo->query($sql);
         $rawResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         $normalizedResults = [];
         foreach ($rawResults as $row) {
             $normalizedResults[] = [
@@ -386,7 +436,7 @@ function getOrdinanceById(PDO $pdo, int $ordinance_id): ?array
             DATE_FORMAT(o.date_enacted, '%d %M %Y')            AS date_enacted_fmt,
  
             -- Lifetime engagement totals
-            " . _reactionCountColumns('orr', 'rt') . "
+            " . _reactionCountColumns('orr', 'orr') . "
  
         FROM       Ordinances           o
  
@@ -401,11 +451,9 @@ function getOrdinanceById(PDO $pdo, int $ordinance_id): ?array
         -- Reactions — aggregate after join; absent rows → 0
         LEFT JOIN  Ordinance_Reactions  orr
                        ON  orr.ordinance_id    = o.ordinance_id
-        LEFT JOIN  Reaction_Types       rt
-                       ON  rt.reaction_type_id = orr.reaction_type_id
  
         WHERE  o.ordinance_id = :ordinance_id
-          AND  o.deleted_at   IS NULL
+          AND  o.archived_at   IS NULL
  
         -- GROUP BY all non-aggregated columns to allow SUM()
         GROUP BY
@@ -433,38 +481,37 @@ function getOrdinanceById(PDO $pdo, int $ordinance_id): ?array
     return $row !== false ? $row : null;
 }
 
-// ------------------------------------------------------------
-// getOrdinanceComments
-//
-// Retrieves comments for a given ordinance, newest-first,
-// with per-comment like and dislike counts.
-//
-// Joins:
-//   Users             — resolves user_id → full_name
-//   Comment_Reactions + Reaction_Types — per-comment
-//     like / dislike totals
-//
-// Soft-deleted user accounts are still included so that
-// comments authored before account deletion remain visible;
-// the display layer should handle anonymisation if needed.
-//
-// Pagination is offset-based.  Pass $limit = 0 to fetch all
-// comments without a LIMIT clause (use with caution on large
-// datasets).
-//
-// @param  PDO   $pdo           Active database connection.
-// @param  int   $ordinance_id  FK of the parent ordinance.
-// @param  int   $limit         Max rows to return (default 50).
-// @param  int   $offset        Row offset for pagination (default 0).
-// @return array                Indexed array of associative rows.
-//                              Empty array when no comments exist.
-// ------------------------------------------------------------
+/**
+ * getOrdinanceComments
+ *
+ * Retrieves comments for a given ordinance, newest-first,
+ * with per-comment like and dislike counts computed directly
+ * from the comment reactions schema state.
+ *
+ * Joins:
+ *   Users             — resolves user_id → full_name
+ *   Comment_Reactions — computes aggregate totals using native ENUM states
+ *
+ * Soft-deleted user accounts are still included so that
+ * comments authored before account deletion remain visible;
+ * the display layer should handle anonymisation if needed.
+ *
+ * Pagination is offset-based. Pass $limit = 0 to fetch all
+ * comments without a LIMIT clause (use with caution on large
+ * datasets).
+ *
+ * @param  PDO   $pdo          Active database connection.
+ * @param  int   $ordinance_id FK of the parent ordinance.
+ * @param  int   $limit        Max rows to return (default 50).
+ * @param  int   $offset       Row offset for pagination (default 0).
+ * @return array               Indexed array of associative rows.
+ *                             Empty array when no comments exist.
+ */
 function getOrdinanceComments(PDO $pdo, int $ordinance_id, int $limit = 50, int $offset = 0): array
 {
-    // Build the LIMIT / OFFSET clause conditionally so callers
-    // can pass $limit = 0 to retrieve the full unbounded set.
+    // Construct pagination safely via conditional named placeholders
     $pagination = $limit > 0
-        ? ' LIMIT ' . $limit . ' OFFSET ' . $offset
+        ? ' LIMIT :limit OFFSET :offset'
         : '';
  
     $sql = "
@@ -479,25 +526,20 @@ function getOrdinanceComments(PDO $pdo, int $ordinance_id, int $limit = 50, int 
  
             -- Author details
             cm.user_id,
-            u.full_name,
+            u.username,
  
-            -- Per-comment engagement totals
-            COALESCE(SUM(CASE WHEN LOWER(rt.reaction_type) = 'like'    THEN 1 ELSE 0 END), 0) AS like_count,
-            COALESCE(SUM(CASE WHEN LOWER(rt.reaction_type) = 'dislike' THEN 1 ELSE 0 END), 0) AS dislike_count
+            -- Per-comment engagement totals (optimized for native ENUM values)
+            " . _reactionCountColumns('cr', 'cr') . "
  
         FROM       Comments          cm
  
-        -- Author — every comment has a user_id FK, so INNER JOIN is safe.
-        -- Using LEFT JOIN preserves comments if the user row was hard-deleted
-        -- (should not happen given ON DELETE CASCADE, but defensive is better).
+        -- Author details extraction with structural fallback
         LEFT JOIN  Users             u
-                       ON  u.user_id        = cm.user_id
+               ON  u.user_id        = cm.user_id
  
-        -- Per-comment reactions (may be absent → 0 via COALESCE)
+        -- Per-comment reactions isolation
         LEFT JOIN  Comment_Reactions cr
-                       ON  cr.comment_id    = cm.comment_id
-        LEFT JOIN  Reaction_Types    rt
-                       ON  rt.reaction_type_id = cr.reaction_type_id
+               ON  cr.comment_id    = cm.comment_id
  
         WHERE  cm.ordinance_id = :ordinance_id
  
@@ -507,14 +549,24 @@ function getOrdinanceComments(PDO $pdo, int $ordinance_id, int $limit = 50, int 
             cm.created_at,
             cm.comment_text,
             cm.user_id,
-            u.full_name
+            u.username
  
-        ORDER BY cm.created_at ASC,
-                 cm.comment_id ASC
+        -- Corrected to fulfill the 'newest-first' operational mandate
+        ORDER BY cm.created_at DESC,
+                 cm.comment_id DESC
     " . $pagination;
  
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([':ordinance_id' => $ordinance_id]);
+    
+    // Explicit value binding enforces type correctness at the driver layer
+    $stmt->bindValue(':ordinance_id', $ordinance_id, PDO::PARAM_INT);
+    
+    if ($limit > 0) {
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    }
+ 
+    $stmt->execute();
  
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }

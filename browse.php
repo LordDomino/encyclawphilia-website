@@ -1,9 +1,10 @@
-
 <?php
+session_start();
+$loggedIn = isset($_SESSION['user_id']);
 
 // Phase 1: Ingestion and State Management
 require_once 'config/database.php';
-require_once 'src/procedures.php'; // Import the newly decoupled data routine
+require_once 'php/procedures.php'; // Import the newly decoupled data routine
 
 $search_keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
 $safe_search_keyword = htmlspecialchars($search_keyword, ENT_QUOTES, 'UTF-8');
@@ -24,6 +25,16 @@ if ($search_keyword !== '') {
     // Debugging payload output
     echo "<script>console.log(" . json_encode($results) . ");</script>";
     echo "<script>console.log('Hello world');</script>";
+} else {
+    // Establish network boundary context
+    $pdo = getDatabaseConnection();
+
+    /* 
+     * Refactored: Replaced 'CALL GetOrdinancesByTitle(:key)' statement compilation 
+     * with an explicit application routine invocation. The connection state ($pdo)
+     * is passed into the function context directly.
+     */
+    $results = getOrdinancesByTitle($pdo, $safe_search_keyword);
 }
 
 // HTML Assembly
@@ -108,7 +119,7 @@ require_once 'php/helpers/view_components.php';
             <section class="results-content" id="browse-all-ordinances">
                 <div class="results-header">
                     <h2 class="results-header-title">Search Results for <?php echo $safe_search_keyword; ?></h2>
-                    <span class="result-count" id="result-count">(4 results)</span>
+                    <span class="result-count" id="result-count">(<?php echo count($results); ?> results)</span>
                 </div>
                 <div class="flex-grid" id="results-grid">
                     <?php if (!empty($results)): ?>

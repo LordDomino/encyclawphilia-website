@@ -1,8 +1,9 @@
+USE if0_41928864_encyclawphilia_db;
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 TRUNCATE TABLE `comment_reactions`;
 TRUNCATE TABLE `ordinance_reactions`;
-TRUNCATE TABLE `reaction_types`;
 TRUNCATE TABLE `comments`;
 TRUNCATE TABLE `ordinance_tags`;
 TRUNCATE TABLE `tags`;

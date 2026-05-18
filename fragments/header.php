@@ -8,7 +8,15 @@
         <nav class="main-nav">
             <a href="browse.php" class="clickable">Ordinances</a>
             <a href="about.php" class="clickable">About</a>
-            <a href="login.php" class="clickable button">Login</a>
+            <a href="login.php" class="clickable button">
+                <?php
+                if (isset($_SESSION['username'])) {
+                    echo 'Welcome, ' . htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8');
+                } else {
+                    echo 'Login';
+                }
+                ?>
+            </a>
         </nav>
     </div>
 </header>

@@ -1,8 +1,13 @@
-
-
 <?php
-$pageTitle = "Login - EncycLawPhilia Valenzuela";
+session_start();
+
+$pageTitle   = "Login - EncycLawPhilia Valenzuela";
 $currentPage = "login";
+
+// Consume the flash message and determine which tab to activate
+$authError  = $_SESSION['auth_error'] ?? null;
+$activeTab  = $authError['tab'] ?? 'login';
+unset($_SESSION['auth_error']);   // clear it so it doesn't persist on refresh
 
 require_once 'fragments/head.php';
 ?>
@@ -11,25 +16,42 @@ require_once 'fragments/head.php';
     <main class="auth-page">
         <div class="login-hero">
             <div class="flex-column" id="login-hero">
-                <?php include 'fragments/brand_title.php'; ?>
+                <?php require_once 'fragments/brand_title.php'; ?>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus posuere magna congue consectetur pharetra. Etiam a nibh quis tellus gravida egestas. Ut eget dictum massa, in accumsan nulla.</p>
                 <p>Just want anonymous browsing? <a href="index.php" class="clickable emphasis">Go back to home page.</a></p>
             </div>
-            <div class="flex-column" id="login-form">
+            <div class="flex-column">
                 <section class="auth-hero">
                     <div class="auth-container">
                         <!-- Tab Navigation -->
                         <div class="auth-tabs">
-                            <button class="tab-button active" data-tab="login">
+                            <button class="tab-button <?= $activeTab === 'login'  ? 'active' : '' ?>" data-tab="login">
                                 <span>Login</span>
                             </button>
-                            <button class="tab-button" data-tab="signup">
+                            <button class="tab-button <?= $activeTab === 'signup' ? 'active' : '' ?>" data-tab="signup">
                                 <span>Sign Up</span>
                             </button>
                         </div>
 
                         <!-- Login Form -->
-                        <form class="auth-form active" id="login-form" data-form="login">
+                        <form class="auth-form <?= $activeTab === 'login'  ? 'active' : '' ?>"
+                            id="login-form"
+                            action="php/login_process.php"
+                            method="POST"
+                            data-form="login">
+
+                            <?php if ($authError && $authError['tab'] === 'login'): ?>
+                                <div class="auth-message-bar auth-message-bar--<?= htmlspecialchars($authError['type'], ENT_QUOTES, 'UTF-8') ?>"
+                                    role="alert" aria-live="assertive">
+                                    <div class="bar-text">
+                                        <span class="bar-title"><?= htmlspecialchars($authError['title'], ENT_QUOTES, 'UTF-8') ?></span>
+                                        <span class="bar-body"><?= htmlspecialchars($authError['body'],  ENT_QUOTES, 'UTF-8') ?></span>
+                                    </div>
+                                    <button class="bar-close" type="button" aria-label="Dismiss"
+                                        onclick="this.parentElement.remove()">✕</button>
+                                </div>
+                            <?php endif; ?>
+
                             <div class="form-group">
                                 <label for="login-email">Email Address</label>
                                 <input
@@ -69,13 +91,30 @@ require_once 'fragments/head.php';
                         </form>
 
                         <!-- Sign Up Form -->
-                        <form class="auth-form" id="signup-form" data-form="signup">
+                        <form class="auth-form <?= $activeTab === 'signup'  ? 'active' : '' ?>"
+                            id="signup-form"
+                            action="php/register_process.php"
+                            method="POST"
+                            data-form="signup">
+
+                            <?php if ($authError && $authError['tab'] === 'signup'): ?>
+                                <div class="auth-message-bar auth-message-bar--<?= htmlspecialchars($authError['type'], ENT_QUOTES, 'UTF-8') ?>"
+                                    role="alert" aria-live="assertive">
+                                    <div class="bar-text">
+                                        <span class="bar-title"><?= htmlspecialchars($authError['title'], ENT_QUOTES, 'UTF-8') ?></span>
+                                        <span class="bar-body"><?= htmlspecialchars($authError['body'],  ENT_QUOTES, 'UTF-8') ?></span>
+                                    </div>
+                                    <button class="bar-close" type="button" aria-label="Dismiss"
+                                        onclick="this.parentElement.remove()">✕</button>
+                                </div>
+                            <?php endif; ?>
+
                             <div class="form-group">
                                 <label for="signup-name">Username</label>
                                 <input
                                     type="text"
                                     id="signup-name"
-                                    name="name"
+                                    name="username"
                                     placeholder="Enter your username"
                                     required>
                             </div>
@@ -129,36 +168,26 @@ require_once 'fragments/head.php';
             </div>
         </div>
     </main>
-
-    <script>
-        // Tab switching functionality
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const tabName = this.dataset.tab;
-
-                // Update active tab button
-                document.querySelectorAll('.tab-button').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                this.classList.add('active');
-
-                // Update active form
-                document.querySelectorAll('.auth-form').forEach(form => {
-                    form.classList.remove('active');
-                });
-                document.querySelector(`[data-form="${tabName}"]`).classList.add('active');
-            });
-        });
-
-        // Switch tab from form buttons
-        document.querySelectorAll('.switch-tab').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const tabName = this.dataset.tab;
-                document.querySelector(`[data-tab="${tabName}"]`).click();
-            });
-        });
-    </script>
 </body>
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const tabName = this.dataset.tab;
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+            document.querySelector(`[data-form="${tabName}"]`).classList.add('active');
+        });
+    });
+
+    // Switch tab from form footer buttons
+    document.querySelectorAll('.switch-tab').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector(`[data-tab="${this.dataset.tab}"]`).click();
+        });
+    });
+</script>
 
 </html>

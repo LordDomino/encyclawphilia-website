@@ -1,8 +1,11 @@
 <?php
+// Session tracking for user credentials persistence
+session_start();
+$loggedIn = isset($_SESSION['user_id']);
 
 // Import structural dependencies
 require_once 'config/database.php';
-require_once 'src/procedures.php';
+require_once 'php/procedures.php';
 
 // Phase 1: Ingestion and State Management
 $search_keyword      = isset($_GET['q']) ? trim($_GET['q']) : '';

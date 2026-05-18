@@ -1,12 +1,15 @@
 <?php
 
+session_start();
+$loggedIn = isset($_SESSION['user_id']);
+
 // ============================================================
 // ORDINANCE DETAIL PAGE
 // Phase 1: Ingestion and State Management
 // ============================================================
 
 require_once 'config/database.php';
-require_once 'src/procedures.php';
+require_once 'php/procedures.php';
 
 $ordinance_id = isset($_GET['id']) ? (int) trim($_GET['id']) : 0;
 
@@ -278,7 +281,7 @@ require_once 'php/helpers/view_components.php';
                     <?php foreach ($comments as $comment): ?>
                         <?php
                         // Derive initials from full_name for avatar
-                        $name_parts = explode(' ', $comment['full_name']);
+                        $name_parts = explode(' ', $comment['username']);
                         $initials   = strtoupper(
                             substr($name_parts[0], 0, 1) .
                             (count($name_parts) > 1 ? substr(end($name_parts), 0, 1) : '')
@@ -290,7 +293,7 @@ require_once 'php/helpers/view_components.php';
                         <article
                             class="ord-comment-card"
                             id="comment-<?php echo (int)$comment['comment_id']; ?>"
-                            aria-label="Comment by <?php echo htmlspecialchars($comment['full_name'], ENT_QUOTES, 'UTF-8'); ?>">
+                            aria-label="Comment by <?php echo htmlspecialchars($comment['username'], ENT_QUOTES, 'UTF-8'); ?>">
 
                             <div class="ord-comment-avatar" aria-hidden="true">
                                 <?php echo htmlspecialchars($initials, ENT_QUOTES, 'UTF-8'); ?>
@@ -299,7 +302,7 @@ require_once 'php/helpers/view_components.php';
                             <div class="ord-comment-body">
                                 <header class="ord-comment-meta">
                                     <span class="ord-comment-author">
-                                        <?php echo htmlspecialchars($comment['full_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                        <?php echo htmlspecialchars($comment['username'], ENT_QUOTES, 'UTF-8'); ?>
                                     </span>
                                     <time
                                         class="ord-comment-time"
@@ -316,7 +319,7 @@ require_once 'php/helpers/view_components.php';
                                     <div class="ord-comment-reactions">
                                         <button
                                             class="ord-comment-react-btn ord-comment-react-btn--like"
-                                            aria-label="Like comment by <?php echo htmlspecialchars($comment['full_name'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            aria-label="Like comment by <?php echo htmlspecialchars($comment['username'], ENT_QUOTES, 'UTF-8'); ?>"
                                             data-comment-id="<?php echo (int)$comment['comment_id']; ?>">
                                             <span aria-hidden="true">▲</span>
                                             <span class="ord-comment-react-count">
@@ -325,7 +328,7 @@ require_once 'php/helpers/view_components.php';
                                         </button>
                                         <button
                                             class="ord-comment-react-btn ord-comment-react-btn--dislike"
-                                            aria-label="Dislike comment by <?php echo htmlspecialchars($comment['full_name'], ENT_QUOTES, 'UTF-8'); ?>"
+                                            aria-label="Dislike comment by <?php echo htmlspecialchars($comment['username'], ENT_QUOTES, 'UTF-8'); ?>"
                                             data-comment-id="<?php echo (int)$comment['comment_id']; ?>">
                                             <span aria-hidden="true">▼</span>
                                             <span class="ord-comment-react-count">

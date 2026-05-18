@@ -1,4 +1,8 @@
 <?php
+
+session_start();
+$loggedIn = isset($_SESSION['user_id']);
+
 $pageTitle = "About EncycLawPhilia Valenzuela";
 $currentPage = "about";
 
@@ -121,8 +125,8 @@ require_once 'fragments/head.php';
             <h3>Ready to Explore Valenzuela's Ordinances?</h3>
             <p>Start by browsing our latest ordinances or use the search feature to find specific regulations.</p>
             <div class="cta-buttons">
-                <a href="index.html" class="cta-link primary">Go to Home</a>
-                <a href="browse.html" class="cta-link secondary">Browse Ordinances</a>
+                <a href="index.php" class="cta-link primary">Go to Home</a>
+                <a href="browse.php" class="cta-link secondary">Browse Ordinances</a>
             </div>
         </section>
     </main>
