@@ -1,5 +1,33 @@
 <?php
 
+
+/**
+ * Translates PDO Exceptions into application level responses based on MariaDB error codes.
+ */
+function _handleDatabaseException(PDOException $e, int $ordinanceId, int $reactionTypeId): array
+{
+    // Error code 1452 indicates a Foreign Key constraint failure in MariaDB
+    if ($e->errorInfo[1] === 1452) {
+        $errorContext = $e->getMessage();
+        
+        if (str_contains($errorContext, 'ordinance_id')) {
+            return ['action' => 'ERROR', 'message' => 'ERROR: Ordinance not found or is inaccessible.'];
+        }
+        if (str_contains($errorContext, 'user_id')) {
+            return ['action' => 'ERROR', 'message' => 'ERROR: User not found or account is deactivated.'];
+        }
+        if (str_contains($errorContext, 'reaction_type_id')) {
+            return ['action' => 'ERROR', 'message' => "ERROR: Invalid reaction_type_id ({$reactionTypeId})."];
+        }
+    }
+
+    // Default structural fallback for unexpected database exceptions
+    return [
+        'action'  => 'ERROR',
+        'message' => 'ERROR: Transaction failed due to an internal database error.'
+    ];
+}
+
 // ------------------------------------------------------------
 // INTERNAL HELPER: reaction-count subexpression
 //
@@ -20,131 +48,131 @@ function _reactionCountColumns(string $join_alias = 'orr', string $rt_alias = 'r
     ";
 }
 
-/**
- * Executes user registration logic previously handled by sp_UserSignUp.
- *
- * @param PDO    $pdo          Authenticated PDO instance.
- * @param string $username     Raw name string.
- * @param string $email        Raw email address string.
- * @param string $passwordHash Pre-hashed password string.
- * @param int    $roleId       Target role identifier.
- * @return array Contains 'user_id' (int) and 'message' (string).
- */
-function registerUser(PDO $pdo, string $username, string $email, string $passwordHash, int $roleId): array
-{
-    // Replicating SQL local variable initialization & data transformation
-    $trimmedName  = trim($username);
-    $trimmedEmail = strtolower(trim($email));
-    $cleanPassword = trim($passwordHash);
+// /**
+//  * Executes user registration logic previously handled by sp_UserSignUp.
+//  *
+//  * @param PDO    $pdo          Authenticated PDO instance.
+//  * @param string $username     Raw name string.
+//  * @param string $email        Raw email address string.
+//  * @param string $passwordHash Pre-hashed password string.
+//  * @param int    $roleId       Target role identifier.
+//  * @return array Contains 'user_id' (int) and 'message' (string).
+//  */
+// function registerUser(PDO $pdo, string $username, string $email, string $passwordHash, int $roleId): array
+// {
+//     // Replicating SQL local variable initialization & data transformation
+//     $trimmedName  = trim($username);
+//     $trimmedEmail = strtolower(trim($email));
+//     $cleanPassword = trim($passwordHash);
 
-    // Structural Validation Phase (Guard Clauses)
-    if ($trimmedName === '') {
-        return ['user_id' => 0, 'message' => 'ERROR: Full name is required.'];
-    }
+//     // Structural Validation Phase (Guard Clauses)
+//     if ($trimmedName === '') {
+//         return ['user_id' => 0, 'message' => 'ERROR: Full name is required.'];
+//     }
 
-    if ($trimmedEmail === '') {
-        return ['user_id' => 0, 'message' => 'ERROR: Email is required.'];
-    }
+//     if ($trimmedEmail === '') {
+//         return ['user_id' => 0, 'message' => 'ERROR: Email is required.'];
+//     }
 
-    if ($cleanPassword === '') {
-        return ['user_id' => 0, 'message' => 'ERROR: Password is required.'];
-    }
+//     if ($cleanPassword === '') {
+//         return ['user_id' => 0, 'message' => 'ERROR: Password is required.'];
+//     }
 
-    try {
-        // Begin transaction block to isolate analytical reads and subsequent write operations
-        $pdo->beginTransaction();
+//     try {
+//         // Begin transaction block to isolate analytical reads and subsequent write operations
+//         $pdo->beginTransaction();
 
-        // 4. Execution Phase: Mutating Schema State
-        $insertStmt = $pdo->prepare("
-            INSERT INTO Users (username, email, password_hash, role_id)
-            VALUES (:username, :email, :password_hash, :role_id)
-        ");
+//         // 4. Execution Phase: Mutating Schema State
+//         $insertStmt = $pdo->prepare("
+//             INSERT INTO Users (username, email, password_hash, role_id)
+//             VALUES (:username, :email, :password_hash, :role_id)
+//         ");
         
-        $insertStmt->execute([
-            ':username'      => $trimmedName,
-            ':email'         => $trimmedEmail,
-            ':password_hash' => $passwordHash, // Retaining original hash structure
-            ':role_id'       => $roleId
-        ]);
+//         $insertStmt->execute([
+//             ':username'      => $trimmedName,
+//             ':email'         => $trimmedEmail,
+//             ':password_hash' => $passwordHash, // Retaining original hash structure
+//             ':role_id'       => $roleId
+//         ]);
 
-        // Capture state details before confirming data persistence
-        $newUserId = (int)$pdo->lastInsertId();
+//         // Capture state details before confirming data persistence
+//         $newUserId = (int)$pdo->lastInsertId();
 
-        // Commit transaction blocks updates to disk atomically
-        $pdo->commit();
+//         // Commit transaction blocks updates to disk atomically
+//         $pdo->commit();
 
-        return [
-            'user_id' => $newUserId,
-            'message' => "SUCCESS: User registered with ID {$newUserId}."
-        ];
+//         return [
+//             'user_id' => $newUserId,
+//             'message' => "SUCCESS: User registered with ID {$newUserId}."
+//         ];
 
-    } catch (PDOException $e) {
-        // Safeguard against partial executions or engine failures
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
+//     } catch (PDOException $e) {
+//         // Safeguard against partial executions or engine failures
+//         if ($pdo->inTransaction()) {
+//             $pdo->rollBack();
+//         }
         
-        // Log $e->getMessage() privately for engineering forensics
-        return [
-            'user_id' => 0,
-            'message' => 'ERROR: System failure encountered during compilation or persistence.'
-        ];
-    }
-}
+//         // Log $e->getMessage() privately for engineering forensics
+//         return [
+//             'user_id' => 0,
+//             'message' => 'ERROR: System failure encountered during compilation or persistence.'
+//         ];
+//     }
+// }
 
-/**
- * Validates user credentials against stored relational identities.
- *
- * @param PDO    $pdo      Active connection instance.
- * @param string $email    Raw client-supplied identification string.
- * @param string $password Raw client-supplied credential string.
- * @return array           An associative array denoting outcome status and user context.
- */
-function verifyUserLogin(PDO $pdo, string $email, string $password): array
-{
-    $sql = "
-        SELECT 
-            user_id, 
-            username, 
-            password_hash, 
-            role_id 
-        FROM Users 
-        WHERE email = :email 
-          AND deleted_at IS NULL 
-        LIMIT 1;
-    ";
+// /**
+//  * Validates user credentials against stored relational identities.
+//  *
+//  * @param PDO    $pdo      Active connection instance.
+//  * @param string $email    Raw client-supplied identification string.
+//  * @param string $password Raw client-supplied credential string.
+//  * @return array           An associative array denoting outcome status and user context.
+//  */
+// function verifyUserLogin(PDO $pdo, string $email, string $password): array
+// {
+//     $sql = "
+//         SELECT 
+//             user_id, 
+//             username, 
+//             password_hash, 
+//             role_id 
+//         FROM Users 
+//         WHERE email = :email 
+//           AND deleted_at IS NULL 
+//         LIMIT 1;
+//     ";
 
-    try {
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([':email' => strtolower(trim($email))]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+//     try {
+//         $stmt = $pdo->prepare($sql);
+//         $stmt->execute([':email' => strtolower(trim($email))]);
+//         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Terminate early if the identification string does not match any records
-        if (!$user) {
-            return ['authenticated' => false, 'message' => 'ERROR: Invalid credentials.'];
-        }
+//         // Terminate early if the identification string does not match any records
+//         if (!$user) {
+//             return ['authenticated' => false, 'message' => 'ERROR: Invalid credentials.'];
+//         }
 
-        // Cryptographic evaluation of the plaintext input against the storage hash
-        if (!password_verify($password, $user['password_hash'])) {
-            return ['authenticated' => false, 'message' => 'ERROR: Invalid credentials.'];
-        }
+//         // Cryptographic evaluation of the plaintext input against the storage hash
+//         if (!password_verify($password, $user['password_hash'])) {
+//             return ['authenticated' => false, 'message' => 'ERROR: Invalid credentials.'];
+//         }
 
-        // Return a safe subset of the identity payload on successful matching
-        return [
-            'authenticated' => true,
-            'message'       => 'SUCCESS: Authentication verified.',
-            'user'          => [
-                'id'        => (int)$user['user_id'],
-                'username' => $user['username'],
-                'role_id'   => (int)$user['role_id']
-            ]
-        ];
+//         // Return a safe subset of the identity payload on successful matching
+//         return [
+//             'authenticated' => true,
+//             'message'       => 'SUCCESS: Authentication verified.',
+//             'user'          => [
+//                 'id'        => (int)$user['user_id'],
+//                 'username' => $user['username'],
+//                 'role_id'   => (int)$user['role_id']
+//             ]
+//         ];
 
-    } catch (PDOException $e) {
-        error_log("Authentication routine system fault: " . $e->getMessage());
-        return ['authenticated' => false, 'message' => 'ERROR: System infrastructure failure.'];
-    }
-}
+//     } catch (PDOException $e) {
+//         error_log("Authentication routine system fault: " . $e->getMessage());
+//         return ['authenticated' => false, 'message' => 'ERROR: System infrastructure failure.'];
+//     }
+// }
 
 
 
@@ -569,4 +597,98 @@ function getOrdinanceComments(PDO $pdo, int $ordinance_id, int $limit = 50, int 
     $stmt->execute();
  
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Handles user reactions (Like/Dislike) on ordinances.
+ *
+ * @param PDO $pdo                  An active database connection instance.
+ * @param int $ordinanceId          The ID of the targeted ordinance.
+ * @param int $userId               The ID of the reacting user.
+ * @param int $reactionTypeId       The ID of the reaction type.
+ * @return array{action: string, message: string} Resulting action status and description.
+ */
+function reactToOrdinance(PDO $pdo, int $ordinanceId, int $userId, string $reactionType): array
+{
+    try {
+        // Begin transaction to ensure isolation level consistency
+        $pdo->beginTransaction();
+
+        // Step 1: Fetch the existing reaction state for this specific user and ordinance
+        $stmt = $pdo->prepare("
+            SELECT reaction_id, reaction_type
+            FROM Ordinance_Reactions
+            WHERE ordinance_id = :ordinance_id
+              AND user_id = :user_id
+            LIMIT 1
+        ");
+        
+        $stmt->execute([
+            ':ordinance_id' => $ordinanceId,
+            ':user_id'      => $userId
+        ]);
+        
+        $existingReaction = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Step 2: Evaluate state machine logic
+        if (!$existingReaction) {
+            // State A: No reaction exists -> Insert new record
+            $insertStmt = $pdo->prepare("
+                INSERT INTO Ordinance_Reactions (ordinance_id, user_id, reaction_type) 
+                VALUES (:ordinance_id, :user_id, :reaction_type)
+            ");
+            $insertStmt->execute([
+                ':ordinance_id'     => $ordinanceId,
+                ':user_id'          => $userId,
+                ':reaction_type'    => $reactionType
+            ]);
+
+            $action = 'ADDED';
+            $message = "SUCCESS: Reaction ('{$reactionType}') added to ordinance ID {$ordinanceId}.";
+
+        } elseif ($existingReaction['reaction_type'] === $reactionType) {
+            // State B: Same reaction exists -> Toggle off (Delete)
+            $deleteStmt = $pdo->prepare("
+                DELETE FROM Ordinance_Reactions 
+                WHERE reaction_id = :reaction_id
+            ");
+            $deleteStmt->execute([':reaction_id' => $existingReaction['reaction_id']]);
+
+            $action = 'REMOVED';
+            $message = "SUCCESS: Reaction removed from ordinance ID {$ordinanceId}.";
+
+        } else {
+            // State C: Different reaction exists -> Update type
+            $updateStmt = $pdo->prepare("
+                UPDATE Ordinance_Reactions 
+                SET reaction_type = :reaction_type, 
+                    created_at = NOW() 
+                WHERE reaction_id = :reaction_id
+            ");
+            $updateStmt->execute([
+                ':reaction_type' => $reactionType,
+                ':reaction_id'      => $existingReaction['reaction_id']
+            ]);
+
+            $action = 'SWITCHED';
+            $message = "SUCCESS: Reaction switched to type '{$reactionType}' on ordinance ID {$ordinanceId}.";
+        }
+
+        // Commit modifications if all statements executed successfully
+        $pdo->commit();
+
+        return [
+            'action'  => $action,
+            'message' => $message
+        ];
+
+    } catch (PDOException $e) {
+        // Rollback any executed operations upon detecting an anomaly
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        // Map MariaDB standard Error Codes to proper contextual messages
+        return _handleDatabaseException($e, $ordinanceId, $reactionType);
+    }
 }

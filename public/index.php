@@ -4,8 +4,8 @@ session_start();
 $loggedIn = isset($_SESSION['user_id']);
 
 // Import structural dependencies
-require_once 'config/database.php';
-require_once 'php/procedures.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../src/models/procedures.php';
 
 // Phase 1: Ingestion and State Management
 $search_keyword      = isset($_GET['q']) ? trim($_GET['q']) : '';
@@ -32,17 +32,17 @@ echo "<script>console.log(" . json_encode($results_latest) . ");</script>";
 $pageTitle = "EncycLawPhilia Valenzuela";
 $currentPage = "home";
 
-require_once 'fragments/head.php';
-require_once 'php/helpers/view_components.php';
+require_once __DIR__ . '/../src/Views/head.php';
+require_once __DIR__ . '/../src/view_components.php';
 ?>
 
 <body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>" id="top">
 
     <section class="hero-container">
-        <?php require_once 'fragments/header.php'; ?>
+        <?php require_once __DIR__ . '/../src/Views/header.php'; ?>
         <div class="hero">
             <hgroup class="title">
-                <?php require_once 'fragments/brand_title.php'; ?>
+                <?php require_once __DIR__ . '/../src/Views/brand_title.php'; ?>
                 <p>Wisdom Beyond Law and Order</p>
             </hgroup>
             <form action="browse.php" method="GET" class="search-bar">

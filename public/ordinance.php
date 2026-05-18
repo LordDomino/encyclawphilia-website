@@ -30,6 +30,8 @@ if ($ordinance === null) {
 
 $comments = getOrdinanceComments($pdo, $ordinance_id);
 
+
+
 // ============================================================
 // Phase 3: HTML Presentation
 // ============================================================
@@ -284,7 +286,7 @@ require_once 'php/helpers/view_components.php';
                         $name_parts = explode(' ', $comment['username']);
                         $initials   = strtoupper(
                             substr($name_parts[0], 0, 1) .
-                            (count($name_parts) > 1 ? substr(end($name_parts), 0, 1) : '')
+                                (count($name_parts) > 1 ? substr(end($name_parts), 0, 1) : '')
                         );
                         // Format relative/absolute date
                         $comment_ts  = strtotime($comment['created_at']);
@@ -362,7 +364,7 @@ require_once 'php/helpers/view_components.php';
         // ============================================================
         // COMMENT TEXTAREA CHAR COUNT
         // ============================================================
-        const textarea  = document.getElementById('comment-input');
+        const textarea = document.getElementById('comment-input');
         const charCount = document.getElementById('char-count');
 
         textarea?.addEventListener('input', () => {
@@ -377,14 +379,38 @@ require_once 'php/helpers/view_components.php';
         // ============================================================
         document.querySelectorAll('.ord-reaction-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                // TODO: Replace with authenticated POST to react.php
+                const ordinanceId = btn.dataset.ordinanceId;
                 const reaction = btn.dataset.reaction;
-                btn.classList.toggle('ord-reaction-btn--active');
 
-                // Deactivate the sibling button
-                const sibling = btn.closest('.ord-reaction-buttons')
-                    ?.querySelector(`.ord-reaction-btn:not([data-reaction="${reaction}"])`);
-                sibling?.classList.remove('ord-reaction-btn--active');
+                // Prepare the data to send
+                const formData = new FormData();
+                formData.append('ordinance_id', ordinanceId);
+                formData.append('reaction_type', reaction);
+
+                // Send authenticated POST request to react.php
+                fetch('php/react.php', {
+                        method: 'POST',
+                        body: formData
+                        // Note: Browsers automatically include session cookies for authentication
+                    })
+                    .then(response => response.json()) // Expecting a JSON response from PHP
+                    .then(data => {
+                        if (data.success) {
+                            // Toggle active state on success
+                            btn.classList.toggle('ord-reaction-btn--active');
+
+                            // Deactivate the sibling button
+                            const sibling = btn.closest('.ord-reaction-buttons')
+                                ?.querySelector(`.ord-reaction-btn:not([data-reaction="${reaction}"])`);
+                            sibling?.classList.remove('ord-reaction-btn--active');
+                        } else {
+                            alert(data.message || 'Failed to save reaction.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('A network error occurred.\n' + error);
+                    });
             });
         });
 
@@ -396,9 +422,9 @@ require_once 'php/helpers/view_components.php';
                 // TODO: Replace with authenticated POST to react.php
                 btn.classList.toggle('ord-comment-react-btn--active');
 
-                const siblingSelector = btn.classList.contains('ord-comment-react-btn--like')
-                    ? '.ord-comment-react-btn--dislike'
-                    : '.ord-comment-react-btn--like';
+                const siblingSelector = btn.classList.contains('ord-comment-react-btn--like') ?
+                    '.ord-comment-react-btn--dislike' :
+                    '.ord-comment-react-btn--like';
                 btn.closest('.ord-comment-reactions')
                     ?.querySelector(siblingSelector)
                     ?.classList.remove('ord-comment-react-btn--active');
@@ -407,4 +433,5 @@ require_once 'php/helpers/view_components.php';
     </script>
 
 </body>
+
 </html>
