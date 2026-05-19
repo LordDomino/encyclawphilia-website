@@ -7,9 +7,9 @@ namespace App;
 session_start();
 
 require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/Models/User.php';
+require_once __DIR__ . '/Models/UserModel.php';
 
-use App\Models\User;
+use App\Models\UserModel;
 use PDO;
 use Exception;
 
@@ -79,7 +79,7 @@ try {
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
     // 3. Execution Phase: Invoke Procedure
-    $user = new User($pdo);
+    $user = new UserModel($pdo);
     $authOutcome = $user->register($username, $email, $passwordHash, $roleId);
 
     // 4. Evaluation Layer: Aligning with the procedure's actual return signature

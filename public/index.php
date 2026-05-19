@@ -36,6 +36,7 @@ $router->get('/dashboard', 'PagesNavigationController@adminDashboard'); // Only 
 $router->post('/login-submit', 'AuthController@handleLoginSubmit');
 $router->get('/logout-submit', 'AuthController@handleLogoutSubmit');
 $router->post('/signup-submit', 'AuthController@handleSignupSubmit');
+
 $router->post('/react', 'UserController@handleOrdinanceReact');
 $router->get('/profile/{id}', 'AuthController@showProfile'); // Dynamic parameter route
 

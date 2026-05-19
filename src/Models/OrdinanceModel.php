@@ -470,6 +470,300 @@ class OrdinanceModel
         }
     }
 
+    /**
+     * searchOrdinancesByCategory
+     *
+     * Retrieves a paginated, filtered list of non-archived ordinances belonging
+     * to one or more categories.  Designed for a single round-trip to MariaDB
+     * using a single parameterised SQL statement (no PHP-side post-processing
+     * loops, no secondary queries).
+     *
+     * Business-rule compliance
+     * ─────────────────────────
+     * • Archived ordinances (archived_at IS NOT NULL) are never surfaced to
+     *   public-facing callers.  Pass $includeArchived = true only from a
+     *   privileged administrator view.
+     * • Write-Once fields (ordinance_number, title, author_sponsor, series_year)
+     *   are returned read-only; this layer never issues UPDATE on them.
+     * • Soft-deleted users are still referenced by their anonymised username
+     *   (the DB already stores the hashed replacement on deletion), so no
+     *   special handling is needed here.
+     * • The result includes aggregate like/dislike counts and total comment
+     *   counts so the caller does not need secondary queries.
+     *
+     * @param PDO        $pdo              Active PDO connection.
+     * @param int|int[]  $categoryIds      Single category ID or array of IDs.
+     *                                     Pass an empty array [] to match ALL
+     *                                     categories (including uncategorised).
+     * @param string     $searchKeyword    Optional full-text keyword matched
+     *                                     against title, summary, and full_text.
+     *                                     Pass '' to skip keyword filtering.
+     * @param string[]   $statuses         Filter by ordinance status values.
+     *                                     Allowed: 'Pending','Active','Repealed','Amended'.
+     *                                     Pass [] to include all statuses.
+     * @param int|null   $barangayId       Optional barangay filter. Pass null to skip.
+     * @param string     $sortBy           Column to sort by.
+     *                                     Allowed: 'date_enacted','created_at','title','series_year'.
+     *                                     Defaults to 'created_at'.
+     * @param string     $sortDir          'ASC' or 'DESC'. Defaults to 'DESC'.
+     * @param int        $limit            Page size (1–100). Defaults to 20.
+     * @param int        $offset           Zero-based row offset for pagination. Defaults to 0.
+     * @param bool       $includeArchived  When true, archived records are included.
+     *                                     Must only be true for privileged admin views.
+     *
+     * @return array{
+     *   total: int,
+     *   limit: int,
+     *   offset: int,
+     *   ordinances: list<array<string, mixed>>
+     * }
+     *
+     * @throws InvalidArgumentException  On illegal parameter values.
+     * @throws PDOException              On database errors.
+     */
+    function searchOrdinancesByCategory(
+        int|array  $categoryIds,
+        string     $searchKeyword  = '',
+        array      $statuses       = [],
+        ?int       $barangayId     = null,
+        string     $sortBy         = 'created_at',
+        string     $sortDir        = 'DESC',
+        int        $limit          = 20,
+        int        $offset         = 0,
+        bool       $includeArchived = false
+    ): array {
+
+        /* ── 1. Input validation ─────────────────────────────────────────────── */
+
+        $allowedSortColumns = ['date_enacted', 'created_at', 'title', 'series_year'];
+        $sortBy  = strtolower(trim($sortBy));
+        $sortDir = strtoupper(trim($sortDir));
+
+        if (!in_array($sortBy, $allowedSortColumns, true)) {
+            throw new \InvalidArgumentException(
+                "Invalid sortBy value '{$sortBy}'. Allowed: " . implode(', ', $allowedSortColumns)
+            );
+        }
+        if (!in_array($sortDir, ['ASC', 'DESC'], true)) {
+            throw new \InvalidArgumentException("sortDir must be 'ASC' or 'DESC'.");
+        }
+
+        $limit  = max(1, min(100, (int) $limit));
+        $offset = max(0, (int) $offset);
+
+        $allowedStatuses = ['Pending', 'Active', 'Repealed', 'Amended'];
+        foreach ($statuses as $s) {
+            if (!in_array($s, $allowedStatuses, true)) {
+                throw new \InvalidArgumentException(
+                    "Invalid status value '{$s}'. Allowed: " . implode(', ', $allowedStatuses)
+                );
+            }
+        }
+
+        // Normalise $categoryIds → always a plain array of ints.
+        $categoryIds = is_array($categoryIds) ? array_values($categoryIds) : [$categoryIds];
+        $categoryIds = array_filter($categoryIds, fn($id) => is_int($id) && $id > 0);
+        $categoryIds = array_values(array_unique($categoryIds));
+
+        /* ── 2. Build WHERE clauses & parameter list ─────────────────────────── */
+
+        $conditions = [];
+        $params     = [];
+
+        // 2a. Archive guard (core business rule).
+        if (!$includeArchived) {
+            $conditions[] = 'o.archived_at IS NULL';
+        }
+
+        // 2b. Category filter.
+        //     Empty $categoryIds → match everything (no category condition added).
+        if (!empty($categoryIds)) {
+            $placeholders  = implode(', ', array_fill(0, count($categoryIds), '?'));
+            $conditions[]  = "o.category_id IN ({$placeholders})";
+            foreach ($categoryIds as $cid) {
+                $params[] = (int) $cid;
+            }
+        }
+
+        // 2c. Status filter.
+        if (!empty($statuses)) {
+            $placeholders = implode(', ', array_fill(0, count($statuses), '?'));
+            $conditions[] = "o.status IN ({$placeholders})";
+            foreach ($statuses as $s) {
+                $params[] = $s;
+            }
+        }
+
+        // 2d. Barangay filter.
+        if ($barangayId !== null) {
+            $conditions[] = 'o.barangay_id = ?';
+            $params[]     = (int) $barangayId;
+        }
+
+        // 2e. Keyword search (LIKE-based; upgrade to FULLTEXT if needed at scale).
+        $keyword = trim($searchKeyword);
+        if ($keyword !== '') {
+            $conditions[] = '(o.title LIKE ? OR o.summary LIKE ? OR o.full_text LIKE ?)';
+            $likeToken    = '%' . addcslashes($keyword, '%_\\') . '%';
+            $params[]     = $likeToken;
+            $params[]     = $likeToken;
+            $params[]     = $likeToken;
+        }
+
+        $whereClause = $conditions
+            ? 'WHERE ' . implode(' AND ', $conditions)
+            : '';
+
+        /* ── 3. Qualify the sort column with the table alias ─────────────────── */
+
+        // title needs a LOWER() wrapper for case-insensitive alphabetical sort.
+        $orderExpr = $sortBy === 'title'
+            ? "LOWER(o.title) {$sortDir}"
+            : "o.{$sortBy} {$sortDir}";
+
+        // Secondary stable sort so paging is deterministic.
+        $orderExpr .= ', o.ordinance_id ASC';
+
+        /* ── 4. Build the single-trip SQL ─────────────────────────────────────── */
+        //
+        // Strategy: one CTE (`filtered`) captures the matching ordinance IDs and
+        // the total row count via COUNT(*) OVER () (window function — MariaDB 10.2+).
+        // The outer SELECT then joins the enriched data (category, barangay, tags,
+        // reaction aggregates, comment count) only for the current page's rows.
+        //
+        // Tags are collapsed into a JSON array in-database so the caller receives
+        // a single row per ordinance with no PHP-side grouping needed.
+        //
+        // All aggregates (likes, dislikes, comment count) are computed with
+        // correlated sub-queries rather than multiple GROUP BY joins to avoid
+        // row-multiplication across different one-to-many relationships.
+        // ─────────────────────────────────────────────────────────────────────────
+
+        $sql = "
+        WITH filtered AS (
+            SELECT
+                o.ordinance_id,
+                COUNT(*) OVER () AS total_count
+            FROM Ordinances o
+            {$whereClause}
+            ORDER BY {$orderExpr}
+            LIMIT ? OFFSET ?
+        )
+        SELECT
+            /* ── pagination meta ── */
+            f.total_count,
+
+            /* ── write-once identity fields ── */
+            o.ordinance_id,
+            o.ordinance_number,
+            o.title,
+            o.author_sponsor,
+            o.series_year,
+
+            /* ── mutable / write-once-after-null fields ── */
+            o.status,
+            o.date_enacted,
+            o.pdf_file,
+            o.summary,
+            o.full_text,
+            o.created_at,
+            o.updated_at,
+            o.archived_at,
+
+            /* ── category info ── */
+            c.category_id,
+            c.category_name,
+            c.description   AS category_description,
+
+            /* ── barangay info ── */
+            b.barangay_id,
+            b.barangay_name,
+
+            /* ── tags collapsed to a JSON array ── */
+            (
+                SELECT JSON_ARRAYAGG(t.tag_name)
+                FROM   Ordinance_Tags ot
+                JOIN   Tags t ON t.tag_id = ot.tag_id
+                WHERE  ot.ordinance_id = o.ordinance_id
+            ) AS tags,
+
+            /* ── reaction aggregates ── */
+            (
+                SELECT COUNT(*)
+                FROM   Ordinance_Reactions r
+                WHERE  r.ordinance_id  = o.ordinance_id
+                  AND  r.reaction_type = 'like'
+            ) AS like_count,
+
+            (
+                SELECT COUNT(*)
+                FROM   Ordinance_Reactions r
+                WHERE  r.ordinance_id  = o.ordinance_id
+                  AND  r.reaction_type = 'dislike'
+            ) AS dislike_count,
+
+            /* ── comment count ── */
+            (
+                SELECT COUNT(*)
+                FROM   Comments cm
+                WHERE  cm.ordinance_id = o.ordinance_id
+            ) AS comment_count
+
+        FROM filtered f
+        JOIN Ordinances  o ON o.ordinance_id  = f.ordinance_id
+        LEFT JOIN Categories c ON c.category_id  = o.category_id
+        LEFT JOIN Barangays  b ON b.barangay_id  = o.barangay_id
+        ORDER BY {$orderExpr}
+    ";
+
+        /* ── 5. Bind pagination params (appended after WHERE params) ─────────── */
+
+        $params[] = $limit;
+        $params[] = $offset;
+
+        /* ── 6. Execute ──────────────────────────────────────────────────────── */
+
+        $stmt = $this->pdo->prepare($sql);
+
+        // Bind everything positionally; PDO will handle type inference.
+        foreach ($params as $index => $value) {
+            // PDO positional params are 1-indexed.
+            $stmt->bindValue($index + 1, $value);
+        }
+
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        /* ── 7. Post-process: decode JSON tag arrays ─────────────────────────── */
+        //
+        // JSON_ARRAYAGG returns a JSON string; decode it here so the caller
+        // always receives a PHP array (empty array when no tags exist).
+        //
+        $total = 0;
+
+        foreach ($rows as &$row) {
+            $total      = (int) $row['total_count'];  // same value on every row
+            unset($row['total_count']);                // strip the meta column
+
+            $row['tags']          = isset($row['tags'])
+                ? (json_decode($row['tags'], true) ?? [])
+                : [];
+            $row['like_count']    = (int) $row['like_count'];
+            $row['dislike_count'] = (int) $row['dislike_count'];
+            $row['comment_count'] = (int) $row['comment_count'];
+        }
+        unset($row);
+
+        /* ── 8. Return structured result ─────────────────────────────────────── */
+
+        return [
+            'total'      => $total,
+            'limit'      => $limit,
+            'offset'     => $offset,
+            'ordinances' => $rows,
+        ];
+    }
+
     // ------------------------------------------------------------
     // getOrdinanceById
     //

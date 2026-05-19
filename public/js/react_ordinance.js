@@ -10,11 +10,17 @@ const ReactionUI = {
 
         // Immediately reflect what we expect to happen
         if (clickedType === 'like') {
-            likeBtn.classList.toggle('ord-reaction-btn--active', !wasActive);
+            const isActive = !wasActive;
+            likeBtn.classList.toggle('ord-reaction-btn--active', isActive);
+            likeBtn.setAttribute('aria-pressed', String(isActive));
             dislikeBtn.classList.remove('ord-reaction-btn--active');
+            dislikeBtn.setAttribute('aria-pressed', 'false');
         } else {
-            dislikeBtn.classList.toggle('ord-reaction-btn--active', !wasActive);
+            const isActive = !wasActive;
+            dislikeBtn.classList.toggle('ord-reaction-btn--active', isActive);
+            dislikeBtn.setAttribute('aria-pressed', String(isActive));
             likeBtn.classList.remove('ord-reaction-btn--active');
+            likeBtn.setAttribute('aria-pressed', 'false');
         }
     },
 
@@ -23,10 +29,14 @@ const ReactionUI = {
         document.getElementById('like-count').textContent = data.likes;
         document.getElementById('dislike-count').textContent = data.dislikes;
 
-        document.getElementById('btn-like')
-            .classList.toggle('ord-reaction-btn--active', data.userReaction === 'like');
-        document.getElementById('btn-dislike')
-            .classList.toggle('ord-reaction-btn--active', data.userReaction === 'dislike');
+        const btnLike = document.getElementById('btn-like');
+        const btnDislike = document.getElementById('btn-dislike');
+
+        btnLike.classList.toggle('ord-reaction-btn--active', data.userReaction === 'like');
+        btnLike.setAttribute('aria-pressed', String(data.userReaction === 'like'));
+
+        btnDislike.classList.toggle('ord-reaction-btn--active', data.userReaction === 'dislike');
+        btnDislike.setAttribute('aria-pressed', String(data.userReaction === 'dislike'));
 
         const total = data.likes + data.dislikes;
         const likePct = total > 0 ? Math.round((data.likes / total) * 100) : 50;
@@ -37,10 +47,13 @@ const ReactionUI = {
 
     // ── Roll back on failure ──────────────────────────────────────────
     rollback(previousLikeActive, previousDislikeActive) {
-        document.getElementById('btn-like')
-            .classList.toggle('ord-reaction-btn--active', previousLikeActive);
-        document.getElementById('btn-dislike')
-            .classList.toggle('ord-reaction-btn--active', previousDislikeActive);
+        const btnLike = document.getElementById('btn-like');
+        const btnDislike = document.getElementById('btn-dislike');
+
+        btnLike.classList.toggle('ord-reaction-btn--active', previousLikeActive);
+        btnLike.setAttribute('aria-pressed', String(previousLikeActive));
+        btnDislike.classList.toggle('ord-reaction-btn--active', previousDislikeActive);
+        btnDislike.setAttribute('aria-pressed', String(previousDislikeActive));
     }
 };
 

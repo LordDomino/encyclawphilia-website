@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace Controllers;
 
 require_once __DIR__ . '/../Core/ApiResponse.php';
 

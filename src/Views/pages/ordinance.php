@@ -22,14 +22,30 @@ $ordinance_id = isset($_GET['id']) ? (int) trim($_GET['id']) : 0;
 // ============================================================
 
 $pdo = getDatabaseConnection();
-$ordinanceModel = new OrdinanceModel($pdo, $ordinance_id);
+$ordinanceModel = new OrdinanceModel($pdo);
 $ordinance = $ordinanceModel->getOrdinanceById($ordinance_id);
+
 // Redirect to the browse page when the requested ordinance
 // does not exist or has been soft-deleted, rather than
 // rendering a broken detail page.
 if ($ordinance === null) {
     header('Location: browse.php');
     exit;
+}
+
+$userReaction = null;
+if ($loggedIn && $ordinance_id > 0) {
+    $reactionStmt = $pdo->prepare(
+        'SELECT reaction_type FROM Ordinance_Reactions WHERE ordinance_id = :ord AND user_id = :usr LIMIT 1'
+    );
+    $reactionStmt->execute([
+        ':ord' => $ordinance_id,
+        ':usr' => (int)$_SESSION['user_id'],
+    ]);
+    $reactionRow = $reactionStmt->fetch(
+        \PDO::FETCH_ASSOC
+    );
+    $userReaction = $reactionRow !== false ? $reactionRow['reaction_type'] : null;
 }
 
 $commentModel = new CommentModel($pdo);
@@ -164,9 +180,10 @@ require_once __DIR__ . '/../../view_components.php';
                     <span class="ord-reactions-label">Community Response</span>
                     <div class="ord-reaction-buttons">
                         <button
-                            class="ord-reaction-btn ord-reaction-btn--like"
+                            class="ord-reaction-btn ord-reaction-btn--like<?php echo $userReaction === 'like' ? ' ord-reaction-btn--active' : ''; ?>"
                             id="btn-like"
                             aria-label="Like this ordinance"
+                            aria-pressed="<?php echo $userReaction === 'like' ? 'true' : 'false'; ?>"
                             data-ordinance-id="<?php echo (int)$ordinance['ordinance_id']; ?>"
                             data-reaction="like">
                             <span class="ord-reaction-icon" aria-hidden="true">▲</span>
@@ -177,9 +194,10 @@ require_once __DIR__ . '/../../view_components.php';
                         </button>
                         <span class="ord-reaction-divider" aria-hidden="true"></span>
                         <button
-                            class="ord-reaction-btn ord-reaction-btn--dislike"
+                            class="ord-reaction-btn ord-reaction-btn--dislike<?php echo $userReaction === 'dislike' ? ' ord-reaction-btn--active' : ''; ?>"
                             id="btn-dislike"
                             aria-label="Dislike this ordinance"
+                            aria-pressed="<?php echo $userReaction === 'dislike' ? 'true' : 'false'; ?>"
                             data-ordinance-id="<?php echo (int)$ordinance['ordinance_id']; ?>"
                             data-reaction="dislike">
                             <span class="ord-reaction-icon" aria-hidden="true">▼</span>
@@ -237,12 +255,11 @@ require_once __DIR__ . '/../../view_components.php';
                             <div class="ord-pdf-unavailable-icon" aria-hidden="true">📄</div>
                             <p class="ord-pdf-unavailable-title">PDF Not Yet Available</p>
                             <p class="ord-pdf-unavailable-sub">
-                                The official document for this ordinance has not been uploaded yet.
-                                Check back later or contact the City Council for a copy.
+                                The official document for this ordinance has not been uploaded yet. Check back later or contact the City Council for a copy.
                             </p>
-                            <a href="mailto:info@encyclawphilia.local" class="ord-pdf-contact-link">
+                            <!-- <a href="mailto:info@encyclawphilia.local" class="ord-pdf-contact-link">
                                 Request Document
-                            </a>
+                            </a> -->
                         </div>
                     <?php endif; ?>
                 </div>
@@ -280,7 +297,7 @@ require_once __DIR__ . '/../../view_components.php';
                         maxlength="1000"></textarea>
                     <div class="ord-comment-compose-footer">
                         <span class="ord-comment-char-count" id="char-count">0 / 1000</span>
-                        <a href="login.php" class="ord-comment-login-prompt">
+                        <a href="/login" class="ord-comment-login-prompt">
                             Login to post a comment
                         </a>
                         <!-- TODO: Replace anchor with submit button once auth is integrated:
@@ -333,7 +350,7 @@ require_once __DIR__ . '/../../view_components.php';
                                     <?php echo htmlspecialchars($comment['comment_text'], ENT_QUOTES, 'UTF-8'); ?>
                                 </p>
 
-                                <footer class="ord-comment-footer">
+                                <div class="ord-comment-footer">
                                     <div class="ord-comment-reactions">
                                         <button
                                             class="ord-comment-react-btn ord-comment-react-btn--like"

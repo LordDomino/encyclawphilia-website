@@ -1253,6 +1253,7 @@ section.browse {
 }
 
 .card-featured .numeral-and-series {
+    color: var(--ink-on-dark);
     font-size: var(--fs-2xl);
 }
 

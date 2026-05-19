@@ -121,17 +121,17 @@ require_once __DIR__ . '/../head.php';
             </div>
         </section>
 
-        <section class="about-cta">
+        <!-- <section class="about-cta">
             <h3>Ready to Explore Valenzuela's Ordinances?</h3>
             <p>Start by browsing our latest ordinances or use the search feature to find specific regulations.</p>
             <div class="cta-buttons">
                 <a href="index.php" class="cta-link primary">Go to Home</a>
                 <a href="browse.php" class="cta-link secondary">Browse Ordinances</a>
             </div>
-        </section>
+        </section> -->
     </main>
 
-    <?php require_once __DIR__ . '/../src/Views/footer.php'; ?>
+    <?php require_once __DIR__ . '/../footer.php'; ?>
 </body>
 
 </html>
