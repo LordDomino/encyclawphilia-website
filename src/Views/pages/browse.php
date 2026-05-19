@@ -3,6 +3,7 @@
 namespace App\Views\pages;
 
 use App\Models\CommentModel;
+use App\Models\OrdinanceModel;
 
 session_start();
 $loggedIn = isset($_SESSION['user_id']);
@@ -19,14 +20,16 @@ $results = [];
 if ($search_keyword !== '') {
     // Establish network boundary context
     $pdo = getDatabaseConnection();
-    $ordinanceMode = new $ordinanceModel($pdo);
+    $ordinanceModel = new OrdinanceModel($pdo);
+    $results = $ordinanceModel->getOrdinancesByTitle($safe_search_keyword);
 
     // Debugging payload output
     //  * Refactored: Replaced 'CALL GetOrdinancesByTitle(:key)' statement compilation 
     //  * with an explicit application routine invocation. The connection state ($pdo)
     //  * is passed into the function context directly.
     //  */
-    $commentMdodel = new CommentModel($pdo);
+    // $commentModel = new CommentModel($pdo);
+    echo "<script>console.log(" . json_encode($results) . ")</script>";
 }
 
 // HTML Assembly

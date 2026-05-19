@@ -1,0 +1,953 @@
+/* ============================================================
+   ADMIN ORDINANCE FORM
+   Shared stylesheet for add_ordinance.php and edit_ordinance.php.
+   Append to admin_dashboard.css, or link as a separate file
+   when $currentPage === 'admin_dashboard'.
+
+   Depends on:  style.css  (all --var references originate there)
+   No raw values are introduced except where a comment explains
+   why no existing variable applies.
+   ============================================================ */
+
+
+/* ============================================================
+   PAGE SHELL
+   ============================================================ */
+
+.add-ord-page {
+    background-color: var(--bg-page);
+    padding-bottom: var(--sp-11);
+}
+
+.add-ord-flash-wrap {
+    padding: var(--sp-7) var(--page-side-margin);
+    padding-bottom: 0;
+    background-color: var(--bg-page);
+}
+
+.add-ord-flash-bar {
+    margin-bottom: 0;
+    max-width: 960px;
+}
+
+
+/* ============================================================
+   TWO-COLUMN LAYOUT
+   ============================================================ */
+
+.add-ord-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    padding: var(--sp-10) var(--page-side-margin);
+}
+
+
+/* ============================================================
+   LEFT COLUMN — POLICY SIDEBAR
+   ============================================================ */
+
+.add-ord-sidebar {
+    width: clamp(240px, 26vw, 340px);
+    flex-shrink: 0;
+    padding-right: var(--sp-9);
+    border-right: var(--bdr-thin) solid var(--bdr-clr-divider);
+    position: sticky;
+    top: calc(var(--header-height) + var(--sp-9));
+    align-self: flex-start;
+    max-height: calc(100vh - var(--header-height) - var(--sp-10));
+    overflow-y: auto;
+}
+
+.add-ord-sidebar::-webkit-scrollbar       { width: 4px; } /* 4px: narrower than --sp-2(4px) floor; intentional hair-thin rail */
+.add-ord-sidebar::-webkit-scrollbar-track { background: transparent; }
+.add-ord-sidebar::-webkit-scrollbar-thumb {
+    background: var(--glass-sky-strong);
+    border-radius: var(--bdr-r-pill);
+}
+
+.add-ord-sidebar-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-7);
+}
+
+.add-ord-sidebar-title {
+    font-family: var(--font-label);
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    letter-spacing: var(--ls-tighter);
+    line-height: var(--lh-snug);
+    color: var(--ink-primary);
+    margin: 0;
+}
+
+.add-ord-sidebar-intro {
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    color: var(--ink-light);
+    margin: 0;
+}
+
+.add-ord-sidebar-divider { margin: var(--sp-3) 0; }
+
+.add-ord-sidebar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+}
+
+.add-ord-sidebar-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-link);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: var(--ls-md);
+    line-height: var(--lh-normal);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-accent);
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--bdr-r-md);
+    transition: all var(--ease-fast);
+}
+
+.add-ord-sidebar-link:hover {
+    background: var(--glass-ink-faint);
+    color: var(--ink-primary);
+}
+
+/* ── Policy groups ────────────────────────────────────────── */
+
+.add-ord-policy-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-4);
+    padding: var(--sp-6);
+    border-radius: var(--bdr-r-xl);
+    border: var(--bdr-thin) solid var(--bdr-clr-divider);
+    background: linear-gradient(135deg,
+        rgba(248, 249, 255, var(--op-60)) 0%,
+        rgba(240, 243, 255, var(--op-40)) 100%);
+    transition: border-color var(--ease-smooth-lg), box-shadow var(--ease-smooth-lg);
+}
+
+.add-ord-policy-group:hover {
+    border-color: var(--bdr-clr-soft);
+    box-shadow: var(--shadow-sm);
+}
+
+.add-ord-policy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--bdr-r-pill);
+    font-family: var(--font-link);
+    font-size: var(--fs-2xs);
+    font-weight: 700;
+    letter-spacing: var(--ls-sm);
+    line-height: var(--lh-tight);
+    text-transform: uppercase;
+    width: fit-content;
+}
+
+.add-ord-policy-badge--locked {
+    background: var(--clr-err-bg);
+    color: var(--clr-err-ink);
+    border: var(--bdr-thin) solid var(--clr-err-bdr);
+}
+
+.add-ord-policy-badge--once-after-null {
+    background: var(--clr-warn-bg);
+    color: var(--clr-warn-ink);
+    border: var(--bdr-thin) solid var(--clr-warn-bdr);
+}
+
+.add-ord-policy-badge--mutable {
+    background: var(--clr-ok-bg);
+    color: var(--clr-ok-ink);
+    border: var(--bdr-thin) solid var(--clr-ok-bdr);
+}
+
+.add-ord-policy-desc {
+    font-family: var(--font-body);
+    font-size: var(--fs-xs);
+    line-height: var(--lh-relaxed);
+    color: var(--ink-light);
+    margin: 0;
+}
+
+.add-ord-policy-list {
+    margin: 0;
+    padding: 0 0 0 var(--sp-6);
+    list-style: disc;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+}
+
+.add-ord-policy-list li {
+    font-family: var(--font-ui);
+    font-size: var(--fs-xs);
+    line-height: var(--lh-relaxed);
+    color: var(--ink-mid);
+}
+
+/* ── Audit block (edit page only) ────────────────────────── */
+
+.edit-ord-audit-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+}
+
+.edit-ord-audit-title {
+    font-family: var(--font-link);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-xl);
+    line-height: var(--lh-tight);
+    color: var(--ink-faint);
+    margin: 0;
+}
+
+.edit-ord-audit-list {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+}
+
+.edit-ord-audit-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+}
+
+.edit-ord-audit-item dt {
+    font-family: var(--font-link);
+    font-size: var(--fs-2xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-lg);
+    line-height: var(--lh-tight);
+    color: var(--ink-faint);
+}
+
+.edit-ord-audit-item dd {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-snug);
+    color: var(--ink-primary);
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.edit-ord-audit-item--warn dt,
+.edit-ord-audit-item--warn dd { color: var(--clr-warn-ink); }
+
+
+/* ============================================================
+   RIGHT COLUMN — FORM
+   ============================================================ */
+
+.add-ord-form-col {
+    flex: 1;
+    min-width: 0;
+    padding: var(--sp-2) 0 var(--sp-2) clamp(var(--sp-9), 3vw, var(--sp-10));
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-9);
+}
+
+.add-ord-section-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(var(--fs-2xl), 2.5vw, var(--fs-4xl));
+    font-weight: 600;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--ls-tighter);
+    color: var(--ink-primary);
+    margin: 0 0 var(--sp-3);
+}
+
+.add-ord-section-sub {
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    color: var(--ink-light);
+    margin: 0;
+}
+
+/* The form itself */
+.add-ord-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-9);
+}
+
+
+/* ============================================================
+   FIELDSET SECTIONS
+   ============================================================ */
+
+.add-ord-fieldset {
+    border: var(--bdr-normal) solid var(--bdr-clr-divider);
+    border-radius: var(--bdr-r-xl);
+    padding: var(--sp-9);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-7);
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, var(--op-60)) 0%,
+        rgba(248, 249, 255, var(--op-50)) 100%);
+    backdrop-filter: blur(var(--blur-md));
+    -webkit-backdrop-filter: blur(var(--blur-md));
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--ease-smooth-lg), border-color var(--ease-smooth-lg);
+}
+
+.add-ord-fieldset:focus-within { box-shadow: var(--shadow-glass-md); }
+
+/* Left-border accent + tinted background per constraint tier */
+.add-ord-fieldset--locked {
+    border-left: var(--bdr-thick) solid var(--clr-danger);
+    border-color: var(--clr-err-bdr);
+    background: linear-gradient(135deg,
+        rgba(248, 215, 218, var(--op-12)) 0%,
+        rgba(248, 249, 255, var(--op-50)) 100%);
+}
+
+.add-ord-fieldset--once-after-null {
+    border-left: var(--bdr-thick) solid var(--clr-warn-amber);
+    border-color: var(--clr-warn-bdr);
+    background: linear-gradient(135deg,
+        rgba(255, 243, 205, var(--op-12)) 0%,
+        rgba(248, 249, 255, var(--op-50)) 100%);
+}
+
+.add-ord-fieldset--mutable {
+    border-left: var(--bdr-thick) solid var(--clr-ok-ink);
+    border-color: var(--clr-ok-bdr);
+    background: linear-gradient(135deg,
+        rgba(212, 237, 218, var(--op-12)) 0%,
+        rgba(248, 249, 255, var(--op-50)) 100%);
+}
+
+/* ── Legend ───────────────────────────────────────────────── */
+
+.add-ord-legend {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-4);
+    flex-wrap: wrap;
+    /* Override browser default legend float/positioning */
+    float: none;
+    width: 100%;
+    margin: 0;
+    padding: 0 var(--sp-2);
+    font-family: var(--font-label);
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    letter-spacing: var(--ls-tighter);
+    line-height: var(--lh-snug);
+    color: var(--ink-primary);
+}
+
+.add-ord-legend-icon {
+    font-size: var(--fs-base);
+    line-height: 1;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.add-ord-legend-sub {
+    font-family: var(--font-body);
+    font-size: var(--fs-xs);
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: var(--ls-none);
+    line-height: var(--lh-normal);
+    color: var(--ink-faint);
+}
+
+/* ── Two-column grid inside a fieldset ───────────────────── */
+
+.add-ord-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-7);
+}
+
+
+/* ============================================================
+   FORM CONTROLS
+   ============================================================ */
+
+.add-ord-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    margin: 0;
+}
+
+.add-ord-form-group--half { max-width: 240px; }
+
+/* Labels */
+.add-ord-label {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-link);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-xl);
+    line-height: var(--lh-normal);
+    color: var(--ink-primary);
+}
+
+.add-ord-required-star {
+    color: var(--clr-danger);
+    font-weight: 700;
+}
+
+.add-ord-optional-tag {
+    font-family: var(--font-body);
+    font-size: var(--fs-2xs);
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: var(--ls-none);
+    text-transform: none;
+    color: var(--ink-faint);
+}
+
+/* Shared input + select + textarea base */
+.add-ord-input,
+.add-ord-select,
+.add-ord-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--sp-4) var(--sp-6);
+    border: var(--bdr-normal) solid var(--glass-ink-mid);
+    border-radius: var(--bdr-r-md);
+    font-family: var(--font-body);
+    font-size: var(--fs-base);
+    line-height: var(--lh-normal);
+    color: var(--ink-body);
+    background-color: rgba(255, 255, 255, var(--op-88));
+    transition: border-color var(--ease-fast), box-shadow var(--ease-fast),
+                background-color var(--ease-fast);
+    outline: none;
+}
+
+.add-ord-input::placeholder,
+.add-ord-textarea::placeholder { color: var(--ink-faint); font-style: italic; }
+
+.add-ord-input:focus,
+.add-ord-select:focus,
+.add-ord-textarea:focus {
+    border-color: var(--glass-ink-vivid);
+    background-color: var(--clr-white);
+    box-shadow: var(--shadow-focus);
+}
+
+/* Select specifics */
+.add-ord-select { cursor: pointer; }
+
+/* Textarea specifics */
+.add-ord-textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: var(--lh-relaxed);
+    padding-top: var(--sp-5);
+    padding-bottom: var(--sp-5);
+}
+
+/* Textarea variants */
+.add-ord-textarea--title    { font-family: var(--font-label); font-weight: 600; }
+.add-ord-textarea--fulltext { font-family: var(--font-ui); font-size: var(--fs-sm); min-height: 260px; }
+
+/* Textarea footer: hint + char count */
+.add-ord-textarea-footer {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--sp-5);
+}
+
+/* Field hint */
+.add-ord-field-hint {
+    font-family: var(--font-body);
+    font-size: var(--fs-xs);
+    line-height: var(--lh-relaxed);
+    color: var(--ink-faint);
+    font-style: italic;
+    margin: 0;
+    flex: 1;
+}
+
+/* Char count */
+.add-ord-char-count {
+    font-family: var(--font-link);
+    font-size: var(--fs-2xs);
+    font-weight: 600;
+    letter-spacing: var(--ls-sm);
+    line-height: var(--lh-tight);
+    color: var(--ink-faint);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: color var(--ease-fast);
+}
+
+.add-ord-char-count--warn { color: var(--clr-warn-amber); font-weight: 700; }
+
+/* Date / number browser quirks */
+input[type="date"].add-ord-input { cursor: pointer; }
+input[type="number"].add-ord-input { -moz-appearance: textfield; }
+input[type="number"].add-ord-input::-webkit-inner-spin-button,
+input[type="number"].add-ord-input::-webkit-outer-spin-button { opacity: 0.5; }
+
+
+/* ============================================================
+   PDF UPLOAD DROP ZONE
+   ============================================================ */
+
+.add-ord-file-drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-4);
+    padding: var(--sp-10) var(--sp-9);
+    border: var(--bdr-normal) dashed var(--glass-ink-mid);
+    border-radius: var(--bdr-r-xl);
+    background: linear-gradient(135deg,
+        rgba(248, 249, 255, var(--op-50)) 0%,
+        rgba(240, 244, 255, var(--op-40)) 100%);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--ease-smooth-lg);
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px; /* 120px: comfortable drop target; no variable equivalent */
+}
+
+.add-ord-file-drop:hover,
+.add-ord-file-drop:focus {
+    border-color: var(--glass-ink-vivid);
+    background: linear-gradient(135deg,
+        rgba(248, 249, 255, var(--op-70)) 0%,
+        rgba(240, 244, 255, var(--op-60)) 100%);
+    box-shadow: var(--shadow-glass-sm);
+    outline: none;
+}
+
+.add-ord-file-drop--dragover {
+    border-color: var(--ink-accent);
+    border-style: solid;
+    background: var(--glass-ink-soft);
+    box-shadow: var(--shadow-glass-md);
+    transform: scale(1.01);
+}
+
+.add-ord-file-drop--selected {
+    border-color: var(--clr-ok-ink);
+    border-style: solid;
+    background: rgba(212, 237, 218, var(--op-20));
+}
+
+.add-ord-file-icon {
+    font-size: var(--fs-7xl);
+    line-height: 1;
+    opacity: var(--op-40);
+    user-select: none;
+    transition: transform var(--ease-spring), opacity var(--ease-fast);
+}
+
+.add-ord-file-drop:hover .add-ord-file-icon,
+.add-ord-file-drop--dragover .add-ord-file-icon {
+    transform: scale(1.15) translateY(calc(var(--sp-2) * -1));
+    opacity: var(--op-80);
+}
+
+.add-ord-file-drop--selected .add-ord-file-icon { opacity: var(--op-80); }
+
+.add-ord-file-prompt {
+    font-family: var(--font-link);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    letter-spacing: var(--ls-sm);
+    line-height: var(--lh-normal);
+    color: var(--ink-accent);
+    transition: color var(--ease-fast);
+}
+
+.add-ord-file-drop--selected .add-ord-file-prompt {
+    color: var(--clr-ok-ink);
+    word-break: break-all;
+}
+
+.add-ord-file-sub {
+    font-family: var(--font-body);
+    font-size: var(--fs-xs);
+    line-height: var(--lh-normal);
+    color: var(--ink-faint);
+    font-style: italic;
+}
+
+/* Visually hidden native input; JS fires .click() on it */
+.add-ord-file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    pointer-events: none; /* JS handles click delegation */
+}
+
+
+/* ============================================================
+   CONFIRMATION NOTICE
+   ============================================================ */
+
+.add-ord-confirm-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-5);
+    padding: var(--sp-7) var(--sp-9);
+    border-radius: var(--bdr-r-xl);
+    background: var(--clr-warn-bg);
+    border: var(--bdr-thin) solid var(--clr-warn-bdr);
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
+}
+
+.add-ord-confirm-icon {
+    font-size: var(--fs-xl);
+    line-height: 1;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.add-ord-confirm-text {
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    color: var(--clr-warn-ink);
+    margin: 0;
+}
+
+.add-ord-confirm-text strong { font-weight: 700; }
+
+
+/* ============================================================
+   FORM ACTIONS
+   ============================================================ */
+
+.add-ord-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--sp-5);
+    flex-wrap: wrap;
+    padding-top: var(--sp-4);
+    border-top: var(--bdr-thin) solid var(--bdr-clr-divider);
+}
+
+.add-ord-cancel-btn  { color: var(--ink-light); }
+.add-ord-submit-btn  { min-width: 200px; justify-content: center; } /* 200px: min button width for readability */
+
+
+/* ============================================================
+   EDIT PAGE — SUBHERO ADDITIONS
+   ============================================================ */
+
+.edit-ord-subhero       { padding-bottom: var(--sp-10); }
+
+.edit-ord-subhero-badges {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+
+/* ============================================================
+   EDIT PAGE — ARCHIVED RECORD BANNER
+   ============================================================ */
+
+.edit-ord-archived-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-5);
+    padding: var(--sp-6) var(--page-side-margin);
+    background: var(--clr-err-bg);
+    border-bottom: var(--bdr-thin) solid var(--clr-err-bdr);
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
+}
+
+.edit-ord-archived-icon { font-size: var(--fs-xl); flex-shrink: 0; line-height: 1; }
+
+.edit-ord-archived-text {
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    color: var(--clr-err-ink);
+}
+
+.edit-ord-archived-text strong { font-weight: 700; }
+
+
+/* ============================================================
+   EDIT PAGE — LOCKED (READ-ONLY) FIELD DISPLAY
+   Replaces form inputs for write-once fields that have been set.
+   ============================================================ */
+
+.edit-ord-locked-field {
+    padding: var(--sp-4) var(--sp-6);
+    border: var(--bdr-thin) solid var(--clr-err-bdr);
+    border-radius: var(--bdr-r-md);
+    background: linear-gradient(135deg,
+        rgba(248, 215, 218, var(--op-20)) 0%,
+        rgba(255, 255, 255, var(--op-50)) 100%);
+    font-family: var(--font-body);
+    font-size: var(--fs-base);
+    line-height: var(--lh-normal);
+    color: var(--ink-mid);
+    cursor: not-allowed;
+    user-select: text;
+    position: relative;
+}
+
+/* Subtle diagonal stripe — signals immutability without colour alone */
+.edit-ord-locked-field::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 6px,                        /* 6px stripe gap: no scale variable applies */
+        rgba(200, 30, 30, 0.03) 6px,
+        rgba(200, 30, 30, 0.03) 7px             /* 7px stripe width: intentional hairline */
+    );
+    pointer-events: none;
+}
+
+.edit-ord-locked-field--multiline  { white-space: pre-wrap; line-height: var(--lh-relaxed); min-height: 60px; }
+.edit-ord-locked-field--tall       { min-height: 90px; } /* 90px: comfortable multi-line read area */
+.edit-ord-locked-field--compact    { display: inline-flex; align-items: center; width: fit-content; min-width: 80px; }
+
+.edit-ord-locked-field--scrollable {
+    max-height: 300px; /* 300px: comfortable viewport for full legislative text */
+    overflow-y: auto;
+    font-family: var(--font-ui);
+    font-size: var(--fs-sm);
+    line-height: var(--lh-relaxed);
+    scroll-behavior: smooth;
+}
+
+.edit-ord-locked-field--scrollable::-webkit-scrollbar       { width: 4px; } /* matches sidebar rail width */
+.edit-ord-locked-field--scrollable::-webkit-scrollbar-thumb {
+    background: var(--glass-danger-border);
+    border-radius: var(--bdr-r-pill);
+}
+
+/* Label modifiers for locked fields */
+.edit-ord-label--locked { color: var(--ink-faint); opacity: var(--op-85); }
+
+.edit-ord-lock-icon {
+    font-size: var(--fs-sm);
+    opacity: var(--op-70);
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* Inline locked tag in section subtitles */
+.edit-ord-inline-locked-label {
+    display: inline-block;
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--bdr-r-sm);
+    background: var(--clr-err-bg);
+    border: var(--bdr-thin) solid var(--clr-err-bdr);
+    font-family: var(--font-ui);
+    font-size: var(--fs-xs);
+    color: var(--clr-err-ink);
+    font-style: normal;
+}
+
+/* Notice bar shown inside locked fieldsets */
+.edit-ord-locked-notice {
+    padding: var(--sp-5) var(--sp-7);
+    border-radius: var(--bdr-r-lg);
+    background: var(--clr-err-bg);
+    border: var(--bdr-thin) solid var(--clr-err-bdr);
+    font-family: var(--font-body);
+    font-size: var(--fs-xs);
+    line-height: var(--lh-relaxed);
+    color: var(--clr-err-ink);
+}
+
+/* Warning hint modifier for once-after-null fields */
+.edit-ord-field-hint--warn {
+    color: var(--clr-warn-ink);
+    font-style: normal;
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   EDIT PAGE — EXISTING PDF DISPLAY
+   ============================================================ */
+
+.edit-ord-pdf-present {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
+    padding: var(--sp-6) var(--sp-7);
+    border: var(--bdr-thin) solid var(--clr-err-bdr);
+    border-radius: var(--bdr-r-lg);
+    background: linear-gradient(135deg,
+        rgba(248, 215, 218, var(--op-15)) 0%,
+        rgba(255, 255, 255, var(--op-50)) 100%);
+}
+
+.edit-ord-pdf-icon { font-size: var(--fs-3xl); line-height: 1; opacity: var(--op-60); flex-shrink: 0; }
+
+.edit-ord-pdf-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+}
+
+.edit-ord-pdf-name {
+    font-family: var(--font-ui);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    line-height: var(--lh-snug);
+    color: var(--ink-primary);
+    word-break: break-all;
+}
+
+.edit-ord-pdf-link {
+    font-family: var(--font-link);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: var(--ls-md);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-accent);
+    width: fit-content;
+    transition: color var(--ease-fast);
+}
+
+.edit-ord-pdf-link:hover { color: var(--ink-primary); text-decoration: underline; }
+
+.edit-ord-pdf-lock { font-size: var(--fs-lg); opacity: var(--op-50); flex-shrink: 0; }
+
+/* Policy list item struck through once field is already set */
+.edit-ord-policy-list-item--locked {
+    opacity: var(--op-50);
+    text-decoration: line-through;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+
+
+/* ============================================================
+   RESPONSIVE — TABLET (≤ 1024px)
+   ============================================================ */
+
+@media screen and (max-width: 1024px) {
+    .add-ord-layout {
+        flex-direction: column;
+        gap: var(--sp-10);
+    }
+
+    .add-ord-sidebar {
+        width: 100%;
+        position: static;
+        max-height: none;
+        overflow-y: visible;
+        border-right: none;
+        border-bottom: var(--bdr-thin) solid var(--bdr-clr-divider);
+        padding-right: 0;
+        padding-bottom: var(--sp-9);
+    }
+
+    .add-ord-sidebar-inner {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: var(--sp-7);
+    }
+
+    /* These items always span the full sidebar grid width */
+    .add-ord-sidebar-title,
+    .add-ord-sidebar-intro,
+    .add-ord-sidebar-divider,
+    .add-ord-sidebar-actions,
+    .edit-ord-audit-block { grid-column: 1 / -1; }
+
+    .add-ord-form-col { padding: 0; }
+
+    .add-ord-two-col { grid-template-columns: 1fr; }
+}
+
+
+/* ============================================================
+   RESPONSIVE — MOBILE (≤ 768px)
+   ============================================================ */
+
+@media screen and (max-width: 768px) {
+    .add-ord-layout         { padding: var(--sp-9) var(--sp-7); }
+    .add-ord-flash-wrap     { padding: var(--sp-7); padding-bottom: 0; }
+    .add-ord-fieldset       { padding: var(--sp-7); }
+    .add-ord-confirm-notice { padding: var(--sp-6) var(--sp-7); }
+    .edit-ord-archived-banner { padding: var(--sp-6) var(--sp-7); }
+
+    .add-ord-legend         { flex-wrap: wrap; gap: var(--sp-3); }
+    .add-ord-legend-sub     { flex-basis: 100%; }
+
+    .edit-ord-subhero-badges { gap: var(--sp-3); }
+
+    .add-ord-form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .add-ord-cancel-btn,
+    .add-ord-submit-btn { flex: 1; justify-content: center; text-align: center; }
+}
+
+
+/* ============================================================
+   RESPONSIVE — MOBILE SMALL (≤ 425px)
+   ============================================================ */
+
+@media screen and (max-width: 425px) {
+    .add-ord-layout   { padding: var(--sp-7) var(--sp-5); }
+    .add-ord-fieldset { padding: var(--sp-5); }
+
+    .add-ord-sidebar-inner  { grid-template-columns: 1fr; }
+    .add-ord-two-col        { gap: var(--sp-5); }
+    .add-ord-form-group--half { max-width: 100%; }
+
+    .edit-ord-pdf-present   { flex-wrap: wrap; }
+    .edit-ord-pdf-lock      { display: none; }
+}

@@ -169,7 +169,7 @@ require_once __DIR__ . '/../../view_components.php';
             </div>
             <div class="admin-section-actions">
                 <?php if ($_SESSION['is_admin']): ?>
-                    <a href="/admin/ordinances/new" class="admin-btn admin-btn--primary">
+                    <a href="/add-ordinance" class="admin-btn admin-btn--primary">
                         + Add Ordinance
                     </a>
                 <?php endif; ?>
@@ -370,21 +370,21 @@ require_once __DIR__ . '/../../view_components.php';
                                     </button>
                                     <ul class="admin-card-action-dropdown" role="menu" aria-label="Card actions">
                                         <li role="none">
-
-                                            href="/ordinance?id=<?php echo (int)$row['ordinance_id']; ?>"
-                                            class="admin-dropdown-item"
-                                            role="menuitem"
-                                            target="_blank">
-                                            👁 View Public Page
+                                            <a
+                                                href="/ordinance?id=<?php echo (int)$row['ordinance_id']; ?>"
+                                                class="admin-dropdown-item"
+                                                role="menuitem"
+                                                target="_blank">
+                                                👁 View Public Page
                                             </a>
                                         </li>
                                         <?php if ($_SESSION['is_admin']): ?>
                                             <li role="none">
-
-                                                href="/admin/ordinances/edit?id=<?php echo (int)$row['ordinance_id']; ?>"
-                                                class="admin-dropdown-item"
-                                                role="menuitem">
-                                                ✏️ Edit Record
+                                                <a
+                                                    href="/edit-ordinance?id=<?php echo (int)$row['ordinance_id']; ?>"
+                                                    class="admin-dropdown-item"
+                                                    role="menuitem">
+                                                    ✏️ Edit Record
                                                 </a>
                                             </li>
                                         <?php endif; ?>
@@ -559,241 +559,241 @@ require_once __DIR__ . '/../../view_components.php';
          ADMIN DASHBOARD SCRIPTS
     ================================================================ -->
     <script>
-    // ============================================================
-    // BULK SELECTION STATE MACHINE  (Batch 2)
-    // ============================================================
-    const toolbar        = document.getElementById('admin-bulk-toolbar');
-    const selectAllCb    = document.getElementById('select-all-ordinances');
-    const bulkCount      = document.getElementById('bulk-selected-count');
-    const bulkApplyBtn   = document.getElementById('bulk-apply-status');
-    const bulkArchiveBtn = document.getElementById('bulk-archive-btn');
-    const bulkClearBtn   = document.getElementById('bulk-clear-btn');
+        // ============================================================
+        // BULK SELECTION STATE MACHINE  (Batch 2)
+        // ============================================================
+        const toolbar = document.getElementById('admin-bulk-toolbar');
+        const selectAllCb = document.getElementById('select-all-ordinances');
+        const bulkCount = document.getElementById('bulk-selected-count');
+        const bulkApplyBtn = document.getElementById('bulk-apply-status');
+        const bulkArchiveBtn = document.getElementById('bulk-archive-btn');
+        const bulkClearBtn = document.getElementById('bulk-clear-btn');
 
-    function getCardCheckboxes() {
-        return [...document.querySelectorAll('.admin-card-checkbox')];
-    }
-
-    function updateBulkToolbar() {
-        const all      = getCardCheckboxes();
-        const selected = all.filter(cb => cb.checked);
-        const count    = selected.length;
-
-        bulkCount.textContent = `${count} selected`;
-
-        if (count > 0) {
-            toolbar.classList.add('is-active');
-            toolbar.setAttribute('aria-hidden', 'false');
-            bulkArchiveBtn.disabled = false;
-        } else {
-            toolbar.classList.remove('is-active');
-            toolbar.setAttribute('aria-hidden', 'true');
-            bulkArchiveBtn.disabled = true;
+        function getCardCheckboxes() {
+            return [...document.querySelectorAll('.admin-card-checkbox')];
         }
 
-        const statusPick = document.getElementById('bulk-status-select');
-        bulkApplyBtn.disabled = (count === 0 || !statusPick.value);
+        function updateBulkToolbar() {
+            const all = getCardCheckboxes();
+            const selected = all.filter(cb => cb.checked);
+            const count = selected.length;
 
-        selectAllCb.indeterminate = (count > 0 && count < all.length);
-        selectAllCb.checked       = (count === all.length && all.length > 0);
-    }
+            bulkCount.textContent = `${count} selected`;
 
-    selectAllCb.addEventListener('change', () => {
-        getCardCheckboxes().forEach(cb => {
-            cb.checked = selectAllCb.checked;
-            cb.closest('.admin-content-card')
-              ?.classList.toggle('admin-content-card--selected', selectAllCb.checked);
-        });
-        updateBulkToolbar();
-    });
+            if (count > 0) {
+                toolbar.classList.add('is-active');
+                toolbar.setAttribute('aria-hidden', 'false');
+                bulkArchiveBtn.disabled = false;
+            } else {
+                toolbar.classList.remove('is-active');
+                toolbar.setAttribute('aria-hidden', 'true');
+                bulkArchiveBtn.disabled = true;
+            }
 
-    document.getElementById('bulk-status-select')
-        .addEventListener('change', updateBulkToolbar);
+            const statusPick = document.getElementById('bulk-status-select');
+            bulkApplyBtn.disabled = (count === 0 || !statusPick.value);
 
-    bulkClearBtn.addEventListener('click', () => {
-        getCardCheckboxes().forEach(cb => {
-            cb.checked = false;
-            cb.closest('.admin-content-card')
-              ?.classList.remove('admin-content-card--selected');
-        });
-        selectAllCb.checked       = false;
-        selectAllCb.indeterminate = false;
-        updateBulkToolbar();
-    });
+            selectAllCb.indeterminate = (count > 0 && count < all.length);
+            selectAllCb.checked = (count === all.length && all.length > 0);
+        }
 
-    bulkApplyBtn.addEventListener('click', () => {
-        const ids    = getCardCheckboxes().filter(cb => cb.checked).map(cb => cb.dataset.id);
-        const status = document.getElementById('bulk-status-select').value;
-        // TODO: POST /admin/ordinances/bulk-status { ids, status }
-        console.log('[TODO] Bulk status →', status, 'IDs:', ids);
-    });
-
-    bulkArchiveBtn.addEventListener('click', () => {
-        const ids = getCardCheckboxes().filter(cb => cb.checked).map(cb => cb.dataset.id);
-        // Surface the modal with a generic multi-record label
-        openArchiveModal(ids.join(', '), `${ids.length} selected record(s)`);
-    });
-
-
-    // ============================================================
-    // PER-CARD CHECKBOX → SELECTION STATE  (Batch 3)
-    // ============================================================
-    document.getElementById('admin-content-grid')
-        ?.addEventListener('change', (e) => {
-            if (!e.target.matches('.admin-card-checkbox')) return;
-            e.target
-                .closest('.admin-content-card')
-                ?.classList.toggle('admin-content-card--selected', e.target.checked);
+        selectAllCb.addEventListener('change', () => {
+            getCardCheckboxes().forEach(cb => {
+                cb.checked = selectAllCb.checked;
+                cb.closest('.admin-content-card')
+                    ?.classList.toggle('admin-content-card--selected', selectAllCb.checked);
+            });
             updateBulkToolbar();
         });
 
+        document.getElementById('bulk-status-select')
+            .addEventListener('change', updateBulkToolbar);
 
-    // ============================================================
-    // PER-CARD ACTION DROPDOWN  (Batch 3)
-    // ============================================================
-    function closeAllDropdowns(except = null) {
-        document.querySelectorAll('.admin-card-action-dropdown').forEach(dd => {
-            if (dd === except) return;
-            dd.classList.remove('is-open');
-            dd.previousElementSibling?.setAttribute('aria-expanded', 'false');
-        });
-    }
-
-    document.addEventListener('click', (e) => {
-        const trigger = e.target.closest('.admin-card-action-trigger');
-        if (trigger) {
-            const dropdown = trigger.nextElementSibling;
-            const isOpen   = dropdown.classList.contains('is-open');
-            closeAllDropdowns();
-            dropdown.classList.toggle('is-open', !isOpen);
-            trigger.setAttribute('aria-expanded', String(!isOpen));
-            return;
-        }
-        if (!e.target.closest('.admin-card-action-menu')) {
-            closeAllDropdowns();
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeAllDropdowns();
-            closeArchiveModal();
-        }
-    });
-
-
-    // ============================================================
-    // ARCHIVE MODAL
-    // ============================================================
-    const archiveModal       = document.getElementById('admin-archive-modal');
-    const archiveModalTarget = document.getElementById('archive-modal-target');
-    const archiveConfirmBtn  = document.getElementById('archive-modal-confirm');
-    const archiveCloseBtn    = document.getElementById('archive-modal-close');
-    const archiveCancelBtn   = document.getElementById('archive-modal-cancel');
-
-    function openArchiveModal(id, label) {
-        archiveModalTarget.textContent   = label;
-        archiveConfirmBtn.dataset.id     = id;
-        archiveModal.classList.add('active');
-        archiveCloseBtn.focus();
-    }
-
-    function closeArchiveModal() {
-        archiveModal.classList.remove('active');
-    }
-
-    // Single-card trigger (from per-card dropdown)
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('.admin-archive-trigger');
-        if (!btn) return;
-        closeAllDropdowns();
-        const id     = btn.dataset.id;
-        const number = btn.dataset.number;
-        openArchiveModal(id, `City Ordinance No. ${number}`);
-    });
-
-    archiveCloseBtn .addEventListener('click', closeArchiveModal);
-    archiveCancelBtn.addEventListener('click', closeArchiveModal);
-
-    archiveModal.addEventListener('click', (e) => {
-        if (e.target === archiveModal) closeArchiveModal();
-    });
-
-    archiveConfirmBtn.addEventListener('click', () => {
-        const id = archiveConfirmBtn.dataset.id;
-        // TODO: POST /admin/ordinances/archive { id }
-        console.log('[TODO] Archive ordinance id(s):', id);
-        closeArchiveModal();
-    });
-
-
-    // ============================================================
-    // FILTER CONTROLS — client-side card filtering  (Batch 3)
-    // ============================================================
-    const filterStatus       = document.getElementById('filter-status');
-    const filterCategory     = document.getElementById('filter-category');
-    const filterYear         = document.getElementById('filter-year');
-    const filterCompleteness = document.getElementById('filter-completeness');
-    const recordCountEl      = document.getElementById('admin-record-count');
-    const adminSearchInput   = document.getElementById('admin-search-input');
-
-    function applyFilters() {
-        const status       = filterStatus.value.toLowerCase();
-        const year         = filterYear.value;
-        const completeness = filterCompleteness.value;
-        const query        = adminSearchInput.value.trim().toLowerCase();
-
-        let visible = 0;
-
-        document.querySelectorAll('.admin-content-card').forEach(card => {
-            const cardStatus     = card.dataset.status?.toLowerCase() ?? '';
-            const cardYear       = card.querySelector('.date-year')?.textContent?.trim() ?? '';
-            const cardIncomplete = card.classList.contains('admin-content-card--incomplete');
-            const cardText       = card.textContent.toLowerCase();
-
-            const statusMatch = !status       || cardStatus === status;
-            const yearMatch   = !year         || cardYear   === year;
-            const compMatch   = !completeness
-                || (completeness === 'incomplete' &&  cardIncomplete)
-                || (completeness === 'complete'   && !cardIncomplete);
-            const queryMatch  = !query        || cardText.includes(query);
-
-            const show = statusMatch && yearMatch && compMatch && queryMatch;
-            card.style.display = show ? '' : 'none';
-            if (show) visible++;
+        bulkClearBtn.addEventListener('click', () => {
+            getCardCheckboxes().forEach(cb => {
+                cb.checked = false;
+                cb.closest('.admin-content-card')
+                    ?.classList.remove('admin-content-card--selected');
+            });
+            selectAllCb.checked = false;
+            selectAllCb.indeterminate = false;
+            updateBulkToolbar();
         });
 
-        if (recordCountEl) {
-            recordCountEl.textContent = `${visible} record${visible !== 1 ? 's' : ''}`;
+        bulkApplyBtn.addEventListener('click', () => {
+            const ids = getCardCheckboxes().filter(cb => cb.checked).map(cb => cb.dataset.id);
+            const status = document.getElementById('bulk-status-select').value;
+            // TODO: POST /admin/ordinances/bulk-status { ids, status }
+            console.log('[TODO] Bulk status →', status, 'IDs:', ids);
+        });
+
+        bulkArchiveBtn.addEventListener('click', () => {
+            const ids = getCardCheckboxes().filter(cb => cb.checked).map(cb => cb.dataset.id);
+            // Surface the modal with a generic multi-record label
+            openArchiveModal(ids.join(', '), `${ids.length} selected record(s)`);
+        });
+
+
+        // ============================================================
+        // PER-CARD CHECKBOX → SELECTION STATE  (Batch 3)
+        // ============================================================
+        document.getElementById('admin-content-grid')
+            ?.addEventListener('change', (e) => {
+                if (!e.target.matches('.admin-card-checkbox')) return;
+                e.target
+                    .closest('.admin-content-card')
+                    ?.classList.toggle('admin-content-card--selected', e.target.checked);
+                updateBulkToolbar();
+            });
+
+
+        // ============================================================
+        // PER-CARD ACTION DROPDOWN  (Batch 3)
+        // ============================================================
+        function closeAllDropdowns(except = null) {
+            document.querySelectorAll('.admin-card-action-dropdown').forEach(dd => {
+                if (dd === except) return;
+                dd.classList.remove('is-open');
+                dd.previousElementSibling?.setAttribute('aria-expanded', 'false');
+            });
         }
 
-        // Deselect hidden cards so they don't bleed into bulk actions
-        document.querySelectorAll('.admin-content-card').forEach(card => {
-            if (card.style.display === 'none') {
-                const cb = card.querySelector('.admin-card-checkbox');
-                if (cb) cb.checked = false;
-                card.classList.remove('admin-content-card--selected');
+        document.addEventListener('click', (e) => {
+            const trigger = e.target.closest('.admin-card-action-trigger');
+            if (trigger) {
+                const dropdown = trigger.nextElementSibling;
+                const isOpen = dropdown.classList.contains('is-open');
+                closeAllDropdowns();
+                dropdown.classList.toggle('is-open', !isOpen);
+                trigger.setAttribute('aria-expanded', String(!isOpen));
+                return;
+            }
+            if (!e.target.closest('.admin-card-action-menu')) {
+                closeAllDropdowns();
             }
         });
-        updateBulkToolbar();
-    }
 
-    [filterStatus, filterCategory, filterYear, filterCompleteness]
-        .forEach(el => el?.addEventListener('change', applyFilters));
-
-    // Live search on the admin search input
-    adminSearchInput?.addEventListener('input', applyFilters);
-
-
-    // ============================================================
-    // REFRESH BUTTON
-    // ============================================================
-    document.getElementById('admin-refresh-btn')
-        ?.addEventListener('click', () => {
-            // TODO: replace with fetch-based grid refresh
-            window.location.reload();
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAllDropdowns();
+                closeArchiveModal();
+            }
         });
 
+
+        // ============================================================
+        // ARCHIVE MODAL
+        // ============================================================
+        const archiveModal = document.getElementById('admin-archive-modal');
+        const archiveModalTarget = document.getElementById('archive-modal-target');
+        const archiveConfirmBtn = document.getElementById('archive-modal-confirm');
+        const archiveCloseBtn = document.getElementById('archive-modal-close');
+        const archiveCancelBtn = document.getElementById('archive-modal-cancel');
+
+        function openArchiveModal(id, label) {
+            archiveModalTarget.textContent = label;
+            archiveConfirmBtn.dataset.id = id;
+            archiveModal.classList.add('active');
+            archiveCloseBtn.focus();
+        }
+
+        function closeArchiveModal() {
+            archiveModal.classList.remove('active');
+        }
+
+        // Single-card trigger (from per-card dropdown)
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.admin-archive-trigger');
+            if (!btn) return;
+            closeAllDropdowns();
+            const id = btn.dataset.id;
+            const number = btn.dataset.number;
+            openArchiveModal(id, `City Ordinance No. ${number}`);
+        });
+
+        archiveCloseBtn.addEventListener('click', closeArchiveModal);
+        archiveCancelBtn.addEventListener('click', closeArchiveModal);
+
+        archiveModal.addEventListener('click', (e) => {
+            if (e.target === archiveModal) closeArchiveModal();
+        });
+
+        archiveConfirmBtn.addEventListener('click', () => {
+            const id = archiveConfirmBtn.dataset.id;
+            // TODO: POST /admin/ordinances/archive { id }
+            console.log('[TODO] Archive ordinance id(s):', id);
+            closeArchiveModal();
+        });
+
+
+        // ============================================================
+        // FILTER CONTROLS — client-side card filtering  (Batch 3)
+        // ============================================================
+        const filterStatus = document.getElementById('filter-status');
+        const filterCategory = document.getElementById('filter-category');
+        const filterYear = document.getElementById('filter-year');
+        const filterCompleteness = document.getElementById('filter-completeness');
+        const recordCountEl = document.getElementById('admin-record-count');
+        const adminSearchInput = document.getElementById('admin-search-input');
+
+        function applyFilters() {
+            const status = filterStatus.value.toLowerCase();
+            const year = filterYear.value;
+            const completeness = filterCompleteness.value;
+            const query = adminSearchInput.value.trim().toLowerCase();
+
+            let visible = 0;
+
+            document.querySelectorAll('.admin-content-card').forEach(card => {
+                const cardStatus = card.dataset.status?.toLowerCase() ?? '';
+                const cardYear = card.querySelector('.date-year')?.textContent?.trim() ?? '';
+                const cardIncomplete = card.classList.contains('admin-content-card--incomplete');
+                const cardText = card.textContent.toLowerCase();
+
+                const statusMatch = !status || cardStatus === status;
+                const yearMatch = !year || cardYear === year;
+                const compMatch = !completeness ||
+                    (completeness === 'incomplete' && cardIncomplete) ||
+                    (completeness === 'complete' && !cardIncomplete);
+                const queryMatch = !query || cardText.includes(query);
+
+                const show = statusMatch && yearMatch && compMatch && queryMatch;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+
+            if (recordCountEl) {
+                recordCountEl.textContent = `${visible} record${visible !== 1 ? 's' : ''}`;
+            }
+
+            // Deselect hidden cards so they don't bleed into bulk actions
+            document.querySelectorAll('.admin-content-card').forEach(card => {
+                if (card.style.display === 'none') {
+                    const cb = card.querySelector('.admin-card-checkbox');
+                    if (cb) cb.checked = false;
+                    card.classList.remove('admin-content-card--selected');
+                }
+            });
+            updateBulkToolbar();
+        }
+
+        [filterStatus, filterCategory, filterYear, filterCompleteness]
+        .forEach(el => el?.addEventListener('change', applyFilters));
+
+        // Live search on the admin search input
+        adminSearchInput?.addEventListener('input', applyFilters);
+
+
+        // ============================================================
+        // REFRESH BUTTON
+        // ============================================================
+        document.getElementById('admin-refresh-btn')
+            ?.addEventListener('click', () => {
+                // TODO: replace with fetch-based grid refresh
+                window.location.reload();
+            });
     </script>
 
 </body>
+
 </html>

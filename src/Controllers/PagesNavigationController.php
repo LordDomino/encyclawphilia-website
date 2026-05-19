@@ -64,4 +64,9 @@ class PagesNavigationController
         require_once __DIR__ . '/../Views/pages/admin_dashboard.php';
     }
     
+    public function addOrdinance(): void
+    {
+        require_once __DIR__ . '/../Views/pages/add_ordinance.php';
+    }
+
 }

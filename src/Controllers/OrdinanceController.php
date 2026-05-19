@@ -7,7 +7,7 @@ require_once __DIR__ . '/../Models/Ordinance.php';
 require_once __DIR__ . '/../Core/ApiResponse.php';
 
 use Core\ApiResponse;
-use App\Models\Ordinance;
+use App\Models\OrdinanceModel;
 use PDOException;
 
 class OrdinanceController
@@ -42,7 +42,7 @@ class OrdinanceController
         // Delegate to repository
         try {
             $pdo        = getDatabaseConnection();
-            $repository = new Ordinance($pdo);
+            $repository = new OrdinanceModel($pdo);
 
             $result = $repository->toggleReaction(
                 ordinanceId: $ordinanceId,

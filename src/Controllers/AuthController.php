@@ -20,13 +20,13 @@ class AuthController
     public function handleLogoutSubmit(): void
     {
         require_once __DIR__ . '/../logout_process.php';
+        header('Location: home');
+        $_SESSION['is_admin'] = false;
+        exit();
     }
 
     public function handleSignupSubmit(): void
     {
         require_once __DIR__ . '/../register_process.php';
-
-        header('Location: home');
-        exit();
     }
 }

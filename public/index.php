@@ -13,6 +13,7 @@ require_once __DIR__ . '/../src/Core/Router.php';
 require_once __DIR__ . '/../src/Controllers/AuthController.php';
 require_once __DIR__ . '/../src/Controllers/UserController.php';
 require_once __DIR__ . '/../src/Controllers/PagesNavigationController.php';
+require_once __DIR__ . '/../src/Controllers/DashboardController.php';
 require_once __DIR__ . '/../src/Models/UserModel.php';
 require_once __DIR__ . '/../src/Models/CommentModel.php';
 require_once __DIR__ . '/../src/Models/OrdinanceModel.php';
@@ -37,6 +38,12 @@ $router->get('/logout-submit', 'AuthController@handleLogoutSubmit');
 $router->post('/signup-submit', 'AuthController@handleSignupSubmit');
 $router->post('/react', 'UserController@handleOrdinanceReact');
 $router->get('/profile/{id}', 'AuthController@showProfile'); // Dynamic parameter route
+
+
+$router->get('/add-ordinance', 'PagesNavigationController@addOrdinance');
+$router->get('/edit-ordinance', 'DashboardController@editOrdinance');
+
+$router->post('/store-ordinance', 'DashboardController@storeOrdinance');
 
 // Catch incoming request context
 $requestUri = $_SERVER['REQUEST_URI'];

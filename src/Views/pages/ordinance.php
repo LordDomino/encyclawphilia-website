@@ -35,7 +35,18 @@ if ($ordinance === null) {
 $commentModel = new CommentModel($pdo);
 $comments = $commentModel->getOrdinanceComments($ordinance_id);
 
+echo "<script>console.log(" . json_encode($ordinance) . ")</script>";
 
+// Fix presentation of ordinance infos
+// Fix presentation of ordinance infos
+$ordinance['summary']           = $ordinance['summary']             ?? 'No summary available.';
+$ordinance['full_text']         = $ordinance['full_text']           ?? 'No full text available.';
+$ordinance['category_name']     = $ordinance['category_name']       ?? '---';
+$ordinance['barangay_name']     = $ordinance['barangay_name']       ?? '---';
+$ordinance['enactment_day']     = $ordinance['enactment_day']       ?? '';
+$ordinance['enactment_month']   = $ordinance['enactment_month']     ?? '';
+$ordinance['enactment_year']    = $ordinance['enactment_year']      ?? '(Pending enactment)';
+$ordinance['date_enacted_fmt']  = $ordinance['date_enacted_fmt']    ?? '';
 
 // ============================================================
 // Phase 3: HTML Presentation

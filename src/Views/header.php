@@ -9,6 +9,9 @@
             <a href="/browse" class="clickable">Ordinances</a>
             <a href="/about" class="clickable">About</a>
             <?php if (isset($_SESSION['user_id'])): ?>
+                <?php if ($_SESSION['is_admin']): ?>
+                    <a href="/dashboard" class="clickable button">Dashboard</a>
+                <?php endif; ?>
                 <a href="/account" class="clickable button">My Account</a>
                 <a href="/logout-submit" class="clickable button">Logout</a>
             <?php else: ?>

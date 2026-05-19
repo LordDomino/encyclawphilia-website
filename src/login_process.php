@@ -5,9 +5,10 @@
 session_start();
 
 require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/Models/User.php';
+require_once __DIR__ . '/Models/UserModel.php';
 
 use App\Models\User;
+use App\Models\UserModel;
 
 // Assert the entry trajectory is strictly an HTTP POST method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -33,7 +34,7 @@ if ($email === '' || $password === '') {
 
 // Inject connection dependency to resolve data validation
 $pdo = getDatabaseConnection();
-$user = new User($pdo);
+$user = new UserModel($pdo);
 $authOutcome = $user->verifyLogin($email, $password);
 
 if ($authOutcome['authenticated']) {
@@ -44,6 +45,8 @@ if ($authOutcome['authenticated']) {
     $_SESSION['user_id']   = $authOutcome['user']['id'];
     $_SESSION['username']  = $authOutcome['user']['username'];
     $_SESSION['role_id']   = $authOutcome['user']['role_id'];
+    $sessionRoleId   = (int)($_SESSION['role_id'] ?? 1);
+    $_SESSION['is_admin'] = ($sessionRoleId === 1);
 
     // Direct execution path to the secure application workspace
     header('Location: home');
