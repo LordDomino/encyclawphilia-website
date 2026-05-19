@@ -2,8 +2,8 @@
 
 namespace App\Views\pages;
 
-use function App\Models\getOrdinanceById;
-use function App\Models\getOrdinanceComments;
+use App\Models\OrdinanceModel;
+use App\Models\CommentModel;
 
 session_start();
 $loggedIn = isset($_SESSION['user_id']);
@@ -14,7 +14,6 @@ $loggedIn = isset($_SESSION['user_id']);
 // ============================================================
 
 require_once __DIR__ . '/../../../config/database.php';
-require_once __DIR__ . '/../../Models/procedures.php';
 
 $ordinance_id = isset($_GET['id']) ? (int) trim($_GET['id']) : 0;
 
@@ -22,9 +21,9 @@ $ordinance_id = isset($_GET['id']) ? (int) trim($_GET['id']) : 0;
 // Phase 2: Database Interrogation
 // ============================================================
 
-$pdo       = getDatabaseConnection();
-$ordinance = getOrdinanceById($pdo, $ordinance_id);
-
+$pdo = getDatabaseConnection();
+$ordinanceModel = new OrdinanceModel($pdo, $ordinance_id);
+$ordinance = $ordinanceModel->getOrdinanceById($ordinance_id);
 // Redirect to the browse page when the requested ordinance
 // does not exist or has been soft-deleted, rather than
 // rendering a broken detail page.
@@ -33,7 +32,8 @@ if ($ordinance === null) {
     exit;
 }
 
-$comments = getOrdinanceComments($pdo, $ordinance_id);
+$commentModel = new CommentModel($pdo);
+$comments = $commentModel->getOrdinanceComments($ordinance_id);
 
 
 

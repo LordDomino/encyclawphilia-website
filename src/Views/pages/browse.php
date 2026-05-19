@@ -2,7 +2,7 @@
 
 namespace App\Views\pages;
 
-use function App\Models\getOrdinancesByTitle;
+use App\Models\CommentModel;
 
 session_start();
 $loggedIn = isset($_SESSION['user_id']);
@@ -19,27 +19,14 @@ $results = [];
 if ($search_keyword !== '') {
     // Establish network boundary context
     $pdo = getDatabaseConnection();
-
-    /* 
-     * Refactored: Replaced 'CALL GetOrdinancesByTitle(:key)' statement compilation 
-     * with an explicit application routine invocation. The connection state ($pdo)
-     * is passed into the function context directly.
-     */
-    $results = getOrdinancesByTitle($pdo, $safe_search_keyword);
+    $ordinanceMode = new $ordinanceModel($pdo);
 
     // Debugging payload output
-    echo "<script>console.log(" . json_encode($results) . ");</script>";
-    echo "<script>console.log('Hello world');</script>";
-} else {
-    // Establish network boundary context
-    $pdo = getDatabaseConnection();
-
-    /* 
-     * Refactored: Replaced 'CALL GetOrdinancesByTitle(:key)' statement compilation 
-     * with an explicit application routine invocation. The connection state ($pdo)
-     * is passed into the function context directly.
-     */
-    $results = getOrdinancesByTitle($pdo, $safe_search_keyword);
+    //  * Refactored: Replaced 'CALL GetOrdinancesByTitle(:key)' statement compilation 
+    //  * with an explicit application routine invocation. The connection state ($pdo)
+    //  * is passed into the function context directly.
+    //  */
+    $commentMdodel = new CommentModel($pdo);
 }
 
 // HTML Assembly

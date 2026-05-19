@@ -4,7 +4,7 @@ namespace App\Models;
 use PDO;
 use PDOException;
 
-class User
+class UserModel
 {
     private PDO $db;
 

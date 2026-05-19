@@ -57,5 +57,11 @@ class PagesNavigationController
         // Enforce secure rendering of the homepage view asset
         require_once __DIR__ . '/../Views/pages/account.php';
     }
+
+    public function adminDashboard(): void
+    {
+        // Enforce secure rendering of the homepage view asset
+        require_once __DIR__ . '/../Views/pages/admin_dashboard.php';
+    }
     
 }

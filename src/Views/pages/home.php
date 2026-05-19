@@ -2,16 +2,11 @@
 
 namespace App\Views\pages;
 
-use function App\Models\getTrendingOrdinance;
-use function App\Models\getRecentOrdinances;
+use App\Models\OrdinanceModel;
 
 // Session tracking for user credentials persistence
 session_start();
 $loggedIn = isset($_SESSION['user_id']);
-
-// Import structural dependencies
-require_once __DIR__ . '/../../../config/database.php';
-require_once __DIR__ . '/../../Models/procedures.php';
 
 // Phase 1: Ingestion and State Management
 $search_keyword      = isset($_GET['q']) ? trim($_GET['q']) : '';
@@ -20,15 +15,10 @@ $featured_ordinance  = null;
 $results_latest      = [];
 
 // Phase 2: Delegating Database Interrogation
-// These procedures take no parameters and always run on page load.
 $pdo = getDatabaseConnection();
-/* 
- * Refactored: Replaced 'CALL GetOrdinancesByTitle(:key)' statement compilation 
- * with an explicit application routine invocation. The connection state ($pdo)
- * is passed into the function context directly.
- */
-$featured_ordinance = getTrendingOrdinance($pdo);
-$results_latest = getRecentOrdinances($pdo);
+$ordinanceModel = new OrdinanceModel($pdo);
+$featured_ordinance = $ordinanceModel->getTrending();
+$results_latest = $ordinanceModel->get20RecentOrdinances();
 
 // Phase 3: HTML Presentation
 $pageTitle = "EncycLawPhilia Valenzuela";

@@ -1,13 +1,11 @@
 <?php
 
-namespace Controllers;
+namespace App\Controllers;
 
-require_once __DIR__ . '/../Models/User.php';
-require_once __DIR__ . '/../Models/Ordinance.php';
 require_once __DIR__ . '/../Core/ApiResponse.php';
 
 use Core\ApiResponse;
-use App\Models\Ordinance;
+use App\Models\OrdinanceModel;
 use PDOException;
 
 class UserController
@@ -42,7 +40,7 @@ class UserController
         // Delegate to repository
         try {
             $pdo        = getDatabaseConnection();
-            $repository = new Ordinance($pdo);
+            $repository = new OrdinanceModel($pdo);
 
             $result = $repository->toggleReaction(
                 ordinanceId: $ordinanceId,
