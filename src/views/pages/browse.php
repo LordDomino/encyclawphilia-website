@@ -9,7 +9,6 @@ session_start();
 $loggedIn = isset($_SESSION['user_id']);
 
 // Phase 1: Ingestion and State Management
-require_once __DIR__ . '/../../../config/database.php';
 require_once __DIR__ . '/../../Models/procedures.php'; // Import the newly decoupled data routine
 
 $search_keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
@@ -19,7 +18,7 @@ $results = [];
 // Phase 2: Delegating Database Interrogation
 if ($search_keyword !== '') {
     // Establish network boundary context
-    $pdo = getDatabaseConnection();
+    $pdo = \App\Controllers\DatabaseController::getDatabaseConnection();
     $ordinanceModel = new OrdinanceModel($pdo);
     $results = $ordinanceModel->getOrdinancesByTitle($safe_search_keyword);
 
@@ -36,12 +35,14 @@ if ($search_keyword !== '') {
 $pageTitle = "Browse | EncycLawPhilia Valenzuela";
 $currentPage = "browse";
 
-require_once __DIR__ . '/../head.php';
-require_once __DIR__ . '/../../view_components.php';
+require_once VIEWS_ROOT . '/head.php';
+
+use \App\Core\TemplateEngine;
+
 ?>
 
 <body>
-    <?php require_once __DIR__ . '/../header.php'; ?>
+    <?php require_once VIEWS_ROOT . '/header.php'; ?>
 
     <main class="browse">
         <div class="subhero" id="browse-subhero">
@@ -156,7 +157,10 @@ require_once __DIR__ . '/../../view_components.php';
                                             </span>
                                         </span>
                                     </div>
-                                    <?php renderOrdinanceRedirectLink((int)$row['ordinance_id']); ?>
+                                    <?php
+                                    $injectedCardHTML = TemplateEngine::compile('partials/ord_link', ['ordinance_id' => $row['ordinance_id']]);
+                                    echo $injectedCardHTML;
+                                    ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>

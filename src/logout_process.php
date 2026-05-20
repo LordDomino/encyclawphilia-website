@@ -1,5 +1,6 @@
 <?php
 // logout_process.php (Controller Layer)
+namespace App;
 
 // Phase 1: Initialize session handling boundaries to access the current session state
 session_start();

@@ -9,7 +9,7 @@ $authError  = $_SESSION['auth_error'] ?? null;
 $activeTab  = $authError['tab'] ?? 'login';
 unset($_SESSION['auth_error']);   // clear it so it doesn't persist on refresh
 
-require_once __DIR__ . '/../head.php';
+require __DIR__ . '/../head.php';
 ?>
 
 <body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>">

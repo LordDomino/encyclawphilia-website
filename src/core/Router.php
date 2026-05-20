@@ -60,7 +60,7 @@ class Router
         // Parse the 'Controller@method' syntax
         list($controllerName, $action) = explode('@', $handler);
         
-        $controllerClass = "\\Controllers\\" . $controllerName;
+        $controllerClass = "App\\Controllers\\" . $controllerName;
 
         if (class_exists($controllerClass)) {
             $controllerInstance = new $controllerClass();

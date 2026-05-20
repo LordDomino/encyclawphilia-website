@@ -1,10 +1,17 @@
 <?php
 declare(strict_types=1);
 
-define('APP_ROOT', dirname(__DIR__) . '/src'); 
+define('APP_ROOT', dirname(__DIR__) . '/src');
+define('PUBLIC_ROOT', dirname(__DIR__) . '/public');
+define('VIEWS_ROOT', APP_ROOT . '/Views');
 
 // Basic PSR-4 Autoloader mapping "App\" namespace to the "src/" directory 
 spl_autoload_register(function ($class) {
+    if (file_exists($class)) {
+        require_once $class;
+        return;
+    }
+
     $prefix = 'App\\';
     
     // Check if the class uses our root namespace prefix
@@ -12,10 +19,9 @@ spl_autoload_register(function ($class) {
     if (strncmp($prefix, $class, $len) !== 0) {
         return; // Move to next registered autoloader if not matching
     }
-    
-    // Get the relative class name (e.g., "Controllers\AuthController")
+
     $relative_class = substr($class, $len);
-    
+
     // Map to the file path (e.g., APP_ROOT . "/Controllers/AuthController.php")
     $file = APP_ROOT . '/' . str_replace('\\', '/', $relative_class) . '.php';
     

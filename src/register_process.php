@@ -6,9 +6,6 @@ namespace App;
 // Initialize session handling boundaries
 session_start();
 
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/Models/UserModel.php';
-
 use App\Models\UserModel;
 use PDO;
 use Exception;
@@ -62,7 +59,7 @@ if (!$termsAccepted) {
 
 try {
     // Inject connection dependency to resolve data validation
-    $pdo = getDatabaseConnection();
+    $pdo = \App\Controllers\getDatabaseConnection();
 
     // Default role validation for Users
     $stmt = $pdo->query("SELECT role_id FROM Roles WHERE role_name='Citizen';");
@@ -99,7 +96,7 @@ try {
             'tab'   => 'login'
         ];
 
-        require_once __DIR__ . '/logout_process.php';
+        require_once App\logout_process.php;
 
         // Direct execution path to the secure application workspace
         header('Location: login');

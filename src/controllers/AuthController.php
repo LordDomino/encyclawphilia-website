@@ -1,13 +1,14 @@
 <?php
 
-namespace Controllers;
+namespace App\Controllers;
 
 class AuthController
 {
     public function handleLoginSubmit(): void
     {
         // Process active POST request data securely
-        require_once __DIR__ . '/../login_process.php';
+        // require_once __DIR__ . '/../login_process.php';
+        \App\Handlers\LoginHandler::handle();
     }
 
     // The variable name matching the route token is fed in dynamically

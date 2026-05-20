@@ -13,15 +13,13 @@ $loggedIn = isset($_SESSION['user_id']);
 // Phase 1: Ingestion and State Management
 // ============================================================
 
-require_once __DIR__ . '/../../../config/database.php';
-
 $ordinance_id = isset($_GET['id']) ? (int) trim($_GET['id']) : 0;
 
 // ============================================================
 // Phase 2: Database Interrogation
 // ============================================================
 
-$pdo = getDatabaseConnection();
+$pdo = \App\Controllers\DatabaseController::getDatabaseConnection();
 $ordinanceModel = new OrdinanceModel($pdo);
 $ordinance = $ordinanceModel->getOrdinanceById($ordinance_id);
 
@@ -54,7 +52,6 @@ $comments = $commentModel->getOrdinanceComments($ordinance_id);
 echo "<script>console.log(" . json_encode($ordinance) . ")</script>";
 
 // Fix presentation of ordinance infos
-// Fix presentation of ordinance infos
 $ordinance['summary']           = $ordinance['summary']             ?? 'No summary available.';
 $ordinance['full_text']         = $ordinance['full_text']           ?? 'No full text available.';
 $ordinance['category_name']     = $ordinance['category_name']       ?? '---';
@@ -79,13 +76,12 @@ $status_map = [
 ];
 $status_display = $status_map[$ordinance['status']] ?? ['label' => ucfirst($ordinance['status']), 'class' => 'pending'];
 
-require_once __DIR__ . '/../head.php';
-require_once __DIR__ . '/../../view_components.php';
+require VIEWS_ROOT . '/head.php';
 ?>
 
 <body class="<?php echo htmlspecialchars($currentPage, ENT_QUOTES, 'UTF-8'); ?>">
 
-    <?php require_once __DIR__ . '/../header.php'; ?>
+    <?php require_once VIEWS_ROOT . '/header.php'; ?>
 
     <main class="ordinance-page">
 
@@ -257,9 +253,9 @@ require_once __DIR__ . '/../../view_components.php';
                             <p class="ord-pdf-unavailable-sub">
                                 The official document for this ordinance has not been uploaded yet. Check back later or contact the City Council for a copy.
                             </p>
-                            <!-- <a href="mailto:info@encyclawphilia.local" class="ord-pdf-contact-link">
+                            <a href="mailto:info@encyclawphilia.local" class="ord-pdf-contact-link">
                                 Request Document
-                            </a> -->
+                            </a>
                         </div>
                     <?php endif; ?>
                 </div>

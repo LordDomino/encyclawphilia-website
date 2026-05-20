@@ -2,8 +2,6 @@
 
 namespace App\Views\pages;
 
-use App\Models\OrdinanceModel;
-
 // Session tracking for user credentials persistence
 session_start();
 $loggedIn = isset($_SESSION['user_id']);
@@ -15,8 +13,8 @@ $featured_ordinance  = null;
 $results_latest      = [];
 
 // Phase 2: Delegating Database Interrogation
-$pdo = getDatabaseConnection();
-$ordinanceModel = new OrdinanceModel($pdo);
+$pdo = \App\Controllers\DatabaseController::getDatabaseConnection();
+$ordinanceModel = new \App\Models\OrdinanceModel($pdo);
 $featured_ordinance = $ordinanceModel->getTrending();
 $results_latest = $ordinanceModel->get20RecentOrdinances();
 
@@ -25,10 +23,7 @@ $pageTitle = "EncycLawPhilia Valenzuela";
 $currentPage = "home";
 
 require_once __DIR__ . '/../head.php';
-require_once __DIR__ . '/../../view_components.php';
 ?>
-
-
 
 <body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>" id="top">
 
@@ -131,7 +126,10 @@ require_once __DIR__ . '/../../view_components.php';
                                                         </span>
                                                     </span>
                                                 </div>
-                                                <?php renderOrdinanceRedirectLink((int)$row['ordinance_id']); ?>
+                                                <?php
+                                                $injectedCardHTML = \App\Core\TemplateEngine::compile('partials/ord_link', ['ordinance_id' => $row['ordinance_id']]);
+                                                echo $injectedCardHTML;
+                                                ?>
                                             </div>
                                         </div>
                                     </li>
@@ -186,7 +184,7 @@ require_once __DIR__ . '/../../view_components.php';
                                         <span class="engagement-count">3</span>
                                     </span>
                                 </div>
-                                <?php renderOrdinanceRedirectLink((int)$row['ordinance_id']); ?>
+                                <--?php renderOrdinanceRedirectLink((int)$row['ordinance_id']); ?>
                             </div>
                         </div>
                     </li>
@@ -314,7 +312,7 @@ require_once __DIR__ . '/../../view_components.php';
     </main>
 
     <?php require_once __DIR__ . '/../footer.php'; ?>
-    
+
     <script src="js/search.js"></script>
     <script src="js/home.js" defer></script>
 </body>
