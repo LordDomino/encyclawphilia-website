@@ -1,24 +1,34 @@
 <?php
 declare(strict_types=1);
 
+define('APP_ROOT', dirname(__DIR__) . '/src'); 
+
+// Basic PSR-4 Autoloader mapping "App\" namespace to the "src/" directory 
+spl_autoload_register(function ($class) {
+    $prefix = 'App\\';
+    
+    // Check if the class uses our root namespace prefix
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return; // Move to next registered autoloader if not matching
+    }
+    
+    // Get the relative class name (e.g., "Controllers\AuthController")
+    $relative_class = substr($class, $len);
+    
+    // Map to the file path (e.g., APP_ROOT . "/Controllers/AuthController.php")
+    $file = APP_ROOT . '/' . str_replace('\\', '/', $relative_class) . '.php';
+    
+    if (file_exists($file)) {
+        require_once $file;
+    }
+});
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-
-// ROUTING
-// Manually require dependencies
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../src/Core/Router.php';
-require_once __DIR__ . '/../src/Controllers/AuthController.php';
-require_once __DIR__ . '/../src/Controllers/UserController.php';
-require_once __DIR__ . '/../src/Controllers/PagesNavigationController.php';
-require_once __DIR__ . '/../src/Controllers/DashboardController.php';
-require_once __DIR__ . '/../src/Models/UserModel.php';
-require_once __DIR__ . '/../src/Models/CommentModel.php';
-require_once __DIR__ . '/../src/Models/OrdinanceModel.php';
-
-$router = new \Core\Router();
+$router = new App\Core\Router();
 
 $sessionRoleId   = (int)($_SESSION['role_id'] ?? 1);
 $_SESSION['is_admin'] = ($sessionRoleId === 1);
