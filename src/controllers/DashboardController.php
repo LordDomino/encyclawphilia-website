@@ -126,7 +126,7 @@ class DashboardController
         }
 
         try {
-            $pdo = getDatabaseConnection();
+            $pdo = \App\Controllers\DatabaseController::getDatabaseConnection();
             $repository = new OrdinanceModel($pdo);
             $repository->addOrdinanceProcedure($data);
 
