@@ -62,6 +62,8 @@ use \App\Core\TemplateEngine;
             <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle filters">☰ Filters</button>
             <aside class="sidebar-column" id="sidebar-column">
                 <div class="sidebar-content">
+
+                    <!-- Mini search -->
                     <form class="search-bar mini" action="/browse" method="get">
                         <input
                             type="search"
@@ -70,47 +72,200 @@ use \App\Core\TemplateEngine;
                             placeholder="Search ordinances..."
                             aria-label="Search within results"
                             autocomplete="off"
-                            inputmode="search" />
+                            inputmode="search"
+                            value="<?php echo $safe_search_keyword; ?>" />
                     </form>
-                    <h2>Filters</h2>
-                    <div class="filter-group">
-                        <label for="category-filter">Category</label>
-                        <select id="category-filter">
-                            <option>All Categories</option>
-                            <option>Public Safety</option>
-                            <option>Environment</option>
-                            <option>Education</option>
-                            <option>Transportation</option>
-                        </select>
+
+                    <!-- Filters heading -->
+                    <div class="filter-sidebar-header">
+                        <h2 class="filter-sidebar-title">Filters</h2>
+                        <button class="filter-clear-all" id="filter-clear-all" type="button" aria-label="Clear all filters">
+                            Clear all
+                        </button>
                     </div>
-                    <div class="filter-group">
-                        <label for="year-filter">Year</label>
-                        <select id="year-filter">
-                            <option>All Years</option>
-                            <option>2026</option>
-                            <option>2025</option>
-                            <option>2024</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="status-filter">Status</label>
-                        <select id="status-filter">
-                            <option>All Statuses</option>
-                            <option>Active</option>
-                            <option>Pending</option>
-                            <option>Archived</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="status-filter">Status</label>
-                        <select id="status-filter">
-                            <option>All Statuses</option>
-                            <option>Active</option>
-                            <option>Pending</option>
-                            <option>Archived</option>
-                        </select>
-                    </div>
-                </div>
+
+                    <div class="filter-sidebar-body" id="filter-sidebar-body">
+
+                        <!-- ── Category ────────────────────────────────── -->
+                        <div class="filter-block" id="filter-block-category">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-category">
+                                <span class="filter-block-label">Category</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-category">
+                                <select
+                                    class="filter-select"
+                                    id="filter-category"
+                                    name="category"
+                                    data-filter-key="category_id"
+                                    aria-label="Filter by category">
+                                    <option value="">All Categories</option>
+                                    <!-- JS-injectable: <option value="{category_id}">{category_name}</option> -->
+                                    <option value="1">Health</option>
+                                    <option value="2">Education</option>
+                                    <option value="3">Environment</option>
+                                    <option value="4">Public Safety</option>
+                                    <option value="5">Infrastructure</option>
+                                    <option value="6">Taxation</option>
+                                    <option value="7">Social Welfare</option>
+                                    <option value="8">Youth Affairs</option>
+                                    <option value="9">Sports and Recreation</option>
+                                    <option value="10">Cultural Heritage</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- ── Date range ──────────────────────────────── -->
+                        <div class="filter-block" id="filter-block-date">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-date">
+                                <span class="filter-block-label">Date Enacted</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-date">
+                                <div class="filter-date-range">
+                                    <div class="filter-date-field">
+                                        <label class="filter-date-label" for="filter-date-from">From</label>
+                                        <input
+                                            type="date"
+                                            class="filter-date-input"
+                                            id="filter-date-from"
+                                            name="date_from"
+                                            data-filter-key="date_from"
+                                            aria-label="Date enacted from" />
+                                    </div>
+                                    <span class="filter-date-separator" aria-hidden="true">—</span>
+                                    <div class="filter-date-field">
+                                        <label class="filter-date-label" for="filter-date-to">To</label>
+                                        <input
+                                            type="date"
+                                            class="filter-date-input"
+                                            id="filter-date-to"
+                                            name="date_to"
+                                            data-filter-key="date_to"
+                                            aria-label="Date enacted to" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── Status ──────────────────────────────────── -->
+                        <div class="filter-block" id="filter-block-status">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-status">
+                                <span class="filter-block-label">Status</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-status">
+                                <fieldset class="filter-checkbox-group" id="filter-status-group" data-filter-key="status">
+                                    <legend class="sr-only">Filter by status</legend>
+                                    <!-- JS-injectable: statuses can be added/removed here -->
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Active" data-status-key="Active" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Active</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Pending" data-status-key="Pending" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Pending</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Repealed" data-status-key="Repealed" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Repealed</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Amended" data-status-key="Amended" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Amended</span>
+                                    </label>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                        <!-- ── Content flags ───────────────────────────── -->
+                        <div class="filter-block" id="filter-block-flags">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-flags">
+                                <span class="filter-block-label">Content</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-flags">
+                                <fieldset class="filter-checkbox-group" data-filter-key="content_flags">
+                                    <legend class="sr-only">Filter by content availability</legend>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="has_summary" value="1" data-filter-key="has_summary" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Has summary</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="has_full_text" value="1" data-filter-key="has_full_text" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Has full text</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="has_pdf" value="1" data-filter-key="has_pdf" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Has PDF file</span>
+                                    </label>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                        <!-- ── Sort ────────────────────────────────────── -->
+                        <div class="filter-block" id="filter-block-sort">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-sort">
+                                <span class="filter-block-label">Sort By</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-sort">
+                                <select
+                                    class="filter-select"
+                                    id="filter-sort-by"
+                                    name="sort_by"
+                                    data-filter-key="sort_by"
+                                    aria-label="Sort results by">
+                                    <option value="date_enacted">Date Enacted</option>
+                                    <option value="popularity">Popularity</option>
+                                    <option value="date_signed">Date Signed</option>
+                                    <option value="numerical">Numerically</option>
+                                </select>
+                                <fieldset class="filter-radio-group" data-filter-key="sort_dir">
+                                    <legend class="sr-only">Sort direction</legend>
+                                    <label class="filter-radio-item">
+                                        <input type="radio" class="filter-radio" name="sort_dir" value="desc" data-filter-key="sort_dir" checked />
+                                        <span class="filter-radio-mark" aria-hidden="true"></span>
+                                        <span class="filter-radio-text">Descending</span>
+                                    </label>
+                                    <label class="filter-radio-item">
+                                        <input type="radio" class="filter-radio" name="sort_dir" value="asc" data-filter-key="sort_dir" />
+                                        <span class="filter-radio-mark" aria-hidden="true"></span>
+                                        <span class="filter-radio-text">Ascending</span>
+                                    </label>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                    </div><!-- /.filter-sidebar-body -->
+                </div><!-- /.sidebar-content -->
             </aside>
             <section class="results-content" id="browse-all-ordinances">
                 <div class="results-header">
@@ -205,7 +360,7 @@ use \App\Core\TemplateEngine;
     // ============================================================
 
     // ============================================================
-    // SIDEBAR DRAWER FOR MOBILE
+    // SIDEBAR DRAWER (mobile)
     // ============================================================
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebarColumn = document.getElementById('sidebar-column');
@@ -215,12 +370,44 @@ use \App\Core\TemplateEngine;
         sidebarToggle.classList.toggle('active');
     });
 
-    // Close drawer when clicking outside
     document.addEventListener('click', (e) => {
         if (!sidebarColumn.contains(e.target) && !sidebarToggle.contains(e.target)) {
             sidebarColumn.classList.remove('drawer-open');
             sidebarToggle.classList.remove('active');
         }
+    });
+
+    // ============================================================
+    // COLLAPSIBLE FILTER BLOCKS
+    // ============================================================
+    document.querySelectorAll('.filter-block-toggle').forEach(toggle => {
+        toggle.addEventListener('click', () => {
+            const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+            const panelId = toggle.getAttribute('aria-controls');
+            const panel = document.getElementById(panelId);
+
+            toggle.setAttribute('aria-expanded', String(!isExpanded));
+            panel.classList.toggle('is-collapsed', isExpanded);
+        });
+    });
+
+    // ============================================================
+    // CLEAR ALL FILTERS
+    // ============================================================
+    document.getElementById('filter-clear-all')?.addEventListener('click', () => {
+        // Selects
+        document.querySelectorAll('.filter-select').forEach(sel => sel.selectedIndex = 0);
+        // Date inputs
+        document.querySelectorAll('.filter-date-input').forEach(inp => inp.value = '');
+        // Checkboxes
+        document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+        // Radios — reset to first in each group
+        document.querySelectorAll('.filter-radio-group').forEach(group => {
+            const first = group.querySelector('.filter-radio');
+            if (first) first.checked = true;
+        });
+        // Update active filters display if wired
+        updateActiveFilters?.();
     });
 
     // ============================================================

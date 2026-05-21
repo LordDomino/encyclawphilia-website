@@ -16,7 +16,7 @@ class DashboardController
 
     public function editOrdinance(): void
     {
-        require_once __DIR__ . '/../Views/pages/add_ordinance.php';
+        require_once __DIR__ . '/../Views/pages/edit_ordinance.php';
     }
 
     public function storeOrdinance(): void
