@@ -27,7 +27,7 @@ $ordinance = $ordinanceModel->getOrdinanceById($ordinance_id);
 // does not exist or has been soft-deleted, rather than
 // rendering a broken detail page.
 if ($ordinance === null) {
-    header('Location: browse.php');
+    header('Location: /browse');
     exit;
 }
 
@@ -93,7 +93,7 @@ require VIEWS_ROOT . '/head.php';
                 <nav class="breadcrumb" aria-label="Breadcrumb">
                     <a href="index.php">Home</a>
                     <span class="separator" aria-hidden="true">›</span>
-                    <a href="browse.php">Ordinances</a>
+                    <a href="/browse">Ordinances</a>
                     <span class="separator" aria-hidden="true">›</span>
                     <span aria-current="page">
                         No. <?php echo htmlspecialchars($ordinance['ordinance_number'], ENT_QUOTES, 'UTF-8'); ?>

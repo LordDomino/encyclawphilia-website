@@ -8,7 +8,7 @@
         <div class="footer-links">
             <div class="footer-column">
                 <h3>About</h3>
-                <a href="#about-us">About Us</a>
+                <a href="/about">About Us</a>
                 <a href="#mission">Our Mission</a>
             </div>
             <div class="footer-column">

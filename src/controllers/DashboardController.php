@@ -3,9 +3,16 @@
 namespace App\Controllers;
 
 use App\Models\OrdinanceModel;
+use App\Services\AdminSearchService;
+use App\Core\ApiResponse;
 
 class DashboardController
 {
+    private function makeAdminSearchService(): AdminSearchService
+    {
+        $pdo = DatabaseController::getDatabaseConnection();
+        return new AdminSearchService(new OrdinanceModel($pdo));
+    }
 
     public function editOrdinance(): void
     {
@@ -147,5 +154,40 @@ class DashboardController
             header('Location: /add-ordinance');
             exit;
         }
+    }
+
+    public function searchOrdinance(): void
+    {
+        session_start();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            header('Location: /dashboard');
+            ApiResponse::send(
+                ApiResponse::error('Request method invalid.', 401),
+                401
+            );
+            exit;
+        }
+
+        $query = trim($_GET['q'] ?? '');
+
+        $result = $this->makeAdminSearchService()->search($query);
+
+        if ($result['ok']) {
+            ApiResponse::send(
+                ApiResponse::success(
+                    data: $result
+                ),
+                httpStatus: 200
+            );
+            exit;
+        }
+
+        header('Location: /dashboard');
+        ApiResponse::send(
+            ApiResponse::error('Search failed', 401),
+            401
+        );
+        exit;
     }
 }

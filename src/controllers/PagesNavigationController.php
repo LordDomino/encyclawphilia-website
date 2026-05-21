@@ -13,9 +13,6 @@ class PagesNavigationController
         require_once __DIR__ . '/../Views/pages/home.php';
     }
 
-    /**
-     * Handles requests directed to the root domain.
-     */
     public function browse(): void
     {
         // Enforce secure rendering of the homepage view asset

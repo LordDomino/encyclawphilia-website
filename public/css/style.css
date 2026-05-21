@@ -4,59 +4,59 @@
 
 @font-face {
     font-family: "Aleo";
-    src: url("/fonts/Aleo-VariableFont_wght.ttf");
+    src: url("/css/fonts/Aleo-VariableFont_wght.ttf");
     font-style: normal;
 }
 
 @font-face {
     font-family: "Aleo";
-    src: url("/fonts/Aleo-Italic-VariableFont_wght.ttf");
+    src: url("/css/fonts/Aleo-Italic-VariableFont_wght.ttf");
     font-style: italic;
 }
 
 @font-face {
     font-family: "Besley";
-    src: url("/fonts/Besley-VariableFont_wght.ttf");
+    src: url("/css/fonts/Besley-VariableFont_wght.ttf");
     font-style: normal;
 }
 
 @font-face {
     font-family: "Besley";
-    src: url("/fonts/Besley-Italic-VariableFont_wght.ttf");
+    src: url("/css/fonts/Besley-Italic-VariableFont_wght.ttf");
     font-style: italic;
 }
 
 @font-face {
     font-family: "Montserrat";
-    src: url("/fonts/Montserrat-VariableFont_wght.ttf");
+    src: url("/css/fonts/Montserrat-VariableFont_wght.ttf");
     font-style: normal;
 }
 
 @font-face {
     font-family: "Montserrat";
-    src: url("/fonts/Montserrat-Italic-VariableFont_wght.ttf");
+    src: url("/css/fonts/Montserrat-Italic-VariableFont_wght.ttf");
     font-style: italic;
 }
 
 @font-face {
     font-family: "Lexend";
-    src: url("/fonts/Lexend-VariableFont_wght.ttf");
+    src: url("/css/fonts/Lexend-VariableFont_wght.ttf");
 }
 
 @font-face {
     font-family: "Lexend Exa";
-    src: url("/fonts/LexendExa-VariableFont_wght.ttf");
+    src: url("/css/fonts/LexendExa-VariableFont_wght.ttf");
 }
 
 @font-face {
     font-family: "Playfair Display";
-    src: url("/fonts/PlayfairDisplay-VariableFont_wght.ttf");
+    src: url("/css/fonts/PlayfairDisplay-VariableFont_wght.ttf");
     font-style: normal;
 }
 
 @font-face {
     font-family: "Playfair Display";
-    src: url("/fonts/PlayfairDisplay-Italic-VariableFont_wght.ttf");
+    src: url("/css/fonts/PlayfairDisplay-Italic-VariableFont_wght.ttf");
     font-style: italic;
 }
 

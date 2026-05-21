@@ -330,6 +330,7 @@
     gap: var(--sp-7);
     flex-wrap: wrap;
     padding: var(--sp-6) var(--sp-9);
+    margin: 0 calc(var(--sp-9) * -1);
     background: linear-gradient(135deg,
             rgba(7, 30, 149, var(--op-08)) 0%,
             rgba(14, 0, 77, var(--op-05)) 100%);
@@ -339,19 +340,22 @@
     -webkit-backdrop-filter: blur(var(--blur-sm));
 
     /* Hidden by default — JS toggles .is-active */
-    opacity: 0;
+    opacity: 0.5;
     pointer-events: none;
-    transform: translateY(calc(var(--sp-3) * -1));
     transition:
         opacity var(--ease-smooth),
         transform var(--ease-smooth),
         border-color var(--ease-smooth);
+    position: sticky;
+    top: calc(var(--header-height) + var(--sp-6));
 }
 
 .admin-bulk-toolbar.is-active {
+    display: flex;
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
+    z-index: 3;
 }
 
 .admin-bulk-toolbar-left {

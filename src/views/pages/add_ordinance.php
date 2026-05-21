@@ -35,8 +35,7 @@ $categories = [];
 $barangays  = [];
 
 try {
-    require_once __DIR__ . '/../../../config/database.php';
-    $pdo = getDatabaseConnection();
+    $pdo = \App\Controllers\DatabaseController::getDatabaseConnection();
 
     $categories = $pdo
         ->query("SELECT category_id, category_name FROM Categories ORDER BY category_name ASC")
@@ -52,7 +51,6 @@ try {
 }
 
 require_once __DIR__ . '/../head.php';
-require_once __DIR__ . '/../../view_components.php';
 ?>
 
 <body class="<?php echo htmlspecialchars($currentPage, ENT_QUOTES, 'UTF-8'); ?>">

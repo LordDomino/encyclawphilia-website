@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Services\AuthService;
+use App\Core\ApiResponse;
 
 class AuthController
 {
@@ -20,6 +21,10 @@ class AuthController
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /login');
+            ApiResponse::send(
+                ApiResponse::error('Request method invalid.', 401),
+                401
+            );
             exit;
         }
 
@@ -38,11 +43,31 @@ class AuthController
             $_SESSION['is_admin'] = ($user['role_id'] === 1);
 
             header('Location: /home');
+            // ApiResponse::send(
+            //     ApiResponse::success(
+            //         data: [
+            //             'action'       => $result['action'],       // 'added'|'removed'|'switched'
+            //             'userReaction' => $result['userReaction'], // 'like'|'dislike'|null
+            //             'likes'        => $result['likes'],
+            //             'dislikes'     => $result['dislikes'],
+            //         ],
+            //         message: match ($result['action']) {
+            //             'added'    => 'Reaction recorded.',
+            //             'removed'  => 'Reaction removed.',
+            //             'switched' => 'Reaction updated.',
+            //         }
+            //     ),
+            //     httpStatus: 200
+            // );
             exit;
         }
 
-        $this->flashError($result['message'], 'Login failed', 'login');
+        // $this->flashError($result['message'], 'Login failed', 'login');
         header('Location: /login');
+        ApiResponse::send(
+            ApiResponse::error('Login failed', 401),
+            401
+        );
         exit;
     }
 
@@ -66,12 +91,12 @@ class AuthController
         }
 
         $result = $this->makeAuthService()->register(
-            username:        trim($_POST['username']         ?? ''),
-            email:           trim($_POST['email']            ?? ''),
-            password:             $_POST['password']         ?? '',
-            confirmPassword:      $_POST['confirm_password'] ?? '',
-            termsAccepted:   isset($_POST['terms']),
-            roleId:          $roleId
+            username: trim($_POST['username']         ?? ''),
+            email: trim($_POST['email']            ?? ''),
+            password: $_POST['password']         ?? '',
+            confirmPassword: $_POST['confirm_password'] ?? '',
+            termsAccepted: isset($_POST['terms']),
+            roleId: $roleId
         );
 
         if ($result['ok']) {
@@ -98,9 +123,14 @@ class AuthController
 
         if (ini_get('session.use_cookies')) {
             $params = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000,
-                $params['path'], $params['domain'],
-                $params['secure'], $params['httponly']
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
             );
         }
 

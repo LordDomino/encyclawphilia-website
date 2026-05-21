@@ -34,13 +34,13 @@ require_once __DIR__ . '/../head.php';
                 <?php require_once __DIR__ . '/../brand_title.php'; ?>
                 <p>Wisdom Beyond Law and Order</p>
             </hgroup>
-            <form action="/browse" method="GET" class="search-bar">
+            <form class="search-bar" id="search-form">
                 <input
                     type="search"
-                    id="home-pg-hero-search"
+                    id="search-input"
                     name="q"
                     placeholder="Search city ordinances..."
-                    aria-label="Search for city legislations"
+                    aria-label="Search for city ordinances"
                     autocomplete="off"
                     inputmode="search" />
             </form>
@@ -313,8 +313,8 @@ require_once __DIR__ . '/../head.php';
 
     <?php require_once __DIR__ . '/../footer.php'; ?>
 
+    <script src="js/sanitize.js"></script>
     <script src="js/search.js"></script>
-    <script src="js/home.js" defer></script>
 </body>
 
 

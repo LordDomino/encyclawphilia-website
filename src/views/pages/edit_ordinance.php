@@ -42,8 +42,8 @@ $categories = [];
 $barangays  = [];
 
 try {
-    require_once __DIR__ . '/../../../config/database.php';
-    $pdo = getDatabaseConnection();
+
+    $pdo = \App\Controllers\DatabaseController::getDatabaseConnection();
 
     // ── Ordinance record (archived records are still editable by admins) ──
     $stmt = $pdo->prepare("
@@ -398,75 +398,6 @@ require_once __DIR__ . '/../../view_components.php';
 
                     <!-- Hidden: pass the ordinance ID to the controller -->
                     <input type="hidden" name="ordinance_id" value="<?php echo $ordinanceId; ?>">
-
-                    <!-- ── SECTION 1: Identity (Permanently Locked) ───── -->
-                    <fieldset class="add-ord-fieldset add-ord-fieldset--locked" disabled>
-                        <legend class="add-ord-legend">
-                            <span class="add-ord-legend-icon" aria-hidden="true">🔒</span>
-                            Identity Fields
-                            <span class="add-ord-legend-sub">Permanently fixed — cannot be changed after creation</span>
-                        </legend>
-
-                        <div class="edit-ord-locked-notice" role="note">
-                            These fields were recorded at the time of ordinance creation and are
-                            immutable. If you believe a value is incorrect, contact a database
-                            administrator.
-                        </div>
-
-                        <!-- Ordinance Number (read-only display) -->
-                        <div class="form-group add-ord-form-group">
-                            <label class="add-ord-label edit-ord-label--locked" for="ordinance_number_display">
-                                Ordinance Number
-                                <span class="edit-ord-lock-icon" aria-label="Locked field">🔒</span>
-                            </label>
-                            <div class="edit-ord-locked-field" id="ordinance_number_display"
-                                aria-label="Ordinance number: <?php echo $ordinanceNum; ?>" role="text">
-                                <?php echo $ordinanceNum; ?>
-                            </div>
-                            <!-- Hidden read-only value so the controller can verify it hasn't been tampered -->
-                            <input type="hidden" name="ordinance_number" value="<?php echo $ordinanceNum; ?>">
-                        </div>
-
-                        <!-- Title (read-only display) -->
-                        <div class="form-group add-ord-form-group">
-                            <label class="add-ord-label edit-ord-label--locked" for="title_display">
-                                Title
-                                <span class="edit-ord-lock-icon" aria-label="Locked field">🔒</span>
-                            </label>
-                            <div class="edit-ord-locked-field edit-ord-locked-field--multiline"
-                                id="title_display" role="text"
-                                aria-label="Title: <?php echo htmlspecialchars($ordinance['title'], ENT_QUOTES, 'UTF-8'); ?>">
-                                <?php echo htmlspecialchars($ordinance['title'], ENT_QUOTES, 'UTF-8'); ?>
-                            </div>
-                            <input type="hidden" name="title" value="<?php echo htmlspecialchars($ordinance['title'], ENT_QUOTES, 'UTF-8'); ?>">
-                        </div>
-
-                        <!-- Author / Sponsor (read-only display) -->
-                        <div class="form-group add-ord-form-group">
-                            <label class="add-ord-label edit-ord-label--locked" for="author_display">
-                                Author / Sponsor
-                                <span class="edit-ord-lock-icon" aria-label="Locked field">🔒</span>
-                            </label>
-                            <div class="edit-ord-locked-field" id="author_display" role="text">
-                                <?php echo htmlspecialchars($ordinance['author_sponsor'], ENT_QUOTES, 'UTF-8'); ?>
-                            </div>
-                            <input type="hidden" name="author_sponsor" value="<?php echo htmlspecialchars($ordinance['author_sponsor'], ENT_QUOTES, 'UTF-8'); ?>">
-                        </div>
-
-                        <!-- Series Year (read-only display) -->
-                        <div class="form-group add-ord-form-group add-ord-form-group--half">
-                            <label class="add-ord-label edit-ord-label--locked" for="series_year_display">
-                                Series Year
-                                <span class="edit-ord-lock-icon" aria-label="Locked field">🔒</span>
-                            </label>
-                            <div class="edit-ord-locked-field edit-ord-locked-field--compact" id="series_year_display" role="text">
-                                <?php echo $seriesYear; ?>
-                            </div>
-                            <input type="hidden" name="series_year" value="<?php echo $seriesYear; ?>">
-                        </div>
-
-                    </fieldset><!-- /.add-ord-fieldset--locked -->
-
 
                     <!-- ── SECTION 2: Classification (Always Mutable) ─── -->
                     <fieldset class="add-ord-fieldset add-ord-fieldset--mutable">

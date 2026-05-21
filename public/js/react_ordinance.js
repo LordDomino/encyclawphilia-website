@@ -66,7 +66,7 @@ document.querySelectorAll('.ord-reaction-btn').forEach(btn => {
         const prevLike = document.getElementById('btn-like').classList.contains('ord-reaction-btn--active');
         const prevDislike = document.getElementById('btn-dislike').classList.contains('ord-reaction-btn--active');
 
-        ReactionUI.applyOptimistic(reactionType);
+        ReactionUI.applyOptimistic(reactionType); // Update UI already even before DB transaction
 
         const form = new FormData();
         form.append('ordinance_id', ordinanceId);
