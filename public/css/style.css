@@ -1858,7 +1858,7 @@ body.home .site-header .header-content {
 /* Status badges */
 .status-badge {
     display: inline-block;
-    padding: var(--sp-3) var(--sp-5);
+    padding: var(--sp-2) var(--sp-3);
     border-radius: var(--bdr-r-pill);
     font-size: var(--fs-xs);
     font-weight: 600;
@@ -3844,7 +3844,7 @@ section.auth-hero {
     position: sticky;
     top: var(--header-height);
     align-self: flex-start;
-    max-height: calc(100vh - var(--header-height));
+    /* max-height: calc(100vh - var(--header-height)); */
     overflow-y: auto;
 }
 

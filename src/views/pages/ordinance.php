@@ -253,9 +253,9 @@ require VIEWS_ROOT . '/head.php';
                             <p class="ord-pdf-unavailable-sub">
                                 The official document for this ordinance has not been uploaded yet. Check back later or contact the City Council for a copy.
                             </p>
-                            <a href="mailto:info@encyclawphilia.local" class="ord-pdf-contact-link">
+                            <!-- <a href="mailto:info@encyclawphilia.local" class="ord-pdf-contact-link">
                                 Request Document
-                            </a>
+                            </a> -->
                         </div>
                     <?php endif; ?>
                 </div>
@@ -367,9 +367,9 @@ require VIEWS_ROOT . '/head.php';
                                             </span>
                                         </button>
                                     </div>
-                                    <button class="ord-comment-reply-btn" aria-label="Reply to this comment">
+                                    <!-- <button class="ord-comment-reply-btn" aria-label="Reply to this comment">
                                         Reply
-                                    </button>
+                                    </button> -->
                                 </footer>
                             </div>
 

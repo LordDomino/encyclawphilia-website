@@ -218,9 +218,39 @@ async function fetchOrdinances(query = '') {
     }
 }
 
+// ── Fetch from API ────────────────────────────────────────────────────────
+// Expects the backend to return { ok, message, data: { records: [...] } }
+// when the request carries Accept: application/json.
+async function fetchAllOrdinances() {
+    grid.innerHTML = `<div class="ord-comments-empty" role="status"><p>Loading records…</p></div>`;
+
+    const url = new URL('/admin/ordinances', window.location.origin);
+    if (query.length > 0) url.searchParams.set('q', query);
+
+    try {
+        const res = await fetch(url.toString(), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+        });
+        const payload = await res.json();
+
+        if (payload.ok) {
+            renderGrid(payload.data.records);
+        } else {
+            renderGrid([]);
+            showToast(payload.message ?? 'Failed to load ordinances.');
+        }
+    } catch (networkError) {
+        renderGrid([]);
+        showToast('Network error. Please check your connection.');
+    }
+}
+
 // ── Search bar: re-fetch on every input change ────────────────────────────
 searchBar.addEventListener('search', function () {
-    fetchOrdinances(this.value.trim());
+    if (this.value.trim() != '') {
+        fetchOrdinances(this.value.trim());
+    }
 });
 
 // ── Initial page load ─────────────────────────────────────────────────────

@@ -27,12 +27,6 @@ $sessionUsername = htmlspecialchars($_SESSION['username'] ?? 'Administrator', EN
 $sessionRoleId   = (int)($_SESSION['role_id'] ?? 1);
 $_SESSION['is_admin'] = ($sessionRoleId === 1);
 
-// ── TODO: Replace stubs below with real DB calls ──────────────────────────────
-// $pdo = getDatabaseConnection();
-// require_once __DIR__ . '/../../Models/procedures.php';
-// $recentOrdinances = getRecentOrdinances($pdo);
-// $stats            = getAdminDashboardStats($pdo);
-
 // Mock stats
 $stats = [
     'total_ordinances' => 148,

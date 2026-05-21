@@ -186,7 +186,7 @@ use \App\Core\TemplateEngine;
     const titleEl = document.querySelector('.results-header-title');
     const searchInput = document.querySelector('form.search-bar.mini input[name="q"]');
 
-    if (query) {
+    if (query != '') {
         if (titleEl) {
             titleEl.textContent = `Search Results for "${query}"`;
         }

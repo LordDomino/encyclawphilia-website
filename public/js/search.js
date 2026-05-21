@@ -9,7 +9,6 @@ form.addEventListener('submit', (event) => {
 console.log("script");
 searchBar.addEventListener('search', async function () {
     const query = escapeHtml(this.value);
-    console.log(query);
 
     // Ensure there's text to prevent unnecessary requests
     if (query.length > 0) {
