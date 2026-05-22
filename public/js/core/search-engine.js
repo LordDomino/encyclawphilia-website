@@ -23,46 +23,59 @@ function buildSkeletonHTML() {
 const SearchEngine = (() => {
     let config = {
         formId: 'search-form',
+        filterFormId: null, // Added to support optional sidebar filters
         gridId: 'results-grid',
         perPage: 20,
-        renderCard: (row) => '', // Injected by page script
-        onComplete: (payload) => { } // Hook for post-render (e.g. updating bulk tools)
+        renderCard: (row) => '',
+        onComplete: (payload) => { }
     };
 
     let isFetching = false;
-    let form, grid, topPagination, bottomPagination, resultCount, resultsTitle;
+    // Added filterForm to tracked DOM elements
+    let form, filterForm, grid, topPagination, bottomPagination, resultCount, resultsTitle;
 
     // -- URL & DOM Syncing --
     function applyUrlToForm() {
         const params = new URLSearchParams(window.location.search);
-        form.reset(); // Reset DOM to default before applying
+
+        form.reset();
+        if (filterForm) filterForm.reset(); // Reset filter form if it exists
+
+        const targetForms = [form, filterForm].filter(Boolean);
 
         for (const [key, value] of params.entries()) {
-            const inputs = form.querySelectorAll(`[name="${key}"]`);
-            inputs.forEach(input => {
-                if (input.type === 'checkbox' || input.type === 'radio') {
-                    if (input.value === value) input.checked = true;
-                } else {
-                    input.value = value;
-                }
+            targetForms.forEach(currentForm => {
+                const inputs = currentForm.querySelectorAll(`[name="${key}"]`);
+                inputs.forEach(input => {
+                    if (input.type === 'checkbox' || input.type === 'radio') {
+                        if (input.value === value) input.checked = true;
+                    } else {
+                        input.value = value;
+                    }
+                });
             });
         }
     }
 
     function pushStateFromForm(page) {
-        const formData = new FormData(form);
         const params = new URLSearchParams();
+        const targetForms = [form, filterForm].filter(Boolean);
 
-        for (const [key, value] of formData.entries()) {
-            if (value.trim() !== '' && value !== 'desc') { // Ignore defaults to keep URL clean
-                params.append(key, value);
+        // Process fields across all tracked forms
+        targetForms.forEach(currentForm => {
+            const formData = new FormData(currentForm);
+            for (const [key, value] of formData.entries()) {
+                if (value.trim() !== '' && value !== 'desc') {
+                    params.append(key, value);
+                }
             }
-        }
+        });
+
         if (page > 1) params.set('page', page);
 
         const newUrl = `${window.location.pathname}?${params.toString()}`;
         window.history.pushState({ path: newUrl }, '', newUrl);
-        return params; // Return params to pass to API
+        return params;
     }
 
     // -- API Interaction --
@@ -83,6 +96,7 @@ const SearchEngine = (() => {
             if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
 
             const payload = await res.json();
+            console.log(payload);
             if (!payload.ok && payload.success === false) throw new Error(payload.message);
 
             renderResults(payload.data, params.get('q'));
@@ -142,6 +156,7 @@ const SearchEngine = (() => {
         config = { ...config, ...customConfig };
 
         form = document.getElementById(config.formId);
+        filterForm = document.getElementById(config.filterFormId); // Resolve filter form element
         grid = document.getElementById(config.gridId);
         topPagination = document.getElementById('pagination-bar-top');
         bottomPagination = document.getElementById('pagination-bar-bottom');
@@ -154,12 +169,18 @@ const SearchEngine = (() => {
 
         if (!form || !grid) return;
 
-        // Apply URL parameters to form inputs
+        // Apply URL parameters to form and filter inputs
         applyUrlToForm();
 
-        // Event Listeners (Delegated change listener catches all selects/checkboxes/radios)
+        // Event Listeners for main search form
         form.addEventListener('submit', (e) => { e.preventDefault(); fetchPage(1); });
         form.addEventListener('change', () => fetchPage(1));
+
+        // Event Listeners for filter form (if it exists on the page)
+        if (filterForm) {
+            filterForm.addEventListener('submit', (e) => { e.preventDefault(); fetchPage(1); });
+            filterForm.addEventListener('change', () => fetchPage(1));
+        }
 
         // Listen to browser back/forward buttons
         window.addEventListener('popstate', () => {

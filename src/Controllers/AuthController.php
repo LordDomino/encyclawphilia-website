@@ -73,6 +73,7 @@ class AuthController
         session_start();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->sendApiError("Invalid request method.");
             header('Location: /login');
             exit;
         }
@@ -81,7 +82,7 @@ class AuthController
         $roleId = $this->resolveCitizenRoleId($pdo);
 
         if ($roleId === null) {
-            $this->flashError("System role 'Citizen' is not configured.", 'Signup failed', 'signup');
+            $this->sendApiError("System role 'Citizen' is not configured.");
             header('Location: /login');
             exit;
         }
@@ -96,18 +97,19 @@ class AuthController
         );
 
         if ($result['ok']) {
-            $_SESSION['auth_error'] = [
-                'type'  => 'success',
-                'title' => 'Registration successful',
-                'body'  => 'You may now log in with your credentials.',
-                'tab'   => 'login',
-            ];
-            header('Location: /login');
+            $this->sendApiSuccess(
+                [
+                    'type'  => 'success',
+                    'title' => 'Registration successful',
+                    'body'  => 'You may now log in with your credentials.',
+                    'tab'   => 'login',
+                ],
+                'You may now log in with your credentials.'
+            );
             exit;
         }
 
-        $this->flashError($result['message'], 'Signup failed', 'signup');
-        header('Location: /login');
+        $this->sendApiError($result['message']);
         exit;
     }
 
@@ -145,21 +147,26 @@ class AuthController
     }
 
     // ── Private helpers ───────────────────────────────────────────────────
-
-    private function flashError(string $body, string $title, string $tab): void
-    {
-        $_SESSION['auth_error'] = [
-            'type'  => 'error',
-            'title' => $title,
-            'body'  => $body,
-            'tab'   => $tab,
-        ];
-    }
-
     private function resolveCitizenRoleId(\PDO $pdo): ?int
     {
         $stmt = $pdo->query("SELECT role_id FROM Roles WHERE role_name = 'Citizen' LIMIT 1");
         $row  = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $row ? (int) $row['role_id'] : null;
+    }
+
+    private function sendApiSuccess(array $data, string $message): void
+    {
+        ApiResponse::send(
+            ApiResponse::success(
+                data: $data,
+                message: $message
+            ),
+            200
+        );
+    }
+
+    private function sendApiError(string $message, int $errCode = 400): void
+    {
+        ApiResponse::send(ApiResponse::error($message, $errCode), 200);
     }
 }

@@ -26,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="preview-container">
                     <div class="preview-text">${escapeHtml(row.title)}</div>
                 </div>
+                <div class="admin-card-meta-row">
+                    <span class="admin-card-meta-item"><span class="admin-card-meta-icon" aria-hidden="true">🖊</span>${escapeHtml(row.author_sponsor ?? '')}</span>
+                    <span class="admin-card-meta-item"><span class="admin-card-meta-icon" aria-hidden="true">🏷</span>${escapeHtml(row.category_name ?? '(Uncategorized)')}</span>
+                </div>
                 <div class="card-footer">
                     <div class="card-engagement">
                         <span class="engagement-item likes">
@@ -47,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize Engine
     SearchEngine.init({
+        filterFormId: 'filter-form',
         renderCard: renderBrowseCard
     });
 });

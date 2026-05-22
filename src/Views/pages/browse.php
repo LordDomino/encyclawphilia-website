@@ -58,187 +58,188 @@ require_once __DIR__ . '/../head.php';
                     </div>
 
                     <div class="filter-sidebar-body" id="filter-sidebar-body">
-
-                        <!-- ── Category ────────────────────────────────── -->
-                        <div class="filter-block" id="filter-block-category">
-                            <button
-                                class="filter-block-toggle"
-                                type="button"
-                                aria-expanded="true"
-                                aria-controls="filter-panel-category">
-                                <span class="filter-block-label">Category</span>
-                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
-                            </button>
-                            <div class="filter-block-panel" id="filter-panel-category">
-                                <select
-                                    class="filter-select"
-                                    id="filter-category"
-                                    name="category"
-                                    data-filter-key="category_id"
-                                    aria-label="Filter by category">
-                                    <option value="">All Categories</option>
-                                    <!-- JS-injectable: <option value="{category_id}">{category_name}</option> -->
-                                    <option value="1">Health</option>
-                                    <option value="2">Education</option>
-                                    <option value="3">Environment</option>
-                                    <option value="4">Public Safety</option>
-                                    <option value="5">Infrastructure</option>
-                                    <option value="6">Taxation</option>
-                                    <option value="7">Social Welfare</option>
-                                    <option value="8">Youth Affairs</option>
-                                    <option value="9">Sports and Recreation</option>
-                                    <option value="10">Cultural Heritage</option>
-                                </select>
+                        <form id="filter-form">
+                            <!-- ── Category ────────────────────────────────── -->
+                            <div class="filter-block" id="filter-block-category">
+                                <button
+                                    class="filter-block-toggle"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="filter-panel-category">
+                                    <span class="filter-block-label">Category</span>
+                                    <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                                </button>
+                                <div class="filter-block-panel" id="filter-panel-category">
+                                    <select
+                                        class="filter-select"
+                                        id="filter-category"
+                                        name="category_id"
+                                        data-filter-key="category_id"
+                                        aria-label="Filter by category">
+                                        <option value="">All Categories</option>
+                                        <!-- JS-injectable: <option value="{category_id}">{category_name}</option> -->
+                                        <option value="1">Health</option>
+                                        <option value="2">Education</option>
+                                        <option value="3">Environment</option>
+                                        <option value="4">Public Safety</option>
+                                        <option value="5">Infrastructure</option>
+                                        <option value="6">Taxation</option>
+                                        <option value="7">Social Welfare</option>
+                                        <option value="8">Youth Affairs</option>
+                                        <option value="9">Sports and Recreation</option>
+                                        <option value="10">Cultural Heritage</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- ── Date range ──────────────────────────────── -->
-                        <div class="filter-block" id="filter-block-date">
-                            <button
-                                class="filter-block-toggle"
-                                type="button"
-                                aria-expanded="true"
-                                aria-controls="filter-panel-date">
-                                <span class="filter-block-label">Date Enacted</span>
-                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
-                            </button>
-                            <div class="filter-block-panel" id="filter-panel-date">
-                                <div class="filter-date-range">
-                                    <div class="filter-date-field">
-                                        <label class="filter-date-label" for="filter-date-from">From</label>
-                                        <input
-                                            type="date"
-                                            class="filter-date-input"
-                                            id="filter-date-from"
-                                            name="date_from"
-                                            data-filter-key="date_from"
-                                            aria-label="Date enacted from" />
-                                    </div>
-                                    <span class="filter-date-separator" aria-hidden="true">—</span>
-                                    <div class="filter-date-field">
-                                        <label class="filter-date-label" for="filter-date-to">To</label>
-                                        <input
-                                            type="date"
-                                            class="filter-date-input"
-                                            id="filter-date-to"
-                                            name="date_to"
-                                            data-filter-key="date_to"
-                                            aria-label="Date enacted to" />
+                            <!-- ── Date range ──────────────────────────────── -->
+                            <div class="filter-block" id="filter-block-date">
+                                <button
+                                    class="filter-block-toggle"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="filter-panel-date">
+                                    <span class="filter-block-label">Date Enacted</span>
+                                    <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                                </button>
+                                <div class="filter-block-panel" id="filter-panel-date">
+                                    <div class="filter-date-range">
+                                        <div class="filter-date-field">
+                                            <label class="filter-date-label" for="filter-date-from">From</label>
+                                            <input
+                                                type="date"
+                                                class="filter-date-input"
+                                                id="filter-date-from"
+                                                name="date_from"
+                                                data-filter-key="date_from"
+                                                aria-label="Date enacted from" />
+                                        </div>
+                                        <span class="filter-date-separator" aria-hidden="true">—</span>
+                                        <div class="filter-date-field">
+                                            <label class="filter-date-label" for="filter-date-to">To</label>
+                                            <input
+                                                type="date"
+                                                class="filter-date-input"
+                                                id="filter-date-to"
+                                                name="date_to"
+                                                data-filter-key="date_to"
+                                                aria-label="Date enacted to" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- ── Status ──────────────────────────────────── -->
-                        <div class="filter-block" id="filter-block-status">
-                            <button
-                                class="filter-block-toggle"
-                                type="button"
-                                aria-expanded="true"
-                                aria-controls="filter-panel-status">
-                                <span class="filter-block-label">Status</span>
-                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
-                            </button>
-                            <div class="filter-block-panel" id="filter-panel-status">
-                                <fieldset class="filter-checkbox-group" id="filter-status-group" data-filter-key="status">
-                                    <legend class="sr-only">Filter by status</legend>
-                                    <!-- JS-injectable: statuses can be added/removed here -->
-                                    <label class="filter-checkbox-item">
-                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Active" data-status-key="Active" />
-                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
-                                        <span class="filter-checkbox-text">Active</span>
-                                    </label>
-                                    <label class="filter-checkbox-item">
-                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Pending" data-status-key="Pending" />
-                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
-                                        <span class="filter-checkbox-text">Pending</span>
-                                    </label>
-                                    <label class="filter-checkbox-item">
-                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Repealed" data-status-key="Repealed" />
-                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
-                                        <span class="filter-checkbox-text">Repealed</span>
-                                    </label>
-                                    <label class="filter-checkbox-item">
-                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Amended" data-status-key="Amended" />
-                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
-                                        <span class="filter-checkbox-text">Amended</span>
-                                    </label>
-                                </fieldset>
+                            <!-- ── Status ──────────────────────────────────── -->
+                            <div class="filter-block" id="filter-block-status">
+                                <button
+                                    class="filter-block-toggle"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="filter-panel-status">
+                                    <span class="filter-block-label">Status</span>
+                                    <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                                </button>
+                                <div class="filter-block-panel" id="filter-panel-status">
+                                    <fieldset class="filter-checkbox-group" id="filter-status-group" data-filter-key="status">
+                                        <legend class="sr-only">Filter by status</legend>
+                                        <!-- JS-injectable: statuses can be added/removed here -->
+                                        <label class="filter-checkbox-item">
+                                            <input type="checkbox" class="filter-checkbox" name="status[]" value="Active" data-status-key="Active" />
+                                            <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                            <span class="filter-checkbox-text">Active</span>
+                                        </label>
+                                        <label class="filter-checkbox-item">
+                                            <input type="checkbox" class="filter-checkbox" name="status[]" value="Pending" data-status-key="Pending" />
+                                            <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                            <span class="filter-checkbox-text">Pending</span>
+                                        </label>
+                                        <label class="filter-checkbox-item">
+                                            <input type="checkbox" class="filter-checkbox" name="status[]" value="Repealed" data-status-key="Repealed" />
+                                            <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                            <span class="filter-checkbox-text">Repealed</span>
+                                        </label>
+                                        <label class="filter-checkbox-item">
+                                            <input type="checkbox" class="filter-checkbox" name="status[]" value="Amended" data-status-key="Amended" />
+                                            <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                            <span class="filter-checkbox-text">Amended</span>
+                                        </label>
+                                    </fieldset>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- ── Content flags ───────────────────────────── -->
-                        <div class="filter-block" id="filter-block-flags">
-                            <button
-                                class="filter-block-toggle"
-                                type="button"
-                                aria-expanded="true"
-                                aria-controls="filter-panel-flags">
-                                <span class="filter-block-label">Content</span>
-                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
-                            </button>
-                            <div class="filter-block-panel" id="filter-panel-flags">
-                                <fieldset class="filter-checkbox-group" data-filter-key="content_flags">
-                                    <legend class="sr-only">Filter by content availability</legend>
-                                    <label class="filter-checkbox-item">
-                                        <input type="checkbox" class="filter-checkbox" name="has_summary" value="1" data-filter-key="has_summary" />
-                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
-                                        <span class="filter-checkbox-text">Has summary</span>
-                                    </label>
-                                    <label class="filter-checkbox-item">
-                                        <input type="checkbox" class="filter-checkbox" name="has_full_text" value="1" data-filter-key="has_full_text" />
-                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
-                                        <span class="filter-checkbox-text">Has full text</span>
-                                    </label>
-                                    <label class="filter-checkbox-item">
-                                        <input type="checkbox" class="filter-checkbox" name="has_pdf" value="1" data-filter-key="has_pdf" />
-                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
-                                        <span class="filter-checkbox-text">Has PDF file</span>
-                                    </label>
-                                </fieldset>
+                            <!-- ── Content flags ───────────────────────────── -->
+                            <div class="filter-block" id="filter-block-flags">
+                                <button
+                                    class="filter-block-toggle"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="filter-panel-flags">
+                                    <span class="filter-block-label">Content</span>
+                                    <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                                </button>
+                                <div class="filter-block-panel" id="filter-panel-flags">
+                                    <fieldset class="filter-checkbox-group" data-filter-key="content_flags">
+                                        <legend class="sr-only">Filter by content availability</legend>
+                                        <label class="filter-checkbox-item">
+                                            <input type="checkbox" class="filter-checkbox" name="has_summary" value="1" data-filter-key="has_summary" />
+                                            <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                            <span class="filter-checkbox-text">Has summary</span>
+                                        </label>
+                                        <label class="filter-checkbox-item">
+                                            <input type="checkbox" class="filter-checkbox" name="has_full_text" value="1" data-filter-key="has_full_text" />
+                                            <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                            <span class="filter-checkbox-text">Has full text</span>
+                                        </label>
+                                        <label class="filter-checkbox-item">
+                                            <input type="checkbox" class="filter-checkbox" name="has_pdf" value="1" data-filter-key="has_pdf" />
+                                            <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                            <span class="filter-checkbox-text">Has PDF file</span>
+                                        </label>
+                                    </fieldset>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- ── Sort ────────────────────────────────────── -->
-                        <div class="filter-block" id="filter-block-sort">
-                            <button
-                                class="filter-block-toggle"
-                                type="button"
-                                aria-expanded="true"
-                                aria-controls="filter-panel-sort">
-                                <span class="filter-block-label">Sort By</span>
-                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
-                            </button>
-                            <div class="filter-block-panel" id="filter-panel-sort">
-                                <!-- ── Sort ────────────────────────────────────────────────── -->
-                                <select
-                                    class="filter-select"
-                                    id="filter-sort-by"
-                                    name="sort_by"
-                                    data-filter-key="sort_by"
-                                    aria-label="Sort results by">
-                                    <option value="date_enacted" selected>Date Enacted</option>
-                                    <option value="series_year">Series Year</option>
-                                    <option value="title">Title (A–Z)</option>
-                                    <option value="created_at">Date Added</option>
-                                </select>
-                                <fieldset class="filter-radio-group" data-filter-key="sort_dir">
-                                    <legend class="sr-only">Sort direction</legend>
-                                    <label class="filter-radio-item">
-                                        <input type="radio" class="filter-radio" name="sort_dir" value="desc" data-filter-key="sort_dir" checked />
-                                        <span class="filter-radio-mark" aria-hidden="true"></span>
-                                        <span class="filter-radio-text">Descending</span>
-                                    </label>
-                                    <label class="filter-radio-item">
-                                        <input type="radio" class="filter-radio" name="sort_dir" value="asc" data-filter-key="sort_dir" />
-                                        <span class="filter-radio-mark" aria-hidden="true"></span>
-                                        <span class="filter-radio-text">Ascending</span>
-                                    </label>
-                                </fieldset>
+                            <!-- ── Sort ────────────────────────────────────── -->
+                            <div class="filter-block" id="filter-block-sort">
+                                <button
+                                    class="filter-block-toggle"
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="filter-panel-sort">
+                                    <span class="filter-block-label">Sort By</span>
+                                    <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                                </button>
+                                <div class="filter-block-panel" id="filter-panel-sort">
+                                    <!-- ── Sort ────────────────────────────────────────────────── -->
+                                    <select
+                                        class="filter-select"
+                                        id="filter-sort-by"
+                                        name="sort_by"
+                                        data-filter-key="sort_by"
+                                        aria-label="Sort results by">
+                                        <option value="date_enacted" selected>Date Enacted</option>
+                                        <option value="series_year">Series Year</option>
+                                        <option value="title">Title (A–Z)</option>
+                                        <option value="created_at">Date Added</option>
+                                    </select>
+                                    <fieldset class="filter-radio-group" data-filter-key="sort_dir">
+                                        <legend class="sr-only">Sort direction</legend>
+                                        <label class="filter-radio-item">
+                                            <input type="radio" class="filter-radio" name="sort_dir" value="desc" data-filter-key="sort_dir" checked />
+                                            <span class="filter-radio-mark" aria-hidden="true"></span>
+                                            <span class="filter-radio-text">Descending</span>
+                                        </label>
+                                        <label class="filter-radio-item">
+                                            <input type="radio" class="filter-radio" name="sort_dir" value="asc" data-filter-key="sort_dir" />
+                                            <span class="filter-radio-mark" aria-hidden="true"></span>
+                                            <span class="filter-radio-text">Ascending</span>
+                                        </label>
+                                    </fieldset>
+                                </div>
                             </div>
-                        </div>
-
+                        </form>
                     </div><!-- /.filter-sidebar-body -->
+
                 </div><!-- /.sidebar-content -->
             </aside>
             <section class="results-content" id="browse-all-ordinances">

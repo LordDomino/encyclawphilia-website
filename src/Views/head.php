@@ -8,7 +8,5 @@
     <title><?php echo $pageTitle; ?></title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/add_ordinance.css">
-    <?php if ($_SESSION['is_admin'] ?? false): ?>
-        <link rel="stylesheet" href="css/admin_dashboard.css">
-    <?php endif; ?>
+    <link rel="stylesheet" href="css/admin_dashboard.css">
 </head>

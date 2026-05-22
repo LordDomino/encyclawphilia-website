@@ -850,6 +850,7 @@ class OrdinanceModel
 
         // 2. Query Builder Setup
         $conditions = [];
+        // Use associative named parameters for clarity: keys include the leading ':'
         $params     = [];
 
         // Core Guard: Archive Check
@@ -861,41 +862,50 @@ class OrdinanceModel
         // Splits "traffic penalty" into "traffic" AND "penalty", checking both across multiple columns.
         $keyword = trim($keyword);
         if ($keyword !== '') {
-            $words = array_filter(explode(' ', $keyword));
-            foreach ($words as $word) {
-                // We use CONCAT_WS to safely search across null columns without breaking the LIKE match
-                $conditions[] = "CONCAT_WS(' ', o.title, o.ordinance_number, o.author_sponsor, COALESCE(o.summary, '')) LIKE ?";
-                $params[] = '%' . addcslashes($word, '%_\\') . '%';
+            $words = array_values(array_filter(explode(' ', $keyword)));
+            foreach ($words as $i => $word) {
+                // Named placeholder per keyword to support positional-safe binding
+                $ph = ':kw' . $i;
+                $conditions[] = "CONCAT_WS(' ', o.title, o.ordinance_number, o.author_sponsor, COALESCE(o.summary, '')) LIKE {$ph}";
+                $params[$ph] = '%' . addcslashes($word, '%_\\') . '%';
             }
         }
 
         // Feature: Category Filter
         $categoryIds = array_filter(array_map('intval', $categoryIds));
         if (!empty($categoryIds)) {
-            $placeholders = implode(', ', array_fill(0, count($categoryIds), '?'));
-            $conditions[] = "o.category_id IN ({$placeholders})";
-            $params = array_merge($params, $categoryIds);
+            $catPlaceholders = [];
+            foreach (array_values($categoryIds) as $i => $cid) {
+                $ph = ':cat' . $i;
+                $catPlaceholders[] = $ph;
+                $params[$ph] = (int) $cid;
+            }
+            $conditions[] = "o.category_id IN (" . implode(', ', $catPlaceholders) . ")";
         }
 
         // Feature: Date Range Filter
         if ($dateFrom !== '') {
-            $conditions[] = 'o.date_enacted >= ?';
-            $params[] = $dateFrom . ' 00:00:00';
+            $conditions[] = 'o.date_enacted >= :date_from';
+            $params[':date_from'] = $dateFrom . ' 00:00:00';
         }
         if ($dateTo !== '') {
-            $conditions[] = 'o.date_enacted <= ?';
-            $params[] = $dateTo . ' 23:59:59';
+            $conditions[] = 'o.date_enacted <= :date_to';
+            $params[':date_to'] = $dateTo . ' 23:59:59';
         }
 
         // Feature: Status Filter
         if (!empty($statuses)) {
             $allowedStatuses = ['Pending', 'Active', 'Repealed', 'Amended'];
-            $validStatuses = array_intersect($statuses, $allowedStatuses);
+            $validStatuses = array_values(array_intersect($statuses, $allowedStatuses));
 
             if (!empty($validStatuses)) {
-                $placeholders = implode(', ', array_fill(0, count($validStatuses), '?'));
-                $conditions[] = "o.status IN ({$placeholders})";
-                $params = array_merge($params, $validStatuses);
+                $statusPlaceholders = [];
+                foreach ($validStatuses as $i => $s) {
+                    $ph = ':status' . $i;
+                    $statusPlaceholders[] = $ph;
+                    $params[$ph] = $s;
+                }
+                $conditions[] = "o.status IN (" . implode(', ', $statusPlaceholders) . ")";
             }
         }
 
@@ -926,7 +936,7 @@ class OrdinanceModel
             FROM Ordinances o
             {$whereClause}
             ORDER BY {$orderExpr}
-            LIMIT ? OFFSET ?
+            LIMIT :limit OFFSET :offset
         )
         SELECT
             f.total_count,
@@ -964,18 +974,18 @@ class OrdinanceModel
         ORDER BY {$orderExpr}
         ";
 
-        // Bind Limit and Offset
-        $params[] = $limit;
-        $params[] = $offset;
+        // Bind Limit and Offset (named params)
+        $params[':limit']  = (int) $limit;
+        $params[':offset'] = (int) $offset;
 
         // 4. Execution & Parsing
         try {
             $stmt = $this->pdo->prepare($sql);
 
-            foreach ($params as $index => $value) {
-                // PDO indexes start at 1
+            // Bind named parameters (keys include leading ':')
+            foreach ($params as $name => $value) {
                 $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
-                $stmt->bindValue($index + 1, $value, $type);
+                $stmt->bindValue($name, $value, $type);
             }
 
             $stmt->execute();

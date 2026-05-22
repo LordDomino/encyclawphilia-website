@@ -147,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize Engine
     SearchEngine.init({
+        filterFormId: 'filter-form',
         renderCard: renderAdminCard,
         onComplete: () => {
             // Reset bulk toolbar when fresh records load
@@ -155,6 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectAllCb.indeterminate = false;
                 updateBulkToolbar();
             }
-        }
+        },
     });
 });

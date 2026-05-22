@@ -66,9 +66,13 @@ class UserModel
         } catch (PDOException $e) {
             if ($this->db->inTransaction()) {
                 $this->db->rollBack();
+                if ($e->errorInfo[1] === 1062) {
+                    return [
+                        'user_id' => 0,
+                        'message' => "Username or email address is already in use."
+                    ];
+                }
             }
-
-            error_log("User::register() failure: " . $e->getMessage());
 
             return [
                 'user_id' => 0,
