@@ -1,0 +1,52 @@
+document.addEventListener('DOMContentLoaded', () => {
+
+    function renderBrowseCard(row) {
+        const day = row.enactment_day != null ? String(row.enactment_day) : '';
+        const month = row.enactment_month ?? '';
+        const year = row.enactment_year != null ? String(row.enactment_year) : '';
+
+        return `
+            <div class="content-card animate-in">
+                <div class="content-card-header">
+                    <div class="card-label-group">
+                        <span class="card-type">City Ordinance</span>
+                        <span class="numeral-and-series">
+                            No. ${escapeHtml(row.ordinance_number)}
+                            s. ${escapeHtml(row.series_year)}
+                        </span>
+                    </div>
+                    <div class="date">
+                        <span class="date-day">${escapeHtml(day)}</span>
+                        <div class="date-meta">
+                            <span class="date-month">${escapeHtml(month)}</span>
+                            <span class="date-year">${escapeHtml(year)}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="preview-container">
+                    <div class="preview-text">${escapeHtml(row.title)}</div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-engagement">
+                        <span class="engagement-item likes">
+                            <span class="engagement-icon">▲</span>
+                            <span class="engagement-count">${escapeHtml(row.like_count || 0)}</span>
+                        </span>
+                        <span class="engagement-divider"></span>
+                        <span class="engagement-item dislikes">
+                            <span class="engagement-icon">▼</span>
+                            <span class="engagement-count">${escapeHtml(row.dislike_count || 0)}</span>
+                        </span>
+                    </div>
+                    <a href="/ordinance?id=${parseInt(row.ordinance_id, 10)}">
+                        <p class="link">Read More</p>
+                    </a>
+                </div>
+            </div>`;
+    }
+
+    // Initialize Engine
+    SearchEngine.init({
+        renderCard: renderBrowseCard
+    });
+});

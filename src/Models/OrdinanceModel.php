@@ -498,6 +498,7 @@ class OrdinanceModel
             'total' => $total,
         ];
     }
+
     /**
      * searchOrdinancesByCategory
      *
@@ -790,6 +791,218 @@ class OrdinanceModel
             'offset'     => $offset,
             'ordinances' => $rows,
         ];
+    }
+
+    /**
+     * Unified master search method for Ordinances.
+     * Handles complex overlapping criteria including smart keyword matching, 
+     * category filtering, date ranges, status multi-selects, and content availability.
+     *
+     * @param PDO       $pdo             Active PDO connection.
+     * @param string    $keyword         Space-separated keywords for flexible matching.
+     * @param int[]     $categoryIds     Array of category IDs. Empty matches all.
+     * @param string    $dateFrom        Start date (YYYY-MM-DD). Empty string ignores.
+     * @param string    $dateTo          End date (YYYY-MM-DD). Empty string ignores.
+     * @param string[]  $statuses        Array of valid statuses ('Pending', 'Active', etc.).
+     * @param bool      $hasSummary      If true, requires the summary column to be populated.
+     * @param bool      $hasFullText     If true, requires the full_text column to be populated.
+     * @param bool      $hasPdf          If true, requires the pdf_file column to be populated.
+     * @param string    $sortBy          Column to sort by. Defaults to 'date_enacted'.
+     * @param string    $sortDir         'ASC' or 'DESC'. Defaults to 'DESC'.
+     * @param int       $limit           Page size (1-100). Defaults to 20.
+     * @param int       $offset          Zero-based row offset. Defaults to 0.
+     * @param bool      $includeArchived Guard override. True ONLY for super-admin views.
+     *
+     * @return array{total: int, limit: int, offset: int, ordinances: array}
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     */
+    public function searchOrdinances(
+        string $keyword = '',
+        array  $categoryIds = [],
+        string $dateFrom = '',
+        string $dateTo = '',
+        array  $statuses = [],
+        bool   $hasSummary = false,
+        bool   $hasFullText = false,
+        bool   $hasPdf = false,
+        string $sortBy = 'date_enacted',
+        string $sortDir = 'DESC',
+        int    $limit = 20,
+        int    $offset = 0,
+        bool   $includeArchived = false
+    ): array {
+
+        // 1. Input Validation & Normalization
+        $allowedSortColumns = ['date_enacted', 'created_at', 'title', 'series_year'];
+        $sortBy  = strtolower(trim($sortBy));
+        $sortDir = strtoupper(trim($sortDir));
+
+        if (!in_array($sortBy, $allowedSortColumns, true)) {
+            throw new \InvalidArgumentException("Invalid sortBy value. Allowed: " . implode(', ', $allowedSortColumns));
+        }
+        if (!in_array($sortDir, ['ASC', 'DESC'], true)) {
+            throw new \InvalidArgumentException("sortDir must be 'ASC' or 'DESC'.");
+        }
+
+        $limit  = max(1, min(100, (int) $limit));
+        $offset = max(0, (int) $offset);
+
+        // 2. Query Builder Setup
+        $conditions = [];
+        $params     = [];
+
+        // Core Guard: Archive Check
+        if (!$includeArchived) {
+            $conditions[] = 'o.archived_at IS NULL';
+        }
+
+        // Feature: "Smart" Keyword Search (Term Splitting)
+        // Splits "traffic penalty" into "traffic" AND "penalty", checking both across multiple columns.
+        $keyword = trim($keyword);
+        if ($keyword !== '') {
+            $words = array_filter(explode(' ', $keyword));
+            foreach ($words as $word) {
+                // We use CONCAT_WS to safely search across null columns without breaking the LIKE match
+                $conditions[] = "CONCAT_WS(' ', o.title, o.ordinance_number, o.author_sponsor, COALESCE(o.summary, '')) LIKE ?";
+                $params[] = '%' . addcslashes($word, '%_\\') . '%';
+            }
+        }
+
+        // Feature: Category Filter
+        $categoryIds = array_filter(array_map('intval', $categoryIds));
+        if (!empty($categoryIds)) {
+            $placeholders = implode(', ', array_fill(0, count($categoryIds), '?'));
+            $conditions[] = "o.category_id IN ({$placeholders})";
+            $params = array_merge($params, $categoryIds);
+        }
+
+        // Feature: Date Range Filter
+        if ($dateFrom !== '') {
+            $conditions[] = 'o.date_enacted >= ?';
+            $params[] = $dateFrom . ' 00:00:00';
+        }
+        if ($dateTo !== '') {
+            $conditions[] = 'o.date_enacted <= ?';
+            $params[] = $dateTo . ' 23:59:59';
+        }
+
+        // Feature: Status Filter
+        if (!empty($statuses)) {
+            $allowedStatuses = ['Pending', 'Active', 'Repealed', 'Amended'];
+            $validStatuses = array_intersect($statuses, $allowedStatuses);
+
+            if (!empty($validStatuses)) {
+                $placeholders = implode(', ', array_fill(0, count($validStatuses), '?'));
+                $conditions[] = "o.status IN ({$placeholders})";
+                $params = array_merge($params, $validStatuses);
+            }
+        }
+
+        // Feature: Content Completeness Filters
+        if ($hasSummary) {
+            $conditions[] = "o.summary IS NOT NULL AND TRIM(o.summary) != ''";
+        }
+        if ($hasFullText) {
+            $conditions[] = "o.full_text IS NOT NULL AND TRIM(o.full_text) != ''";
+        }
+        if ($hasPdf) {
+            $conditions[] = "o.pdf_file IS NOT NULL AND TRIM(o.pdf_file) != ''";
+        }
+
+        // Assemble WHERE Clause
+        $whereClause = $conditions ? 'WHERE ' . implode(' AND ', $conditions) : '';
+
+        // Sorting Qualification
+        $orderExpr = $sortBy === 'title' ? "LOWER(o.title) {$sortDir}" : "o.{$sortBy} {$sortDir}";
+        $orderExpr .= ', o.ordinance_id ASC'; // Stable fallback sort
+
+        // 3. The Unified SQL Statement utilizing CTE for Pagination Math
+        $sql = "
+        WITH filtered AS (
+            SELECT 
+                o.ordinance_id,
+                COUNT(*) OVER () AS total_count
+            FROM Ordinances o
+            {$whereClause}
+            ORDER BY {$orderExpr}
+            LIMIT ? OFFSET ?
+        )
+        SELECT
+            f.total_count,
+            o.ordinance_id,
+            SUBSTRING_INDEX(o.ordinance_number, '-', -1) AS ordinance_number_display,
+            o.ordinance_number AS ordinance_number_full,
+            o.title,
+            o.author_sponsor,
+            o.series_year,
+            o.status,
+            o.date_enacted,
+            IFNULL(DAY(o.date_enacted), '') AS enactment_day,
+            IFNULL(MONTHNAME(o.date_enacted), '') AS enactment_month,
+            IFNULL(YEAR(o.date_enacted), o.series_year) AS enactment_year,
+            o.pdf_file,
+            o.summary,
+            c.category_name,
+            
+            (
+                SELECT COUNT(*) FROM Ordinance_Reactions r 
+                WHERE r.ordinance_id = o.ordinance_id AND r.reaction_type = 'like'
+            ) AS like_count,
+            (
+                SELECT COUNT(*) FROM Ordinance_Reactions r 
+                WHERE r.ordinance_id = o.ordinance_id AND r.reaction_type = 'dislike'
+            ) AS dislike_count,
+            (
+                SELECT COUNT(*) FROM Comments cm 
+                WHERE cm.ordinance_id = o.ordinance_id
+            ) AS comment_count
+
+        FROM filtered f
+        JOIN Ordinances o ON o.ordinance_id = f.ordinance_id
+        LEFT JOIN Categories c ON c.category_id = o.category_id
+        ORDER BY {$orderExpr}
+        ";
+
+        // Bind Limit and Offset
+        $params[] = $limit;
+        $params[] = $offset;
+
+        // 4. Execution & Parsing
+        try {
+            $stmt = $this->pdo->prepare($sql);
+
+            foreach ($params as $index => $value) {
+                // PDO indexes start at 1
+                $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+                $stmt->bindValue($index + 1, $value, $type);
+            }
+
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $total = 0;
+            foreach ($rows as &$row) {
+                $total = (int) $row['total_count'];
+                unset($row['total_count']);
+
+                // Normalize output types
+                $row['like_count']    = (int) $row['like_count'];
+                $row['dislike_count'] = (int) $row['dislike_count'];
+                $row['comment_count'] = (int) $row['comment_count'];
+            }
+            unset($row);
+
+            return [
+                'total'      => $total,
+                'limit'      => $limit,
+                'offset'     => $offset,
+                'ordinances' => $rows,
+            ];
+        } catch (\PDOException $e) {
+            error_log("Database execution error within searchOrdinances: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     // ------------------------------------------------------------

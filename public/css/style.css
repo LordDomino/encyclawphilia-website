@@ -359,8 +359,8 @@
 
     /* ── Transitions ───────────────────────────────────────── */
     --ease: 0.25s ease;
-    --ease-fast: 0.20s ease;
-    --ease-slow: 0.30s ease;
+    --ease-fast: 0.10s ease;
+    --ease-slow: 0.40s ease;
     --ease-spring: 0.30s cubic-bezier(0.34, 1.56, 0.64, 1);
     --ease-smooth: 0.20s cubic-bezier(0.4, 0, 0.2, 1);
     --ease-smooth-lg: 0.30s cubic-bezier(0.4, 0, 0.2, 1);
@@ -642,10 +642,8 @@ form.search-bar.mini input[type="search"] {
 }
 
 form.search-bar.mini input[type="search"]:focus {
-    background-color: rgba(255, 255, 255, var(--op-95));
-    border-color: var(--glass-navy-mid);
-    border-bottom-color: var(--ink-primary);
-    box-shadow: var(--shadow-glass-sm);
+    outline: none;
+    box-shadow: none;
 }
 
 form.search-bar input[type="search"]::placeholder,
@@ -892,11 +890,6 @@ section.browse {
     font-style: italic;
     line-height: var(--lh-normal);
 }
-
-/* @keyframes fadeInScale {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-} */
 
 .content-card {
     animation: none;
@@ -1477,7 +1470,8 @@ section.browse {
     flex-wrap: wrap;
     align-items: center;
     gap: 0.35rem;
-    padding: 0.75rem 0;
+    margin: 0.75rem 0;
+    padding: 0 0;
     min-height: 2.75rem; /* reserves space while empty during fetch */
 }
 
@@ -1531,28 +1525,36 @@ section.browse {
 /* ── Search bar with submit button ────────────────────────────────── */
 .search-bar.mini {
     display: flex;
-    align-items: center;
+    align-items: stretch; /* Change from center to stretch to force equal heights */
     gap: 0;
 }
 
+
+
 .search-bar.mini input[type="search"] {
     flex: 1;
+    border: 1px solid var(--color-border, #ccc); /* Ensure it matches the button's border style */
     border-right: none;
     border-radius: 5px 0 0 5px;
+    padding: 0.5rem 0.75rem; /* Explicit vertical padding helps stabilize height cross-browser */
+    box-sizing: border-box;  /* Includes padding and border in element's total width and height */
+    margin: 0;               /* Remove native browser overrides */
 }
 
 .search-submit-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 100%;          /* matches input height */
+    /* Removed height: 100%; as flex stretch handles sizing automatically */
     padding: 0 0.75rem;
     border: 1px solid var(--color-border, #ccc);
     border-left: none;
     border-radius: 0 5px 5px 0;
     background: var(--color-surface-alt, #f5f5f5);
     cursor: pointer;
-    transition: background 0.12s;
+    box-sizing: border-box;  /* Ensures borders are calculated identically to the input field */
+    margin: 0;               /* Evades any button margin variations in Chromium/Gecko engines */
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
 }
 
 .search-submit-btn:hover {
@@ -1816,7 +1818,7 @@ body.home .site-header .header-content {
     height: 100%;
     top: var(--header-height);
     margin: var(--pad-sm) 0;
-    position: sticky;
+    /* position: sticky; */
     flex-shrink: 0;
     transition: all var(--ease-slow);
 }
@@ -5577,7 +5579,7 @@ section.auth-hero {
 .filter-sidebar-body {
     display: flex;
     flex-direction: column;
-    gap: var(--sp-2);
+    gap: var(--sp-3);
 }
 
 /* ── Individual filter block (collapsible) ───────────────── */

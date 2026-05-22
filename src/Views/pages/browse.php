@@ -21,23 +21,18 @@ require_once __DIR__ . '/../head.php';
                 <p>Browse the latest ordinances in Valenzuela City.</p>
             </div>
         </div>
-        <div class="active-filters" id="active-filters" style="display: none;">
-            <div class="active-filters-content">
-                <span class="filter-label">Active Filters:</span>
-                <div class="filter-chips" id="filter-chips"></div>
-                <button class="clear-filters" id="clear-filters">Clear All</button>
-            </div>
-        </div>
         <div class="columns-split">
+
             <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle filters">☰ Filters</button>
+
             <aside class="sidebar-column" id="sidebar-column">
                 <div class="sidebar-content">
 
                     <!-- Mini search -->
-                    <form class="search-bar mini" id="browse-search-form" action="/browse" method="get">
+                    <form class="search-bar mini" id="search-form" action="/browse" method="get">
                         <input
                             type="search"
-                            id="browse-pg-search-bar"
+                            id="search-input"
                             name="q"
                             placeholder="Search ordinances..."
                             aria-label="Search within results"
@@ -215,16 +210,17 @@ require_once __DIR__ . '/../head.php';
                                 <span class="filter-block-chevron" aria-hidden="true">▾</span>
                             </button>
                             <div class="filter-block-panel" id="filter-panel-sort">
+                                <!-- ── Sort ────────────────────────────────────────────────── -->
                                 <select
                                     class="filter-select"
                                     id="filter-sort-by"
                                     name="sort_by"
                                     data-filter-key="sort_by"
                                     aria-label="Sort results by">
-                                    <option value="date_enacted">Date Enacted</option>
-                                    <option value="popularity">Popularity</option>
-                                    <option value="date_signed">Date Signed</option>
-                                    <option value="numerical">Numerically</option>
+                                    <option value="date_enacted" selected>Date Enacted</option>
+                                    <option value="series_year">Series Year</option>
+                                    <option value="title">Title (A–Z)</option>
+                                    <option value="created_at">Date Added</option>
                                 </select>
                                 <fieldset class="filter-radio-group" data-filter-key="sort_dir">
                                     <legend class="sr-only">Sort direction</legend>
@@ -270,268 +266,13 @@ require_once __DIR__ . '/../head.php';
     </main>
 
     <?php require_once __DIR__ . '/../footer.php'; ?>
-</body>
-<script>
-    // ============================================================
-    // SEARCH RESULTS INITIALIZATION
-    // ============================================================
-    const params = new URLSearchParams(window.location.search);
-    const query = params.get('q')?.trim();
-    const titleEl = document.querySelector('.results-header-title');
-    const searchInput = document.querySelector('form.search-bar.mini input[name="q"]');
 
-    if (query != '') {
-        if (titleEl) {
-            titleEl.textContent = `Search Results for "${query}"`;
-        }
-        if (searchInput) {
-            searchInput.value = query;
-        }
-        document.title = `${query} | EncycLawPhilia`;
-    } else {
-        if (titleEl) {
-            titleEl.textContent = 'Search Results';
-        }
-    }
+    <script src="js/sanitize.js"></script>
+    <script src="js/utils/pagination.js"></script>
+    <script src="js/components/sidebar.js"></script>
+    <script src="js/core/search-engine.js"></script>
 
-    // ============================================================
-    // SCROLL ANIMATIONS & STICKY HEADER
-    // ============================================================
-
-    // ============================================================
-    // SIDEBAR DRAWER (mobile)
-    // ============================================================
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const sidebarColumn = document.getElementById('sidebar-column');
-
-    sidebarToggle.addEventListener('click', () => {
-        sidebarColumn.classList.toggle('drawer-open');
-        sidebarToggle.classList.toggle('active');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!sidebarColumn.contains(e.target) && !sidebarToggle.contains(e.target)) {
-            sidebarColumn.classList.remove('drawer-open');
-            sidebarToggle.classList.remove('active');
-        }
-    });
-
-    // ============================================================
-    // COLLAPSIBLE FILTER BLOCKS
-    // ============================================================
-    document.querySelectorAll('.filter-block-toggle').forEach(toggle => {
-        toggle.addEventListener('click', () => {
-            const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
-            const panelId = toggle.getAttribute('aria-controls');
-            const panel = document.getElementById(panelId);
-
-            toggle.setAttribute('aria-expanded', String(!isExpanded));
-            panel.classList.toggle('is-collapsed', isExpanded);
-        });
-    });
-
-    // ============================================================
-    // CLEAR ALL FILTERS
-    // ============================================================
-    document.getElementById('filter-clear-all')?.addEventListener('click', () => {
-        // Selects
-        document.querySelectorAll('.filter-select').forEach(sel => sel.selectedIndex = 0);
-        // Date inputs
-        document.querySelectorAll('.filter-date-input').forEach(inp => inp.value = '');
-        // Checkboxes
-        document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
-        // Radios — reset to first in each group
-        document.querySelectorAll('.filter-radio-group').forEach(group => {
-            const first = group.querySelector('.filter-radio');
-            if (first) first.checked = true;
-        });
-        // Update active filters display if wired
-        updateActiveFilters?.();
-    });
-
-    // ============================================================
-    // ACTIVE FILTERS DISPLAY
-    // ============================================================
-    const activeFiltersContainer = document.getElementById('active-filters');
-    const filterChips = document.getElementById('filter-chips');
-
-    /**
-     * Collects all currently active filter states across every
-     * filter control in the sidebar and returns a flat array of
-     * { label, id, reset } descriptor objects.
-     */
-    function collectActiveFilters() {
-        const active = [];
-
-        // ── Category (single select) ─────────────────────────
-        const categoryEl = document.getElementById('filter-category');
-        if (categoryEl && categoryEl.value !== '') {
-            active.push({
-                label: categoryEl.options[categoryEl.selectedIndex].text,
-                id: 'category',
-                reset: () => {
-                    categoryEl.value = '';
-                }
-            });
-        }
-
-        // ── Date range ───────────────────────────────────────
-        const dateFrom = document.getElementById('filter-date-from');
-        const dateTo = document.getElementById('filter-date-to');
-        if (dateFrom && dateFrom.value) {
-            active.push({
-                label: `From ${dateFrom.value}`,
-                id: 'date_from',
-                reset: () => {
-                    dateFrom.value = '';
-                }
-            });
-        }
-        if (dateTo && dateTo.value) {
-            active.push({
-                label: `To ${dateTo.value}`,
-                id: 'date_to',
-                reset: () => {
-                    dateTo.value = '';
-                }
-            });
-        }
-
-        // ── Status (multi-checkbox) ──────────────────────────
-        document.querySelectorAll('#filter-status-group .filter-checkbox:checked').forEach(cb => {
-            active.push({
-                label: cb.value,
-                id: `status_${cb.value}`,
-                reset: () => {
-                    cb.checked = false;
-                }
-            });
-        });
-
-        // ── Content flags (multi-checkbox) ──────────────────
-        const flagLabels = {
-            has_summary: 'Has summary',
-            has_full_text: 'Has full text',
-            has_pdf: 'Has PDF file'
-        };
-        document.querySelectorAll('[data-filter-key^="has_"]:checked').forEach(cb => {
-            active.push({
-                label: flagLabels[cb.name] ?? cb.name,
-                id: `flag_${cb.name}`,
-                reset: () => {
-                    cb.checked = false;
-                }
-            });
-        });
-
-        // ── Sort (only surface when non-default) ────────────
-        const sortEl = document.getElementById('filter-sort-by');
-        const sortDir = document.querySelector('.filter-radio:checked');
-        const defaultSort = 'date_enacted';
-        const defaultDir = 'desc';
-        if (sortEl && (sortEl.value !== defaultSort || (sortDir && sortDir.value !== defaultDir))) {
-            const dirLabel = sortDir ? (sortDir.value === 'asc' ? '↑' : '↓') : '';
-            active.push({
-                label: `${sortEl.options[sortEl.selectedIndex].text} ${dirLabel}`.trim(),
-                id: 'sort',
-                reset: () => {
-                    sortEl.value = defaultSort;
-                    const descRadio = document.querySelector('.filter-radio[value="desc"]');
-                    if (descRadio) descRadio.checked = true;
-                }
-            });
-        }
-
-        return active;
-    }
-
-    function updateActiveFilters() {
-        const active = collectActiveFilters();
-
-        if (active.length > 0) {
-            activeFiltersContainer.style.display = 'block';
-            filterChips.innerHTML = active.map(f =>
-                `<span class="chip" data-filter="${f.id}">${f.label} ✕</span>`
-            ).join('');
-
-            // Bind removal to each chip's reset function
-            filterChips.querySelectorAll('.chip').forEach(chip => {
-                const descriptor = active.find(f => f.id === chip.dataset.filter);
-                chip.addEventListener('click', () => {
-                    descriptor?.reset();
-                    updateActiveFilters();
-                });
-            });
-        } else {
-            activeFiltersContainer.style.display = 'none';
-            filterChips.innerHTML = '';
-        }
-    }
-
-    // ── Attach change listeners to all filter controls ────────
-    document.getElementById('filter-category')
-        ?.addEventListener('change', updateActiveFilters);
-
-    document.getElementById('filter-date-from')
-        ?.addEventListener('change', updateActiveFilters);
-
-    document.getElementById('filter-date-to')
-        ?.addEventListener('change', updateActiveFilters);
-
-    document.querySelectorAll('#filter-status-group .filter-checkbox')
-        .forEach(cb => cb.addEventListener('change', updateActiveFilters));
-
-    document.querySelectorAll('[data-filter-key^="has_"]')
-        .forEach(cb => cb.addEventListener('change', updateActiveFilters));
-
-    document.getElementById('filter-sort-by')
-        ?.addEventListener('change', updateActiveFilters);
-
-    document.querySelectorAll('.filter-radio')
-        .forEach(r => r.addEventListener('change', updateActiveFilters));
-
-    // ── Clear-all wired to the new sidebar button ────────────
-    document.getElementById('filter-clear-all')
-        ?.addEventListener('click', () => {
-            collectActiveFilters().forEach(f => f.reset());
-            updateActiveFilters();
-        });
-
-    // ── Legacy clear-all button in the active-filters band ───
-    document.getElementById('clear-filters')
-        ?.addEventListener('click', () => {
-            collectActiveFilters().forEach(f => f.reset());
-            updateActiveFilters();
-        });
-
-    // ============================================================
-    // CARD ENTRANCE ANIMATIONS (Intersection Observer)
-    // ============================================================
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                // Add slight delay per card for staggered effect
-                setTimeout(() => {
-                    entry.target.classList.add('animate-in');
-                }, index * 50);
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    // Observe all content cards
-    document.querySelectorAll('.content-card').forEach(card => {
-        observer.observe(card);
-    });
-</script>
-<script src="js/browse-search.js"></script>
-
-</html>
+    <script src="js/pages/browse.js"></script>
 </body>
 
 </html>

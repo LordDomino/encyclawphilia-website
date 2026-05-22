@@ -127,14 +127,7 @@
    ADMIN DASHBOARD — MAIN PAGE SHELL
    ============================================================ */
 
-.admin-dashboard-page {
-    background-color: var(--bg-page);
-    padding: var(--sp-10) var(--page-side-margin);
-    padding-bottom: var(--sp-11);
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-7);
-}
+/* main.admin-dashboard-page { } */
 
 /* ============================================================
    ADMIN DASHBOARD — SECTION HEADER
@@ -260,6 +253,72 @@
     transform: translateY(calc(var(--sp-1) * -1));
 }
 
+/* ── Admin Browse Layout (Sidebar + Grid) ── */
+.admin-browse-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    margin-top: 1.5rem;
+}
+
+.admin-filter-sidebar {
+    flex: 0 0 280px;
+    /* Fixed width sidebar mimicking browse.php */
+    background: var(--surface-color, #ffffff);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    position: sticky;
+    top: 2rem;
+    /* Keeps filters in view while scrolling grid */
+}
+
+.admin-main-view {
+    flex: 1;
+    min-width: 0;
+    /* Prevents flex-child blowout on narrow screens */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Form Grouping inside Sidebar */
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-group:last-child {
+    margin-bottom: 0;
+}
+
+.filter-checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.filter-checkbox-list label {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+/* Responsive collapse for smaller admin screens */
+@media (max-width: 992px) {
+    .admin-browse-layout {
+        flex-direction: column;
+    }
+
+    .admin-filter-sidebar {
+        flex: 1 1 auto;
+        width: 100%;
+        position: static;
+    }
+}
+
 
 /* ============================================================
    ADMIN DASHBOARD — FILTER & SEARCH BAR
@@ -330,7 +389,7 @@
     gap: var(--sp-7);
     flex-wrap: wrap;
     padding: var(--sp-6) var(--sp-9);
-    margin: 0 calc(var(--sp-9) * -1);
+    margin: var(--sp-6) 0;
     background: linear-gradient(135deg,
             rgba(7, 30, 149, var(--op-08)) 0%,
             rgba(14, 0, 77, var(--op-05)) 100%);

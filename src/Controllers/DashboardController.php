@@ -156,38 +156,38 @@ class DashboardController
         }
     }
 
-    public function searchOrdinance(): void
-    {
-        session_start();
+    // public function searchOrdinance(): void
+    // {
+    //     session_start();
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            header('Location: /dashboard');
-            ApiResponse::send(
-                ApiResponse::error('Request method invalid.', 401),
-                401
-            );
-            exit;
-        }
+    //     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    //         header('Location: /dashboard');
+    //         ApiResponse::send(
+    //             ApiResponse::error('Request method invalid.', 401),
+    //             401
+    //         );
+    //         exit;
+    //     }
 
-        $query = trim($_GET['q'] ?? '');
+    //     $query = trim($_GET['q'] ?? '');
 
-        $result = $this->makeAdminSearchService()->search($query);
+    //     $result = $this->makeAdminSearchService()->search($query);
 
-        if ($result['ok']) {
-            ApiResponse::send(
-                ApiResponse::success(
-                    data: $result
-                ),
-                httpStatus: 200
-            );
-            exit;
-        }
+    //     if ($result['ok']) {
+    //         ApiResponse::send(
+    //             ApiResponse::success(
+    //                 data: $result
+    //             ),
+    //             httpStatus: 200
+    //         );
+    //         exit;
+    //     }
 
-        header('Location: /dashboard');
-        ApiResponse::send(
-            ApiResponse::error('Search failed', 401),
-            401
-        );
-        exit;
-    }
+    //     header('Location: /dashboard');
+    //     ApiResponse::send(
+    //         ApiResponse::error('Search failed', 401),
+    //         401
+    //     );
+    //     exit;
+    // }
 }

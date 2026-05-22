@@ -57,249 +57,371 @@ require_once VIEWS_ROOT . '/head.php';
     data-is-admin="<?php echo $_SESSION['is_admin'] ? '1' : '0'; ?>">
 
     <?php require_once VIEWS_ROOT . '/header.php'; ?>
-    <!-- ================================================================
-         SUBHERO
-    ================================================================ -->
-    <div class="subhero admin-subhero">
-        <div class="subhero-content">
-            <nav class="breadcrumb" aria-label="Breadcrumb">
-                <a href="/home">Home</a>
-                <span class="separator" aria-hidden="true">›</span>
-                <span aria-current="page">Admin Dashboard</span>
-            </nav>
-            <div class="admin-subhero-meta">
-                <div>
-                    <h1>Admin Dashboard</h1>
-                    <p class="admin-subhero-greeting">
-                        Welcome back, <strong><?php echo $sessionUsername; ?></strong>
-                        — <?php echo $_SESSION['is_admin'] ? 'Super Administrator' : 'Moderator'; ?>
-                    </p>
-                </div>
-                <?php if ($_SESSION['is_admin']): ?>
-                    <span class="status-badge passed status-badge--hero admin-role-indicator">
-                        Super Admin
-                    </span>
-                <?php else: ?>
-                    <span class="status-badge in-progress status-badge--hero admin-role-indicator">
-                        Moderator
-                    </span>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================================================================
-         STATS OVERVIEW ROW
-    ================================================================ -->
-    <div class="admin-stats-band" aria-label="Platform overview statistics">
-        <div class="admin-stats-inner">
-
-            <div class="admin-stat-card">
-                <span class="admin-stat-icon" aria-hidden="true">📋</span>
-                <div class="admin-stat-body">
-                    <span class="admin-stat-value"><?php echo number_format($stats['total_ordinances']); ?></span>
-                    <span class="admin-stat-label">Total Ordinances</span>
-                </div>
-            </div>
-
-            <div class="admin-stat-card admin-stat-card--warn">
-                <span class="admin-stat-icon" aria-hidden="true">⏳</span>
-                <div class="admin-stat-body">
-                    <span class="admin-stat-value"><?php echo number_format($stats['pending']); ?></span>
-                    <span class="admin-stat-label">Pending Review</span>
-                </div>
-            </div>
-
-            <div class="admin-stat-card admin-stat-card--ok">
-                <span class="admin-stat-icon" aria-hidden="true">✅</span>
-                <div class="admin-stat-body">
-                    <span class="admin-stat-value"><?php echo number_format($stats['active']); ?></span>
-                    <span class="admin-stat-label">Active</span>
-                </div>
-            </div>
-
-            <div class="admin-stat-card admin-stat-card--muted">
-                <span class="admin-stat-icon" aria-hidden="true">🗂️</span>
-                <div class="admin-stat-body">
-                    <span class="admin-stat-value"><?php echo number_format($stats['repealed']); ?></span>
-                    <span class="admin-stat-label">Repealed</span>
-                </div>
-            </div>
-
-            <div class="admin-stat-card">
-                <span class="admin-stat-icon" aria-hidden="true">👥</span>
-                <div class="admin-stat-body">
-                    <span class="admin-stat-value"><?php echo number_format($stats['total_users']); ?></span>
-                    <span class="admin-stat-label">Registered Users</span>
-                </div>
-            </div>
-
-            <div class="admin-stat-card">
-                <span class="admin-stat-icon" aria-hidden="true">💬</span>
-                <div class="admin-stat-body">
-                    <span class="admin-stat-value"><?php echo number_format($stats['total_comments']); ?></span>
-                    <span class="admin-stat-label">Comments</span>
-                </div>
-            </div>
-
-        </div>
-    </div>
 
     <main class="admin-dashboard-page">
         <!-- ================================================================
-             SECTION HEADER
+             SUBHERO
         ================================================================ -->
-        <div class="admin-section-header">
-            <div class="admin-section-title-group">
-                <h2 class="admin-section-title">Ordinance Records</h2>
-                <!-- Section count: JS will overwrite this once cards load -->
-                <span class="admin-section-count" id="admin-record-count">
-                    Loading…
-                </span>
-            </div>
-            <div class="admin-section-actions">
-                <?php if ($_SESSION['is_admin']): ?>
-                    <a href="/add-ordinance" class="admin-btn admin-btn--primary">
-                        + Add Ordinance
-                    </a>
-                <?php endif; ?>
-                <button class="admin-btn admin-btn--ghost" id="admin-refresh-btn" type="button"
-                    aria-label="Refresh records">
-                    ↻ Refresh
-                </button>
+        <div class="subhero admin-subhero">
+            <div class="subhero-content">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="/home">Home</a>
+                    <span class="separator" aria-hidden="true">›</span>
+                    <span aria-current="page">Admin Dashboard</span>
+                </nav>
+                <div class="admin-subhero-meta">
+                    <div>
+                        <h1>Admin Dashboard</h1>
+                        <p class="admin-subhero-greeting">
+                            Welcome back, <strong><?php echo $sessionUsername; ?></strong>
+                            — <?php echo $_SESSION['is_admin'] ? 'Super Administrator' : 'Moderator'; ?>
+                        </p>
+                    </div>
+                    <?php if ($_SESSION['is_admin']): ?>
+                        <span class="status-badge passed status-badge--hero admin-role-indicator">
+                            Super Admin
+                        </span>
+                    <?php else: ?>
+                        <span class="status-badge in-progress status-badge--hero admin-role-indicator">
+                            Moderator
+                        </span>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 
+        <!-- ================================================================
+             STATS OVERVIEW ROW
+        ================================================================ -->
+        <div class="admin-stats-band" aria-label="Platform overview statistics">
+            <div class="admin-stats-inner">
+
+                <div class="admin-stat-card">
+                    <span class="admin-stat-icon" aria-hidden="true">📋</span>
+                    <div class="admin-stat-body">
+                        <span class="admin-stat-value"><?php echo number_format($stats['total_ordinances']); ?></span>
+                        <span class="admin-stat-label">Total Ordinances</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card admin-stat-card--warn">
+                    <span class="admin-stat-icon" aria-hidden="true">⏳</span>
+                    <div class="admin-stat-body">
+                        <span class="admin-stat-value"><?php echo number_format($stats['pending']); ?></span>
+                        <span class="admin-stat-label">Pending Review</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card admin-stat-card--ok">
+                    <span class="admin-stat-icon" aria-hidden="true">✅</span>
+                    <div class="admin-stat-body">
+                        <span class="admin-stat-value"><?php echo number_format($stats['active']); ?></span>
+                        <span class="admin-stat-label">Active</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card admin-stat-card--muted">
+                    <span class="admin-stat-icon" aria-hidden="true">🗂️</span>
+                    <div class="admin-stat-body">
+                        <span class="admin-stat-value"><?php echo number_format($stats['repealed']); ?></span>
+                        <span class="admin-stat-label">Repealed</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <span class="admin-stat-icon" aria-hidden="true">👥</span>
+                    <div class="admin-stat-body">
+                        <span class="admin-stat-value"><?php echo number_format($stats['total_users']); ?></span>
+                        <span class="admin-stat-label">Registered Users</span>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <span class="admin-stat-icon" aria-hidden="true">💬</span>
+                    <div class="admin-stat-body">
+                        <span class="admin-stat-value"><?php echo number_format($stats['total_comments']); ?></span>
+                        <span class="admin-stat-label">Comments</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
         <!-- ================================================================
              FILTER & SEARCH BAR
         ================================================================ -->
-        <div class="admin-controls-row" role="search">
+        <div class="columns-split">
 
-            <form class="search-bar mini admin-search-form" action="/admin/ordinances" method="GET"
-                aria-label="Search ordinances" id="search-form">
-                <input
-                    type="search"
-                    name="q"
-                    id="search-input"
-                    placeholder="Search by title or ordinance number..."
-                    autocomplete="off"
-                    inputmode="search"
-                    aria-label="Search ordinances" />
-            </form>
+            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle filters">☰ Filters</button>
 
-            <div class="admin-filter-row" role="group" aria-label="Filter controls">
+            <aside class="sidebar-column" id="sidebar-column">
+                <div class="sidebar-content">
 
-                <div class="admin-filter-group">
-                    <label for="filter-status" class="admin-filter-label">Status</label>
-                    <select id="filter-status" class="admin-filter-select" aria-label="Filter by status">
-                        <option value="">All Statuses</option>
-                        <option value="pending">Pending</option>
-                        <option value="active">Active</option>
-                        <option value="repealed">Repealed</option>
-                        <option value="amended">Amended</option>
-                    </select>
+                    <form class="search-bar mini" id="search-form" action="/api/ordinances/search" method="GET">
+                        <input
+                            type="search"
+                            id="search-input"
+                            name="q"
+                            placeholder="Search ordinances..."
+                            aria-label="Search within results"
+                            autocomplete="off"
+                            inputmode="search" />
+                        <button type="submit" class="search-submit-btn" aria-label="Search">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </form>
+
+                    <div class="filter-sidebar-header">
+                        <h2 class="filter-sidebar-title">Filters</h2>
+                        <button class="filter-clear-all" id="filter-clear-all" type="button" aria-label="Clear all filters">
+                            Clear all
+                        </button>
+                    </div>
+
+                    <div class="filter-sidebar-body" id="filter-sidebar-body">
+
+                        <!-- ── Category ────────────────────────────────── -->
+                        <div class="filter-block" id="filter-block-category">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-category">
+                                <span class="filter-block-label">Category</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-category">
+                                <select
+                                    class="filter-select"
+                                    id="filter-category"
+                                    name="category"
+                                    data-filter-key="category_id"
+                                    aria-label="Filter by category">
+                                    <option value="">All Categories</option>
+                                    <!-- JS-injectable: <option value="{category_id}">{category_name}</option> -->
+                                    <option value="1">Health</option>
+                                    <option value="2">Education</option>
+                                    <option value="3">Environment</option>
+                                    <option value="4">Public Safety</option>
+                                    <option value="5">Infrastructure</option>
+                                    <option value="6">Taxation</option>
+                                    <option value="7">Social Welfare</option>
+                                    <option value="8">Youth Affairs</option>
+                                    <option value="9">Sports and Recreation</option>
+                                    <option value="10">Cultural Heritage</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- ── Date range ──────────────────────────────── -->
+                        <div class="filter-block" id="filter-block-date">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-date">
+                                <span class="filter-block-label">Date Enacted</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-date">
+                                <div class="filter-date-range">
+                                    <div class="filter-date-field">
+                                        <label class="filter-date-label" for="filter-date-from">From</label>
+                                        <input
+                                            type="date"
+                                            class="filter-date-input"
+                                            id="filter-date-from"
+                                            name="date_from"
+                                            data-filter-key="date_from"
+                                            aria-label="Date enacted from" />
+                                    </div>
+                                    <span class="filter-date-separator" aria-hidden="true">—</span>
+                                    <div class="filter-date-field">
+                                        <label class="filter-date-label" for="filter-date-to">To</label>
+                                        <input
+                                            type="date"
+                                            class="filter-date-input"
+                                            id="filter-date-to"
+                                            name="date_to"
+                                            data-filter-key="date_to"
+                                            aria-label="Date enacted to" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ── Status ──────────────────────────────────── -->
+                        <div class="filter-block" id="filter-block-status">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-status">
+                                <span class="filter-block-label">Status</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-status">
+                                <fieldset class="filter-checkbox-group" id="filter-status-group" data-filter-key="status">
+                                    <legend class="sr-only">Filter by status</legend>
+                                    <!-- JS-injectable: statuses can be added/removed here -->
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Active" data-status-key="Active" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Active</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Pending" data-status-key="Pending" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Pending</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Repealed" data-status-key="Repealed" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Repealed</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="status[]" value="Amended" data-status-key="Amended" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Amended</span>
+                                    </label>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                        <!-- ── Content flags ───────────────────────────── -->
+                        <div class="filter-block" id="filter-block-flags">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-flags">
+                                <span class="filter-block-label">Content</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-flags">
+                                <fieldset class="filter-checkbox-group" data-filter-key="content_flags">
+                                    <legend class="sr-only">Filter by content availability</legend>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="has_summary" value="1" data-filter-key="has_summary" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Has summary</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="has_full_text" value="1" data-filter-key="has_full_text" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Has full text</span>
+                                    </label>
+                                    <label class="filter-checkbox-item">
+                                        <input type="checkbox" class="filter-checkbox" name="has_pdf" value="1" data-filter-key="has_pdf" />
+                                        <span class="filter-checkbox-mark" aria-hidden="true"></span>
+                                        <span class="filter-checkbox-text">Has PDF file</span>
+                                    </label>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                        <!-- ── Sort ────────────────────────────────────── -->
+                        <div class="filter-block" id="filter-block-sort">
+                            <button
+                                class="filter-block-toggle"
+                                type="button"
+                                aria-expanded="true"
+                                aria-controls="filter-panel-sort">
+                                <span class="filter-block-label">Sort By</span>
+                                <span class="filter-block-chevron" aria-hidden="true">▾</span>
+                            </button>
+                            <div class="filter-block-panel" id="filter-panel-sort">
+                                <!-- ── Sort ────────────────────────────────────────────────── -->
+                                <select
+                                    class="filter-select"
+                                    id="filter-sort-by"
+                                    name="sort_by"
+                                    data-filter-key="sort_by"
+                                    aria-label="Sort results by">
+                                    <option value="date_enacted" selected>Date Enacted</option>
+                                    <option value="series_year">Series Year</option>
+                                    <option value="title">Title (A–Z)</option>
+                                    <option value="created_at">Date Added</option>
+                                </select>
+                                <fieldset class="filter-radio-group" data-filter-key="sort_dir">
+                                    <legend class="sr-only">Sort direction</legend>
+                                    <label class="filter-radio-item">
+                                        <input type="radio" class="filter-radio" name="sort_dir" value="desc" data-filter-key="sort_dir" checked />
+                                        <span class="filter-radio-mark" aria-hidden="true"></span>
+                                        <span class="filter-radio-text">Descending</span>
+                                    </label>
+                                    <label class="filter-radio-item">
+                                        <input type="radio" class="filter-radio" name="sort_dir" value="asc" data-filter-key="sort_dir" />
+                                        <span class="filter-radio-mark" aria-hidden="true"></span>
+                                        <span class="filter-radio-text">Ascending</span>
+                                    </label>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                    </div><!-- /.filter-sidebar-body -->
+                </div>
+            </aside>
+            <section class="results-content" id="admin-results-section">
+
+                <div class="results-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+                    <div class="results-header-left">
+                        <h2 class="results-header-title">Ordinance Management</h2>
+                        <span class="result-count" id="result-count">Loading...</span>
+                    </div>
+
+                    <div class="admin-section-actions" style="display: flex; gap: 0.5rem;">
+                        <?php if ($_SESSION['is_admin']): ?>
+                            <a href="/add-ordinance" class="admin-btn admin-btn--primary">
+                                + Add Ordinance
+                            </a>
+                        <?php endif; ?>
+                        <button class="admin-btn admin-btn--ghost" id="admin-refresh-btn" type="button" aria-label="Refresh records">
+                            ↻ Refresh
+                        </button>
+                    </div>
                 </div>
 
-                <div class="admin-filter-group">
-                    <label for="filter-category" class="admin-filter-label">Category</label>
-                    <select id="filter-category" class="admin-filter-select" aria-label="Filter by category">
-                        <option value="">All Categories</option>
-                        <option value="traffic">Traffic &amp; Transportation</option>
-                        <option value="health">Health &amp; Sanitation</option>
-                        <option value="safety">Public Safety</option>
-                        <option value="environment">Environment &amp; Zoning</option>
-                        <option value="education">Education</option>
-                    </select>
+                <nav class="pagination-bar" id="pagination-bar-top" aria-label="Pagination top">
+                </nav>
+
+
+                <!-- Bulk Action Toolbar -->
+                <div class="admin-bulk-toolbar" id="admin-bulk-toolbar" role="toolbar" aria-label="Bulk actions" aria-hidden="true">
+                    <div class="admin-bulk-toolbar-left">
+                        <label class="admin-checkbox-wrapper admin-select-all-wrap" for="select-all-ordinances">
+                            <input type="checkbox" id="select-all-ordinances" class="admin-checkbox" aria-label="Select all" />
+                            <span class="admin-checkbox-label">Select All</span>
+                        </label>
+                        <span class="admin-bulk-count" id="bulk-selected-count">0 selected</span>
+                    </div>
+
+                    <div class="admin-bulk-toolbar-actions">
+                        <div class="admin-bulk-action-group">
+                            <select id="bulk-status-select" class="admin-filter-select">
+                                <option value="">— Pick status —</option>
+                                <option value="active">Set Active</option>
+                                <option value="pending">Set Pending</option>
+                                <option value="repealed">Set Repealed</option>
+                                <option value="amended">Set Amended</option>
+                            </select>
+                        </div>
+                        <button class="admin-btn admin-btn--action" id="bulk-apply-status" type="button" disabled>Apply</button>
+                        <span class="admin-bulk-divider" aria-hidden="true"></span>
+                        <button class="admin-btn admin-btn--danger" id="bulk-archive-btn" type="button" disabled>🗂 Archive</button>
+                        <button class="admin-btn admin-btn--ghost admin-bulk-clear" id="bulk-clear-btn" type="button">✕ Clear</button>
+                    </div>
                 </div>
 
-                <div class="admin-filter-group">
-                    <label for="filter-year" class="admin-filter-label">Series Year</label>
-                    <select id="filter-year" class="admin-filter-select" aria-label="Filter by year">
-                        <option value="">All Years</option>
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                    </select>
+                <div class="admin-content-grid" id="results-grid">
                 </div>
 
-                <div class="admin-filter-group">
-                    <label for="filter-completeness" class="admin-filter-label">Record State</label>
-                    <select id="filter-completeness" class="admin-filter-select" aria-label="Filter by record completeness">
-                        <option value="">All Records</option>
-                        <option value="incomplete">Incomplete</option>
-                        <option value="complete">Complete</option>
-                    </select>
-                </div>
+                <nav class="pagination-bar" id="pagination-bar-bottom" aria-label="Pagination bottom" style="margin-top: 1.5rem;">
+                </nav>
 
-            </div>
-
+            </section>
         </div>
-
-        <!-- ================================================================
-             BULK ACTION TOOLBAR (shown only when cards are selected)
-        ================================================================ -->
-        <div class="admin-bulk-toolbar" id="admin-bulk-toolbar" role="toolbar"
-            aria-label="Bulk actions" aria-hidden="true">
-
-            <div class="admin-bulk-toolbar-left">
-                <label class="admin-checkbox-wrapper admin-select-all-wrap" for="select-all-ordinances">
-                    <input
-                        type="checkbox"
-                        id="select-all-ordinances"
-                        class="admin-checkbox"
-                        aria-label="Select all visible records" />
-                    <span class="admin-checkbox-label">Select All</span>
-                </label>
-                <span class="admin-bulk-count" id="bulk-selected-count" aria-live="polite">
-                    0 selected
-                </span>
-            </div>
-
-            <div class="admin-bulk-toolbar-actions">
-
-                <div class="admin-bulk-action-group">
-                    <label for="bulk-status-select" class="admin-filter-label">
-                        Change Status
-                    </label>
-                    <select id="bulk-status-select" class="admin-filter-select"
-                        aria-label="Change status of selected records">
-                        <option value="">— Pick status —</option>
-                        <option value="active">Set Active</option>
-                        <option value="pending">Set Pending</option>
-                        <option value="repealed">Set Repealed</option>
-                        <option value="amended">Set Amended</option>
-                    </select>
-                </div>
-
-                <button class="admin-btn admin-btn--action" id="bulk-apply-status"
-                    type="button" disabled aria-label="Apply status change to selected records">
-                    Apply
-                </button>
-
-                <span class="admin-bulk-divider" aria-hidden="true"></span>
-
-                <button class="admin-btn admin-btn--danger" id="bulk-archive-btn"
-                    type="button" disabled aria-label="Archive selected records">
-                    🗂 Archive Selected
-                </button>
-
-                <button class="admin-btn admin-btn--ghost admin-bulk-clear"
-                    id="bulk-clear-btn" type="button" aria-label="Clear selection">
-                    ✕ Clear
-                </button>
-
-            </div>
-
-        </div>
-
-        <!-- ================================================================
-             ORDINANCE MODERATION GRID
-        ================================================================ -->
-        <section class="admin-grid-section" aria-labelledby="admin-section-title">
-            <div class="admin-content-grid" id="admin-content-grid">
-                <!-- Populated by admin-search.js -->
-            </div>
-        </section>
 
         <!-- ================================================================
              ARCHIVE CONFIRMATION MODAL
@@ -359,235 +481,12 @@ require_once VIEWS_ROOT . '/head.php';
 
     <?php require_once __DIR__ . '/../footer.php'; ?>
 
-    <!-- ================================================================
-         ADMIN DASHBOARD SCRIPTS
-    ================================================================ -->
-    <script>
-        // ============================================================
-        // BULK SELECTION STATE MACHINE
-        // ============================================================
-        const toolbar = document.getElementById('admin-bulk-toolbar');
-        const selectAllCb = document.getElementById('select-all-ordinances');
-        const bulkCount = document.getElementById('bulk-selected-count');
-        const bulkApplyBtn = document.getElementById('bulk-apply-status');
-        const bulkArchiveBtn = document.getElementById('bulk-archive-btn');
-        const bulkClearBtn = document.getElementById('bulk-clear-btn');
-
-        function getCardCheckboxes() {
-            return [...document.querySelectorAll('.admin-card-checkbox')];
-        }
-
-        function updateBulkToolbar() {
-            const all = getCardCheckboxes();
-            const selected = all.filter(cb => cb.checked);
-            const count = selected.length;
-
-            bulkCount.textContent = `${count} selected`;
-
-            if (count > 0) {
-                toolbar.classList.add('is-active');
-                toolbar.setAttribute('aria-hidden', 'false');
-                bulkArchiveBtn.disabled = false;
-            } else {
-                toolbar.classList.remove('is-active');
-                toolbar.setAttribute('aria-hidden', 'true');
-                bulkArchiveBtn.disabled = true;
-            }
-
-            const statusPick = document.getElementById('bulk-status-select');
-            bulkApplyBtn.disabled = (count === 0 || !statusPick.value);
-
-            selectAllCb.indeterminate = (count > 0 && count < all.length);
-            selectAllCb.checked = (count === all.length && all.length > 0);
-        }
-
-        selectAllCb.addEventListener('change', () => {
-            getCardCheckboxes().forEach(cb => {
-                cb.checked = selectAllCb.checked;
-                cb.closest('.admin-content-card')
-                    ?.classList.toggle('admin-content-card--selected', selectAllCb.checked);
-            });
-            updateBulkToolbar();
-        });
-
-        document.getElementById('bulk-status-select')
-            .addEventListener('change', updateBulkToolbar);
-
-        bulkClearBtn.addEventListener('click', () => {
-            getCardCheckboxes().forEach(cb => {
-                cb.checked = false;
-                cb.closest('.admin-content-card')
-                    ?.classList.remove('admin-content-card--selected');
-            });
-            selectAllCb.checked = false;
-            selectAllCb.indeterminate = false;
-            updateBulkToolbar();
-        });
-
-        bulkApplyBtn.addEventListener('click', () => {
-            const ids = getCardCheckboxes().filter(cb => cb.checked).map(cb => cb.dataset.id);
-            const status = document.getElementById('bulk-status-select').value;
-            // TODO: POST /admin/ordinances/bulk-status { ids, status }
-            console.log('[TODO] Bulk status →', status, 'IDs:', ids);
-        });
-
-        bulkArchiveBtn.addEventListener('click', () => {
-            const ids = getCardCheckboxes().filter(cb => cb.checked).map(cb => cb.dataset.id);
-            // Surface the modal with a generic multi-record label
-            openArchiveModal(ids.join(', '), `${ids.length} selected record(s)`);
-        });
-
-
-        // ============================================================
-        // PER-CARD CHECKBOX → SELECTION STATE  (Batch 3)
-        // ============================================================
-        document.getElementById('admin-content-grid')
-            ?.addEventListener('change', (e) => {
-                if (!e.target.matches('.admin-card-checkbox')) return;
-                e.target
-                    .closest('.admin-content-card')
-                    ?.classList.toggle('admin-content-card--selected', e.target.checked);
-                updateBulkToolbar();
-            });
-
-
-        // ============================================================
-        // PER-CARD ACTION DROPDOWN  (Batch 3)
-        // ============================================================
-        function closeAllDropdowns(except = null) {
-            document.querySelectorAll('.admin-card-action-dropdown').forEach(dd => {
-                if (dd === except) return;
-                dd.classList.remove('is-open');
-                dd.previousElementSibling?.setAttribute('aria-expanded', 'false');
-            });
-        }
-
-        document.addEventListener('click', (e) => {
-            const trigger = e.target.closest('.admin-card-action-trigger');
-            if (trigger) {
-                const dropdown = trigger.nextElementSibling;
-                const isOpen = dropdown.classList.contains('is-open');
-                closeAllDropdowns();
-                dropdown.classList.toggle('is-open', !isOpen);
-                trigger.setAttribute('aria-expanded', String(!isOpen));
-                return;
-            }
-            if (!e.target.closest('.admin-card-action-menu')) {
-                closeAllDropdowns();
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeAllDropdowns();
-                closeArchiveModal();
-            }
-        });
-
-
-        // ============================================================
-        // ARCHIVE MODAL
-        // ============================================================
-        const archiveModal = document.getElementById('admin-archive-modal');
-        const archiveModalTarget = document.getElementById('archive-modal-target');
-        const archiveConfirmBtn = document.getElementById('archive-modal-confirm');
-        const archiveCloseBtn = document.getElementById('archive-modal-close');
-        const archiveCancelBtn = document.getElementById('archive-modal-cancel');
-
-        function openArchiveModal(id, label) {
-            archiveModalTarget.textContent = label;
-            archiveConfirmBtn.dataset.id = id;
-            archiveModal.classList.add('active');
-            archiveCloseBtn.focus();
-        }
-
-        function closeArchiveModal() {
-            archiveModal.classList.remove('active');
-        }
-
-        // Single-card trigger (from per-card dropdown)
-        document.addEventListener('click', (e) => {
-            const btn = e.target.closest('.admin-archive-trigger');
-            if (!btn) return;
-            closeAllDropdowns();
-            const id = btn.dataset.id;
-            const number = btn.dataset.number;
-            openArchiveModal(id, `City Ordinance No. ${number}`);
-        });
-
-        archiveCloseBtn.addEventListener('click', closeArchiveModal);
-        archiveCancelBtn.addEventListener('click', closeArchiveModal);
-
-        archiveModal.addEventListener('click', (e) => {
-            if (e.target === archiveModal) closeArchiveModal();
-        });
-
-        archiveConfirmBtn.addEventListener('click', () => {
-            const id = archiveConfirmBtn.dataset.id;
-            // TODO: POST /admin/ordinances/archive { id }
-            console.log('[TODO] Archive ordinance id(s):', id);
-            closeArchiveModal();
-        });
-
-
-        // ============================================================
-        // FILTER CONTROLS — client-side card filtering  (Batch 3)
-        // ============================================================
-        const filterStatus = document.getElementById('filter-status');
-        const filterCategory = document.getElementById('filter-category');
-        const filterYear = document.getElementById('filter-year');
-        const filterCompleteness = document.getElementById('filter-completeness');
-        const recordCountEl = document.getElementById('admin-record-count');
-        const adminSearchInput = document.getElementById('admin-search-input');
-
-        function applyFilters() {
-            const status = filterStatus.value.toLowerCase();
-            const year = filterYear.value;
-            const completeness = filterCompleteness.value;
-
-            let visible = 0;
-
-            document.querySelectorAll('.admin-content-card').forEach(card => {
-                const cardStatus = card.dataset.status?.toLowerCase() ?? '';
-                const cardYear = card.querySelector('.date-year')?.textContent?.trim() ?? '';
-                const cardIncomplete = card.classList.contains('admin-content-card--incomplete');
-
-                const statusMatch = !status || cardStatus === status;
-                const yearMatch = !year || cardYear === year;
-                const compMatch = !completeness ||
-                    (completeness === 'incomplete' && cardIncomplete) ||
-                    (completeness === 'complete' && !cardIncomplete);
-
-                const show = statusMatch && yearMatch && compMatch;
-                card.style.display = show ? '' : 'none';
-                if (show) visible++;
-            });
-
-            if (recordCountEl) {
-                recordCountEl.textContent = `${visible} record${visible !== 1 ? 's' : ''}`;
-            }
-
-            document.querySelectorAll('.admin-content-card').forEach(card => {
-                if (card.style.display === 'none') {
-                    const cb = card.querySelector('.admin-card-checkbox');
-                    if (cb) cb.checked = false;
-                    card.classList.remove('admin-content-card--selected');
-                }
-            });
-            updateBulkToolbar();
-        }
-
-        [filterStatus, filterCategory, filterYear, filterCompleteness]
-        .forEach(el => el?.addEventListener('change', applyFilters));
-
-        // Live search on the admin search input
-        // adminSearchInput?.addEventListener('input', applyFilters);
-    </script>
-
     <script src="js/sanitize.js"></script>
-    <script src="js/admin-search.js"></script>
-    <script src="js/admin-dashboard.js"></script>
+    <script src="js/utils/pagination.js"></script>
+    <script src="js/components/sidebar.js"></script>
+    <script src="js/core/search-engine.js"></script>
 
+    <script src="js/pages/admin-dashboard.js"></script>
 </body>
 
 </html>

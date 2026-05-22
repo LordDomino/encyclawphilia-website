@@ -50,7 +50,6 @@ $router->get('/ordinance', 'PagesNavigationController@ordinance');
 $router->get('/account', 'PagesNavigationController@account');
 $router->get('/dashboard', 'PagesNavigationController@adminDashboard'); // Only for administrator role
 
-$router->get('/admin/ordinances', 'DashboardController@searchOrdinance');
 
 $router->post('/login-submit', 'AuthController@handleLoginSubmit');
 $router->get('/logout-submit', 'AuthController@handleLogoutSubmit');
@@ -65,6 +64,7 @@ $router->get('/edit-ordinance', 'DashboardController@editOrdinance');
 
 $router->post('/store-ordinance', 'DashboardController@storeOrdinance');
 
+// $router->get('/api/ordinances/search', 'DashboardController@searchOrdinance');
 $router->get('/api/ordinances/search', 'OrdinanceApiController@search');
 $router->get('/api/ordinances/meta',   'OrdinanceApiController@meta');
 
