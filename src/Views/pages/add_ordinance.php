@@ -253,7 +253,7 @@ require_once __DIR__ . '/../head.php';
                                 class="add-ord-textarea add-ord-textarea--title"
                                 placeholder="AN ORDINANCE …"
                                 rows="3"
-                                maxlength="255"
+                                maxlength="1000"
                                 required
                                 aria-describedby="title-hint title-char-count"></textarea>
                             <div class="add-ord-textarea-footer">
@@ -261,7 +261,7 @@ require_once __DIR__ . '/../head.php';
                                     Full official title of the ordinance. Max 255 characters.
                                 </span>
                                 <span class="add-ord-char-count" id="title-char-count" aria-live="polite">
-                                    0 / 255
+                                    0 / 1000
                                 </span>
                             </div>
                         </div>
@@ -278,11 +278,11 @@ require_once __DIR__ . '/../head.php';
                                 name="author_sponsor"
                                 class="add-ord-input"
                                 placeholder="e.g. Hon. Juan dela Cruz"
-                                maxlength="150"
+                                maxlength="500"
                                 required
                                 aria-describedby="sponsor-hint" />
                             <span class="add-ord-field-hint" id="sponsor-hint">
-                                Legislator(s) who authored this ordinance. Max 150 characters.
+                                Legislator(s) who authored this ordinance. Max 500 characters.
                             </span>
                         </div>
 

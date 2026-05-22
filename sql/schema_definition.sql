@@ -160,8 +160,8 @@ CREATE TABLE Categories (
 CREATE TABLE Ordinances (
     ordinance_id        INT             NOT NULL AUTO_INCREMENT,
     ordinance_number    VARCHAR(50)     NOT NULL,
-    title               VARCHAR(255)    NOT NULL,
-    author_sponsor      VARCHAR(150)    NOT NULL,
+    title               TEXT            NOT NULL,
+    author_sponsor      TEXT            NOT NULL,
     series_year         VARCHAR(10)     NOT NULL,
     category_id         INT                 NULL,   -- mutable; exempt from write-once
     barangay_id         INT                 NULL,   -- write-once-after-null; see above
