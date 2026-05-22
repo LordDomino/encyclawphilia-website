@@ -18,6 +18,20 @@ $ordinanceModel = new \App\Models\OrdinanceModel($pdo);
 $featured_ordinance = $ordinanceModel->getTrending();
 $results_latest = $ordinanceModel->get20RecentOrdinances();
 
+// Fetch the full record for the featured card (richer metadata)
+$featured_detail = null;
+if ($featured_ordinance !== null) {
+    $featured_detail = $ordinanceModel->getOrdinanceById($featured_ordinance['ordinance_id']);
+}
+
+// Status → CSS badge class map (mirrors ordinance.php)
+$featured_status_class = [
+    'Active'   => 'passed',
+    'Pending'  => 'pending',
+    'Repealed' => 'rejected',
+    'Amended'  => 'in-progress',
+];
+
 // Phase 3: HTML Presentation
 $pageTitle = "EncycLawPhilia Valenzuela";
 $currentPage = "home";
@@ -50,25 +64,91 @@ require_once __DIR__ . '/../head.php';
         <section class="dashboard" id="browse-latest">
             <div class="flex-column" id="featured">
                 <h2>Featured</h2>
-                <p>
-                    Honorable _____ signs City Ordinance No. 3750 s. 2026 for improving the quality education in the
-                    Pamantasan ng Lungsod ng Valenzuela.
-                </p>
-                <div class="card-featured">
-                    <div class="card-title">City Ordinance<br /><span class="numeral-and-series">
-                            No. <?php echo htmlspecialchars($featured_ordinance['ordinance_number'], ENT_QUOTES, 'UTF-8'); ?>
-                            s. <?php echo htmlspecialchars($featured_ordinance['series_year'], ENT_QUOTES, 'UTF-8'); ?>
-                        </span>
-                    </div>
-                    <div class="date">
-                        <?php echo htmlspecialchars($featured_ordinance['date_enacted_fmt'], ENT_QUOTES, 'UTF-8'); ?>
-                    </div>
-                    <div class="preview-container">
-                        <div class="preview-text">
-                            <?php echo htmlspecialchars($featured_ordinance['title'], ENT_QUOTES, 'UTF-8'); ?>
+                <?php if ($featured_detail): ?>
+                    <?php
+                    $f_status_cls = $featured_status_class[$featured_detail['status']] ?? 'pending';
+                    $f_like_count    = (int)($featured_detail['like_count']    ?? 0);
+                    $f_dislike_count = (int)($featured_detail['dislike_count'] ?? 0);
+                    $f_total         = $f_like_count + $f_dislike_count;
+                    $f_like_pct      = $f_total > 0 ? round(($f_like_count / $f_total) * 100) : 50;
+                    ?>
+                    <div class="card-featured">
+
+                        <!-- Top bar: label + status -->
+                        <div class="card-featured-topbar">
+                            <span class="card-type">City Ordinance</span>
+                            <span class="status-badge <?php echo htmlspecialchars($f_status_cls, ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo htmlspecialchars($featured_detail['status'], ENT_QUOTES, 'UTF-8'); ?>
+                            </span>
                         </div>
+
+                        <!-- Ordinance number + decorative background numeral -->
+                        <div class="card-featured-numeral-wrap">
+                            <span class="card-featured-numeral-bg" aria-hidden="true">
+                                <?php echo htmlspecialchars($featured_detail['ordinance_number'], ENT_QUOTES, 'UTF-8'); ?>
+                            </span>
+                            <span class="numeral-and-series card-featured-numeral">
+                                No. <?php echo htmlspecialchars($featured_detail['ordinance_number'], ENT_QUOTES, 'UTF-8'); ?>
+                                <span class="series-year">s. <?php echo htmlspecialchars($featured_detail['series_year'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            </span>
+                        </div>
+
+                        <!-- Title -->
+                        <div class="preview-container">
+                            <div class="preview-text">
+                                <?php echo htmlspecialchars($featured_detail['title'], ENT_QUOTES, 'UTF-8'); ?>
+                            </div>
+                        </div>
+
+                        <!-- Author + Category -->
+                        <div class="card-featured-meta">
+                            <?php if (!empty($featured_detail['author_sponsor'])): ?>
+                                <span class="card-featured-meta-item">
+                                    <span class="card-featured-meta-icon" aria-hidden="true">🖊</span>
+                                    <?php echo htmlspecialchars($featured_detail['author_sponsor'], ENT_QUOTES, 'UTF-8'); ?>
+                                </span>
+                            <?php endif; ?>
+                            <?php if (!empty($featured_detail['category_name'])): ?>
+                                <span class="card-featured-meta-item">
+                                    <span class="card-featured-meta-icon" aria-hidden="true">🏷</span>
+                                    <?php echo htmlspecialchars($featured_detail['category_name'], ENT_QUOTES, 'UTF-8'); ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Footer: engagement + date -->
+                        <div class="card-footer card-featured-footer">
+                            <div class="card-engagement">
+                                <span class="engagement-item likes">
+                                    <span class="engagement-icon">▲</span>
+                                    <span class="engagement-count"><?php echo $f_like_count; ?></span>
+                                </span>
+                                <span class="engagement-divider"></span>
+                                <span class="engagement-item dislikes">
+                                    <span class="engagement-icon">▼</span>
+                                    <span class="engagement-count"><?php echo $f_dislike_count; ?></span>
+                                </span>
+                            </div>
+                            <?php if (!empty($featured_detail['enactment_day'])): ?>
+                                <div class="date card-featured-date">
+                                    <span class="date-day"><?php echo htmlspecialchars($featured_detail['enactment_day'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                    <div class="date-meta">
+                                        <span class="date-month"><?php echo htmlspecialchars($featured_detail['enactment_month'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <span class="date-year"><?php echo htmlspecialchars($featured_detail['enactment_year'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Reaction ratio bar -->
+                        <div class="card-featured-reaction-bar" title="<?php echo $f_like_pct; ?>% support" aria-hidden="true">
+                            <div class="card-featured-reaction-fill" style="width: <?php echo $f_like_pct; ?>%"></div>
+                        </div>
+
                     </div>
-                </div>
+                <?php else: ?>
+                    <p class="card-featured-empty">No featured ordinance available.</p>
+                <?php endif; ?>
                 <a href="/ordinance?id=<?= $featured_ordinance['ordinance_id'] ?>">
                     <p class="link">Read More</p>
                 </a>
@@ -145,170 +225,6 @@ require_once __DIR__ . '/../head.php';
             </div>
 
         </section>
-
-        <!-- <section class="dashboard" id="browse-category">
-            <h1>Browse by Category</h1>
-            <h2>Traffic and Transportation</h2>
-            <div class="carousel-wrapper">
-                <ul class="carousel">
-                    <li>
-                        <div class="content-card">
-                            <div class="content-card-header">
-                                <div class="card-label-group">
-                                    <span class="card-type">City Ordinance</span>
-                                    <span class="numeral-and-series">No. 3749 s. 2026</span>
-                                </div>
-                                <div class="date">
-                                    <span class="date-day">10</span>
-                                    <div class="date-meta">
-                                        <span class="date-month">April</span>
-                                        <span class="date-year">2026</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="preview-container">
-                                <div class="preview-text">
-                                    AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                    SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="card-engagement">
-                                    <span class="engagement-item likes">
-                                        <span class="engagement-icon">▲</span>
-                                        <span class="engagement-count">24</span>
-                                    </span>
-                                    <span class="engagement-divider"></span>
-                                    <span class="engagement-item dislikes">
-                                        <span class="engagement-icon">▼</span>
-                                        <span class="engagement-count">3</span>
-                                    </span>
-                                </div>
-                                <--?php renderOrdinanceRedirectLink((int)$row['ordinance_id']); ?>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="content-card">
-                            <div class="content-card-header">
-                                <div class="card-label-group">
-                                    <span class="card-type">City Ordinance</span>
-                                    <span class="numeral-and-series">No. 3749 s. 2026</span>
-                                </div>
-                                <div class="date">
-                                    <span class="date-day">10</span>
-                                    <div class="date-meta">
-                                        <span class="date-month">April</span>
-                                        <span class="date-year">2026</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="preview-container">
-                                <div class="preview-text">
-                                    AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                    SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="card-engagement">
-                                    <span class="engagement-item likes">
-                                        <span class="engagement-icon">▲</span>
-                                        <span class="engagement-count">24</span>
-                                    </span>
-                                    <span class="engagement-divider"></span>
-                                    <span class="engagement-item dislikes">
-                                        <span class="engagement-icon">▼</span>
-                                        <span class="engagement-count">3</span>
-                                    </span>
-                                </div>
-                                <a href="ordinance.php?id=...">
-                                    <p class="link">Read More</p>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="content-card">
-                            <div class="content-card-header">
-                                <div class="card-label-group">
-                                    <span class="card-type">City Ordinance</span>
-                                    <span class="numeral-and-series">No. 3749 s. 2026</span>
-                                </div>
-                                <div class="date">
-                                    <span class="date-day">10</span>
-                                    <div class="date-meta">
-                                        <span class="date-month">April</span>
-                                        <span class="date-year">2026</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="preview-container">
-                                <div class="preview-text">
-                                    AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                    SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="card-engagement">
-                                    <span class="engagement-item likes">
-                                        <span class="engagement-icon">▲</span>
-                                        <span class="engagement-count">24</span>
-                                    </span>
-                                    <span class="engagement-divider"></span>
-                                    <span class="engagement-item dislikes">
-                                        <span class="engagement-icon">▼</span>
-                                        <span class="engagement-count">3</span>
-                                    </span>
-                                </div>
-                                <a href="ordinance.php?id=...">
-                                    <p class="link">Read More</p>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="content-card">
-                            <div class="content-card-header">
-                                <div class="card-label-group">
-                                    <span class="card-type">City Ordinance</span>
-                                    <span class="numeral-and-series">No. 3749 s. 2026</span>
-                                </div>
-                                <div class="date">
-                                    <span class="date-day">10</span>
-                                    <div class="date-meta">
-                                        <span class="date-month">April</span>
-                                        <span class="date-year">2026</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="preview-container">
-                                <div class="preview-text">
-                                    AN ORDINANCE ESTABLISHING A COMPREHENSIVE TRAFFIC MANAGEMENT
-                                    SYSTEM IN HIGH-DENSITY AREAS OF VALENZUELA CITY...
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <div class="card-engagement">
-                                    <span class="engagement-item likes">
-                                        <span class="engagement-icon">▲</span>
-                                        <span class="engagement-count">24</span>
-                                    </span>
-                                    <span class="engagement-divider"></span>
-                                    <span class="engagement-item dislikes">
-                                        <span class="engagement-icon">▼</span>
-                                        <span class="engagement-count">3</span>
-                                    </span>
-                                </div>
-                                <a href="ordinance.php?id=...">
-                                    <p class="link">Read More</p>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </section> -->
-
     </main>
 
     <?php require_once __DIR__ . '/../footer.php'; ?>

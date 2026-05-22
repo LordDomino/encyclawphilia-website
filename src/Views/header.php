@@ -1,3 +1,5 @@
+
+
 <header class="site-header">
     <div class="header-content">
         <a href="/home#top" class="clickable">
@@ -23,6 +25,17 @@
                     } ?>
                 </a>
             <?php endif; ?>
+            <li id="google_translate_element" style=""></li>
         </nav>
+        <script type="text/javascript">
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en', // Your website's default language
+                    includedLanguages: 'en,tl', // Restrict to English and Tagalog (add more if needed)
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                }, 'google_translate_element');
+            }
+        </script>
+        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     </div>
 </header>

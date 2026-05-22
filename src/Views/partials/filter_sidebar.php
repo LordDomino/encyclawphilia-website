@@ -6,7 +6,7 @@
 </div>
 
 <div class="filter-sidebar-body" id="filter-sidebar-body">
-    <form id="filter-form">
+    <form class="filter-sidebar-body" id="filter-form">
         <!-- ── Category ────────────────────────────────── -->
         <div class="filter-block" id="filter-block-category">
             <button

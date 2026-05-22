@@ -16,3 +16,59 @@
     accent-color: var(--clr-primary, #2563eb);
     cursor: pointer;
 }
+
+/* ============================================================
+   REVISION: comment.css
+   ============================================================ */
+
+.comment-policy-dont-show-row {
+    display: flex;
+    align-items: flex-start;
+    /* Prevents checkbox from floating mid-text on mobile wrap */
+    gap: var(--sp-3);
+    /* Replaces raw 0.5rem */
+    margin-top: var(--sp-5);
+    /* Replaces raw 0.75rem */
+    padding: var(--sp-2) 0;
+    /* Expanded invisible touch boundary */
+    font-family: var(--font-ui);
+    font-size: var(--fs-xs);
+    color: var(--ink-muted);
+    /* Leverages global semantic alias */
+    cursor: pointer;
+    user-select: none;
+    transition: color var(--ease-fast);
+}
+
+.comment-policy-dont-show-row:hover {
+    color: var(--ink-primary);
+}
+
+.comment-policy-dont-show-checkbox {
+    width: 1.25rem;
+    /* Increased base size for better desktop pointer precision */
+    height: 1.25rem;
+    flex-shrink: 0;
+    accent-color: var(--ink-accent);
+    /* Leverages global primary blue */
+    cursor: pointer;
+    margin-top: 0.125rem;
+    /* Optical nudge to perfectly align with the first line of text */
+}
+
+/* ── Responsive Mobile Interactivity ────────────────────────── */
+@media screen and (max-width: 768px) {
+    .comment-policy-dont-show-row {
+        font-size: var(--fs-sm);
+        /* Bump font size for legibility */
+        padding: var(--sp-3) 0;
+        /* Increase touch target area for thumbs */
+        gap: var(--sp-4);
+    }
+
+    .comment-policy-dont-show-checkbox {
+        width: 1.5rem;
+        /* Forces minimum 24px Apple/Google touch target spec */
+        height: 1.5rem;
+    }
+}

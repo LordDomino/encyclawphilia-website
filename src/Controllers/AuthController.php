@@ -50,6 +50,7 @@ class AuthController
         $user = $result['user'];
         $_SESSION['user_id']  = $user['id'];
         $_SESSION['username'] = $user['username'];
+        $_SESSION['email']    = $user['email'] ?? '';
         $_SESSION['role_id']  = $user['role_id'];
         $_SESSION['is_admin'] = ($user['role_id'] === 1);
 
@@ -58,6 +59,7 @@ class AuthController
                 data: [
                     'user_id'  => $user['id'],
                     'username' => $user['username'],
+                    'email'    => $user['email'] ?? '',
                     'role_id'  => $user['role_id'],
                     'is_admin' => $_SESSION['is_admin'],
                 ],

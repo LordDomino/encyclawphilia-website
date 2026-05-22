@@ -126,6 +126,101 @@ class UserModel
         }
     }
 
+    public function getUserById(int $userId): ?array
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT user_id, username, email, password_hash, deleted_at FROM Users WHERE user_id = :user_id AND deleted_at IS NULL LIMIT 1");
+            $stmt->execute([':user_id' => $userId]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $user !== false ? $user : null;
+        } catch (PDOException $e) {
+            error_log("User::getUserById() failure: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    public function verifyPasswordById(int $userId, string $password): bool
+    {
+        $user = $this->getUserById($userId);
+        if (!$user || !isset($user['password_hash'])) {
+            return false;
+        }
+
+        return password_verify($password, $user['password_hash']);
+    }
+
+    public function updateUsername(int $userId, string $username): array
+    {
+        $trimmed = trim($username);
+
+        if ($trimmed === '') {
+            return ['ok' => false, 'message' => 'Username is required.'];
+        }
+
+        $length = mb_strlen($trimmed);
+        if ($length < 3 || $length > 100) {
+            return ['ok' => false, 'message' => 'Username must be 3 to 100 characters long.'];
+        }
+
+        try {
+            $stmt = $this->db->prepare("UPDATE Users SET username = :username WHERE user_id = :user_id AND deleted_at IS NULL");
+            $stmt->execute([
+                ':username' => $trimmed,
+                ':user_id'  => $userId,
+            ]);
+
+            if ($stmt->rowCount() === 0) {
+                return ['ok' => false, 'message' => 'Unable to update username.'];
+            }
+
+            return ['ok' => true, 'message' => 'Username updated successfully.'];
+        } catch (PDOException $e) {
+            if (isset($e->errorInfo[1]) && $e->errorInfo[1] === 1062) {
+                return ['ok' => false, 'message' => 'This username is already taken.'];
+            }
+
+            error_log("User::updateUsername() failure: " . $e->getMessage());
+            return ['ok' => false, 'message' => 'A system error occurred while updating username.'];
+        }
+    }
+
+    public function updatePassword(int $userId, string $passwordHash): array
+    {
+        if (trim($passwordHash) === '') {
+            return ['ok' => false, 'message' => 'Password hash cannot be empty.'];
+        }
+
+        try {
+            $stmt = $this->db->prepare("UPDATE Users SET password_hash = :password_hash WHERE user_id = :user_id AND deleted_at IS NULL");
+            $stmt->execute([
+                ':password_hash' => $passwordHash,
+                ':user_id'       => $userId,
+            ]);
+
+            return ['ok' => true, 'message' => 'Password updated successfully.'];
+        } catch (PDOException $e) {
+            error_log("User::updatePassword() failure: " . $e->getMessage());
+            return ['ok' => false, 'message' => 'A system error occurred while updating password.'];
+        }
+    }
+
+    public function deactivateAccount(int $userId): array
+    {
+        try {
+            $stmt = $this->db->prepare("UPDATE Users SET deleted_at = NOW() WHERE user_id = :user_id AND deleted_at IS NULL");
+            $stmt->execute([':user_id' => $userId]);
+
+            if ($stmt->rowCount() === 0) {
+                return ['ok' => false, 'message' => 'Unable to deactivate account.'];
+            }
+
+            return ['ok' => true, 'message' => 'Account deactivated successfully.'];
+        } catch (PDOException $e) {
+            error_log("User::deactivateAccount() failure: " . $e->getMessage());
+            return ['ok' => false, 'message' => 'A system error occurred while deactivating account.'];
+        }
+    }
+
     /**
      * Handles user reactions (Like/Dislike) on ordinances using a
      * State-Oriented Single-Trip Protocol.

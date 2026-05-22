@@ -54,6 +54,9 @@ $router->get('/dashboard', 'PagesNavigationController@adminDashboard'); // Only 
 $router->post('/login-submit', 'AuthController@handleLoginSubmit');
 $router->get('/logout-submit', 'AuthController@handleLogoutSubmit');
 $router->post('/signup-submit', 'AuthController@handleSignupSubmit');
+$router->post('/account/update-username', 'UserController@updateUsername');
+$router->post('/account/update-password', 'UserController@updatePassword');
+$router->post('/account/deactivate', 'UserController@deactivateAccount');
 
 $router->post('/react', 'UserController@handleOrdinanceReact');
 $router->post('/react-comment', 'UserController@handleCommentReact');

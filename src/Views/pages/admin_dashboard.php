@@ -27,16 +27,6 @@ $sessionUsername = htmlspecialchars($_SESSION['username'] ?? 'Administrator', EN
 $sessionRoleId   = (int)($_SESSION['role_id'] ?? 1);
 $_SESSION['is_admin'] = ($sessionRoleId === 1);
 
-// Mock stats
-$stats = [
-    'total_ordinances' => 148,
-    'pending'          => 12,
-    'active'           => 109,
-    'repealed'         => 27,
-    'total_users'      => 543,
-    'total_comments'   => 1204,
-];
-
 require_once __DIR__ . '/../../Models/procedures.php';
 
 // Status map — mirrors ordinance.php
@@ -59,9 +49,6 @@ require_once VIEWS_ROOT . '/head.php';
     <?php require_once VIEWS_ROOT . '/header.php'; ?>
 
     <main class="admin-dashboard-page">
-        <!-- ================================================================
-             SUBHERO
-        ================================================================ -->
         <div class="subhero admin-subhero">
             <div class="subhero-content">
                 <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -69,83 +56,135 @@ require_once VIEWS_ROOT . '/head.php';
                     <span class="separator" aria-hidden="true">›</span>
                     <span aria-current="page">Admin Dashboard</span>
                 </nav>
+
                 <div class="admin-subhero-meta">
                     <div>
                         <h1>Admin Dashboard</h1>
                         <p class="admin-subhero-greeting">
                             Welcome back, <strong><?php echo $sessionUsername; ?></strong>
-                            — <?php echo $_SESSION['is_admin'] ? 'Super Administrator' : 'Moderator'; ?>
                         </p>
                     </div>
-                    <?php if ($_SESSION['is_admin']): ?>
-                        <span class="status-badge passed status-badge--hero admin-role-indicator">
-                            Super Admin
+                </div>
+
+                <!-- KPI strip — values populated by JS; data-kpi used as hook -->
+                <div class="admin-kpi-strip" aria-label="Platform overview statistics">
+
+                    <div class="admin-kpi-card" data-kpi="total_ordinances">
+                        <span class="admin-kpi-icon" aria-hidden="true">
+                            <!-- Document / clipboard outline -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                                <rect x="9" y="3" width="6" height="4" rx="1" />
+                                <line x1="9" y1="12" x2="15" y2="12" />
+                                <line x1="9" y1="16" x2="13" y2="16" />
+                            </svg>
                         </span>
-                    <?php else: ?>
-                        <span class="status-badge in-progress status-badge--hero admin-role-indicator">
-                            Moderator
+                        <div class="admin-kpi-body">
+                            <span class="admin-kpi-value" id="kpi-total-ordinances">—</span>
+                            <span class="admin-kpi-label">Total Ordinances</span>
+                        </div>
+                    </div>
+
+                    <span class="admin-kpi-divider" aria-hidden="true"></span>
+
+                    <div class="admin-kpi-card admin-kpi-card--warn" data-kpi="pending">
+                        <span class="admin-kpi-icon" aria-hidden="true">
+                            <!-- Hourglass outline -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 2h14" />
+                                <path d="M5 22h14" />
+                                <path d="M5 2c0 7 7 8 7 10S5 15 5 22" />
+                                <path d="M19 2c0 7-7 8-7 10s7 5 7 10" />
+                            </svg>
                         </span>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================================================================
-             STATS OVERVIEW ROW
-        ================================================================ -->
-        <div class="admin-stats-band" aria-label="Platform overview statistics">
-            <div class="admin-stats-inner">
-
-                <div class="admin-stat-card">
-                    <span class="admin-stat-icon" aria-hidden="true">📋</span>
-                    <div class="admin-stat-body">
-                        <span class="admin-stat-value"><?php echo number_format($stats['total_ordinances']); ?></span>
-                        <span class="admin-stat-label">Total Ordinances</span>
+                        <div class="admin-kpi-body">
+                            <span class="admin-kpi-value" id="kpi-pending">—</span>
+                            <span class="admin-kpi-label">Pending</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="admin-stat-card admin-stat-card--warn">
-                    <span class="admin-stat-icon" aria-hidden="true">⏳</span>
-                    <div class="admin-stat-body">
-                        <span class="admin-stat-value"><?php echo number_format($stats['pending']); ?></span>
-                        <span class="admin-stat-label">Pending Review</span>
+                    <span class="admin-kpi-divider" aria-hidden="true"></span>
+
+                    <div class="admin-kpi-card admin-kpi-card--ok" data-kpi="active">
+                        <span class="admin-kpi-icon" aria-hidden="true">
+                            <!-- Shield / check outline -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                <polyline points="9 12 11 14 15 10" />
+                            </svg>
+                        </span>
+                        <div class="admin-kpi-body">
+                            <span class="admin-kpi-value" id="kpi-active">—</span>
+                            <span class="admin-kpi-label">Active</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="admin-stat-card admin-stat-card--ok">
-                    <span class="admin-stat-icon" aria-hidden="true">✅</span>
-                    <div class="admin-stat-body">
-                        <span class="admin-stat-value"><?php echo number_format($stats['active']); ?></span>
-                        <span class="admin-stat-label">Active</span>
+                    <span class="admin-kpi-divider" aria-hidden="true"></span>
+
+                    <div class="admin-kpi-card admin-kpi-card--muted" data-kpi="repealed">
+                        <span class="admin-kpi-icon" aria-hidden="true">
+                            <!-- Archive / box outline -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="21 8 21 21 3 21 3 8" />
+                                <rect x="1" y="3" width="22" height="5" />
+                                <line x1="10" y1="12" x2="14" y2="12" />
+                            </svg>
+                        </span>
+                        <div class="admin-kpi-body">
+                            <span class="admin-kpi-value" id="kpi-repealed">—</span>
+                            <span class="admin-kpi-label">Repealed</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="admin-stat-card admin-stat-card--muted">
-                    <span class="admin-stat-icon" aria-hidden="true">🗂️</span>
-                    <div class="admin-stat-body">
-                        <span class="admin-stat-value"><?php echo number_format($stats['repealed']); ?></span>
-                        <span class="admin-stat-label">Repealed</span>
+                    <span class="admin-kpi-divider" aria-hidden="true"></span>
+
+                    <div class="admin-kpi-card" data-kpi="total_users">
+                        <span class="admin-kpi-icon" aria-hidden="true">
+                            <!-- Users / people outline -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </span>
+                        <div class="admin-kpi-body">
+                            <span class="admin-kpi-value" id="kpi-total-users">—</span>
+                            <span class="admin-kpi-label">Registered Users</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="admin-stat-card">
-                    <span class="admin-stat-icon" aria-hidden="true">👥</span>
-                    <div class="admin-stat-body">
-                        <span class="admin-stat-value"><?php echo number_format($stats['total_users']); ?></span>
-                        <span class="admin-stat-label">Registered Users</span>
+                    <span class="admin-kpi-divider" aria-hidden="true"></span>
+
+                    <div class="admin-kpi-card" data-kpi="total_comments">
+                        <span class="admin-kpi-icon" aria-hidden="true">
+                            <!-- Speech bubble / comment outline -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                        </span>
+                        <div class="admin-kpi-body">
+                            <span class="admin-kpi-value" id="kpi-total-comments">—</span>
+                            <span class="admin-kpi-label">Comments</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="admin-stat-card">
-                    <span class="admin-stat-icon" aria-hidden="true">💬</span>
-                    <div class="admin-stat-body">
-                        <span class="admin-stat-value"><?php echo number_format($stats['total_comments']); ?></span>
-                        <span class="admin-stat-label">Comments</span>
-                    </div>
-                </div>
+                </div><!-- /.admin-kpi-strip -->
 
-            </div>
-        </div>
+            </div><!-- /.subhero-content -->
+        </div><!-- /.subhero.admin-subhero -->
         <!-- ================================================================
              FILTER & SEARCH BAR
         ================================================================ -->

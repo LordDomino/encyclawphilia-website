@@ -258,7 +258,7 @@ require_once __DIR__ . '/../head.php';
                                 aria-describedby="title-hint title-char-count"></textarea>
                             <div class="add-ord-textarea-footer">
                                 <span class="add-ord-field-hint" id="title-hint">
-                                    Full official title of the ordinance. Max 255 characters.
+                                    Full official title of the ordinance. Max 1000 characters.
                                 </span>
                                 <span class="add-ord-char-count" id="title-char-count" aria-live="polite">
                                     0 / 1000
@@ -569,7 +569,7 @@ require_once __DIR__ . '/../head.php';
         update(); // initialise
     }
 
-    attachCharCount('title',     'title-char-count',    255);
+    attachCharCount('title',     'title-char-count',    500);
     attachCharCount('summary',   'summary-char-count',  null);
     attachCharCount('full_text', 'fulltext-char-count', null);
 

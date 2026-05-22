@@ -6,6 +6,7 @@ require_once __DIR__ . '/../Core/ApiResponse.php';
 
 use App\Core\ApiResponse;
 use App\Models\OrdinanceModel;
+use App\Models\UserModel;
 use PDOException;
 
 class UserController
@@ -202,5 +203,182 @@ class UserController
             ),
             httpStatus: 200
         );
+    }
+
+    public function updateUsername(): void
+    {
+        session_start();
+
+        if (empty($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /account');
+            exit;
+        }
+
+        $newUsername = trim($_POST['username'] ?? '');
+        $userId      = (int) $_SESSION['user_id'];
+
+        if ($newUsername === '') {
+            $this->redirectWithFlash('error', 'Username update failed.', 'Please enter a new username.');
+        }
+
+        if (mb_strlen($newUsername) < 3 || mb_strlen($newUsername) > 100) {
+            $this->redirectWithFlash('error', 'Invalid username.', 'Username must be 3–100 characters long.');
+        }
+
+        if ($newUsername === ($_SESSION['username'] ?? '')) {
+            $this->redirectWithFlash('info', 'No changes made.', 'The new username matches your current username.');
+        }
+
+        $result = ['ok' => false, 'message' => ''];
+        try {
+            $pdo        = DatabaseController::getDatabaseConnection();
+            $repository = new UserModel($pdo);
+
+            $result = $repository->updateUsername($userId, $newUsername);
+        } catch (PDOException $e) {
+            error_log('updateUsername failure: ' . $e->getMessage());
+            $this->redirectWithFlash('error', 'Update failed.', 'A database error occurred. Please try again.');
+        }
+
+        if (!$result['ok']) {
+            $this->redirectWithFlash('error', 'Update failed.', $result['message']);
+        }
+
+        $_SESSION['username'] = $newUsername;
+        $_SESSION['account_flash'] = [
+            'type'  => 'success',
+            'title' => 'Username updated',
+            'body'  => 'Your display name has been updated successfully.',
+        ];
+
+        header('Location: /account');
+        exit;
+    }
+
+    public function updatePassword(): void
+    {
+        session_start();
+
+        if (empty($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /account');
+            exit;
+        }
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword     = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_new_password'] ?? '';
+        $userId          = (int) $_SESSION['user_id'];
+
+        if ($currentPassword === '' || $newPassword === '' || $confirmPassword === '') {
+            $this->redirectWithFlash('error', 'Password update failed.', 'All password fields are required.');
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            $this->redirectWithFlash('error', 'Password mismatch.', 'The new passwords do not match.');
+        }
+
+        if (mb_strlen($newPassword) < 8) {
+            $this->redirectWithFlash('error', 'Password too short.', 'New password must be at least 8 characters long.');
+        }
+
+        $result = ['ok' => false, 'message' => ''];
+        try {
+            $pdo        = DatabaseController::getDatabaseConnection();
+            $repository = new UserModel($pdo);
+
+            if (!$repository->verifyPasswordById($userId, $currentPassword)) {
+                $this->redirectWithFlash('error', 'Incorrect password.', 'Your current password is invalid.');
+            }
+
+            $passwordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+            $result       = $repository->updatePassword($userId, $passwordHash);
+        } catch (PDOException $e) {
+            error_log('updatePassword failure: ' . $e->getMessage());
+            $this->redirectWithFlash('error', 'Update failed.', 'A database error occurred. Please try again.');
+        }
+
+        if (!$result['ok']) {
+            $this->redirectWithFlash('error', 'Update failed.', $result['message']);
+        }
+
+        $_SESSION['account_flash'] = [
+            'type'  => 'success',
+            'title' => 'Password updated',
+            'body'  => 'Your password has been changed successfully.',
+        ];
+
+        header('Location: /account');
+        exit;
+    }
+
+    public function deactivateAccount(): void
+    {
+        session_start();
+
+        if (empty($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /account');
+            exit;
+        }
+
+        $userId = (int) $_SESSION['user_id'];
+
+        $result = ['ok' => false, 'message' => ''];
+        try {
+            $pdo        = DatabaseController::getDatabaseConnection();
+            $repository = new UserModel($pdo);
+            $result     = $repository->deactivateAccount($userId);
+        } catch (PDOException $e) {
+            error_log('deactivateAccount failure: ' . $e->getMessage());
+            $this->redirectWithFlash('error', 'Deactivation failed.', 'A database error occurred. Please try again.');
+        }
+
+        if (!$result['ok']) {
+            $this->redirectWithFlash('error', 'Deactivation failed.', $result['message']);
+        }
+
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
+            );
+        }
+        session_destroy();
+
+        header('Location: /login');
+        exit;
+    }
+
+    private function redirectWithFlash(string $type, string $title, string $body): void
+    {
+        $_SESSION['account_flash'] = [
+            'type'  => $type,
+            'title' => $title,
+            'body'  => $body,
+        ];
+
+        header('Location: /account');
+        exit;
     }
 }

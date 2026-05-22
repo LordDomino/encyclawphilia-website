@@ -31,104 +31,6 @@
     align-self: center;
 }
 
-
-/* ============================================================
-   ADMIN DASHBOARD — STATS BAND
-   ============================================================ */
-
-.admin-stats-band {
-    background: linear-gradient(135deg,
-            rgba(248, 249, 255, var(--op-80)) 0%,
-            rgba(240, 243, 255, var(--op-70)) 100%);
-    border-bottom: var(--bdr-thin) solid var(--bdr-clr-divider);
-    padding: var(--sp-8) var(--page-side-margin);
-    backdrop-filter: blur(var(--blur-md));
-    -webkit-backdrop-filter: blur(var(--blur-md));
-}
-
-.admin-stats-inner {
-    display: flex;
-    gap: var(--sp-6);
-    flex-wrap: wrap;
-    align-items: stretch;
-}
-
-.admin-stat-card {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-5);
-    padding: var(--sp-6) var(--sp-8);
-    background: rgba(255, 255, 255, var(--op-70));
-    border: var(--bdr-thin) solid var(--bdr-clr-divider);
-    border-radius: var(--bdr-r-xl);
-    min-width: 140px;
-    flex: 1 1 140px;
-    backdrop-filter: blur(var(--blur-sm));
-    -webkit-backdrop-filter: blur(var(--blur-sm));
-    box-shadow: var(--shadow-sm);
-    transition: all var(--ease-smooth-lg);
-}
-
-.admin-stat-card:hover {
-    border-color: var(--bdr-clr-soft);
-    box-shadow: var(--shadow-glass-md);
-    transform: translateY(calc(var(--sp-1) * -1));
-}
-
-.admin-stat-card--warn {
-    background: rgba(255, 243, 205, var(--op-70));
-    border-color: rgba(255, 234, 167, var(--op-60));
-}
-
-.admin-stat-card--ok {
-    background: rgba(212, 237, 218, var(--op-70));
-    border-color: rgba(195, 230, 203, var(--op-60));
-}
-
-.admin-stat-card--muted {
-    background: rgba(240, 240, 245, var(--op-70));
-    border-color: var(--glass-navy-soft);
-}
-
-.admin-stat-icon {
-    font-size: var(--fs-2xl);
-    line-height: 1;
-    flex-shrink: 0;
-    user-select: none;
-}
-
-.admin-stat-body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-1);
-}
-
-.admin-stat-value {
-    font-family: var(--font-heading);
-    font-size: var(--fs-3xl);
-    font-weight: 700;
-    line-height: var(--lh-tight);
-    letter-spacing: var(--ls-tighter);
-    color: var(--ink-primary);
-}
-
-.admin-stat-label {
-    font-family: var(--font-link);
-    font-size: var(--fs-2xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: var(--ls-xl);
-    line-height: var(--lh-tight);
-    color: var(--ink-faint);
-}
-
-
-/* ============================================================
-   ADMIN DASHBOARD — MAIN PAGE SHELL
-   ============================================================ */
-
-/* main.admin-dashboard-page { } */
-
 /* ============================================================
    ADMIN DASHBOARD — SECTION HEADER
    ============================================================ */
@@ -498,7 +400,7 @@
 
 .admin-content-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
     gap: var(--sp-6);
 }
 
@@ -984,5 +886,596 @@
 
     .admin-card-action-menu {
         margin-left: 0;
+    }
+}
+
+/* ============================================================
+   ADMIN DASHBOARD — KPI STRIP (inside subhero)
+   ============================================================ */
+
+.admin-kpi-strip {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-top: var(--sp-9);
+
+    background: rgba(255, 255, 255, 0.06);
+    border: var(--bdr-thin) solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--bdr-r-xl);
+    backdrop-filter: blur(var(--blur-lg));
+    -webkit-backdrop-filter: blur(var(--blur-lg));
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+    /* clip child borders to pill shape */
+}
+
+/* ── Individual KPI card ─────────────────────────────────── */
+
+.admin-kpi-card {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
+    /* padding: var(--sp-3) var(--sp-5); */
+    transition: background var(--ease-smooth);
+    min-width: 0;
+}
+
+.admin-kpi-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* Status tint variants */
+.admin-kpi-card--warn {
+    background: rgba(255, 195, 60, 0.07);
+}
+
+.admin-kpi-card--warn:hover {
+    background: rgba(255, 195, 60, 0.12);
+}
+
+.admin-kpi-card--ok {
+    background: rgba(80, 220, 130, 0.07);
+}
+
+.admin-kpi-card--ok:hover {
+    background: rgba(80, 220, 130, 0.12);
+}
+
+.admin-kpi-card--muted {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-kpi-card--muted:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* ── Thin vertical rule between cards ───────────────────── */
+
+.admin-kpi-divider {
+    flex-shrink: 0;
+    width: var(--bdr-thin);
+    align-self: stretch;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── SVG icon ────────────────────────────────────────────── */
+
+.admin-kpi-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--bdr-r-lg);
+    background: rgba(255, 255, 255, 0.08);
+    border: var(--bdr-thin) solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.80);
+}
+
+.admin-kpi-icon svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* Tinted icon backgrounds for status variants */
+.admin-kpi-card--warn .admin-kpi-icon {
+    background: rgba(255, 195, 60, 0.14);
+    border-color: rgba(255, 195, 60, 0.28);
+    color: rgba(255, 220, 120, 0.90);
+}
+
+.admin-kpi-card--ok .admin-kpi-icon {
+    background: rgba(80, 220, 130, 0.14);
+    border-color: rgba(80, 220, 130, 0.28);
+    color: rgba(130, 240, 170, 0.90);
+}
+
+.admin-kpi-card--muted .admin-kpi-icon {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.10);
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Text body ───────────────────────────────────────────── */
+
+.admin-kpi-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    min-width: 0;
+}
+
+.admin-kpi-value {
+    font-family: var(--font-heading);
+    font-size: var(--fs-2xl);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-tighter);
+    color: var(--clr-white);
+    white-space: nowrap;
+}
+
+.admin-kpi-label {
+    font-family: var(--font-link);
+    font-size: var(--fs-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-xl);
+    line-height: var(--lh-tight);
+    color: rgba(255, 255, 255, 0.50);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+/* Tablet: two-row wrapping grid */
+@media screen and (max-width: 1100px) {
+    .admin-kpi-strip {
+        flex-wrap: wrap;
+        border-radius: var(--bdr-r-xl);
+    }
+
+    .admin-kpi-card {
+        flex: 1 1 calc(33.333% - 2px);
+        /* 3-up */
+    }
+
+    /* Hide dividers when wrapping — borders take over */
+    .admin-kpi-divider {
+        display: none;
+    }
+
+    /* Restore separation via bottom border on wrapped cards */
+    .admin-kpi-card:not(:nth-child(n+10)) {
+        border-bottom: var(--bdr-thin) solid rgba(255, 255, 255, 0.10);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .admin-kpi-strip {
+        margin-top: var(--sp-7);
+    }
+
+    .admin-kpi-card {
+        flex: 1 1 calc(50% - 1px);
+        /* 2-up */
+        padding: var(--sp-6) var(--sp-7);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .admin-kpi-card {
+        flex: 1 1 100%;
+        /* stacked */
+        border-bottom: var(--bdr-thin) solid rgba(255, 255, 255, 0.10);
+    }
+
+    .admin-kpi-card:last-of-type {
+        border-bottom: none;
+    }
+
+    .admin-kpi-value {
+        font-size: var(--fs-xl);
+    }
+}
+
+/* ============================================================
+   ADMIN DASHBOARD — KPI STRIP (inside subhero)
+   ============================================================ */
+
+.admin-kpi-strip {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-top: var(--sp-9);
+
+    background: rgba(255, 255, 255, 0.06);
+    border: var(--bdr-thin) solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--bdr-r-xl);
+    backdrop-filter: blur(var(--blur-lg));
+    -webkit-backdrop-filter: blur(var(--blur-lg));
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+    /* clip child borders to pill shape */
+}
+
+/* ── Individual KPI card ─────────────────────────────────── */
+
+.admin-kpi-card {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
+    padding: var(--sp-7) var(--sp-8);
+    transition: background var(--ease-smooth);
+    min-width: 0;
+}
+
+.admin-kpi-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* Status tint variants */
+.admin-kpi-card--warn {
+    background: rgba(255, 195, 60, 0.07);
+}
+
+.admin-kpi-card--warn:hover {
+    background: rgba(255, 195, 60, 0.12);
+}
+
+.admin-kpi-card--ok {
+    background: rgba(80, 220, 130, 0.07);
+}
+
+.admin-kpi-card--ok:hover {
+    background: rgba(80, 220, 130, 0.12);
+}
+
+.admin-kpi-card--muted {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-kpi-card--muted:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* ── Thin vertical rule between cards ───────────────────── */
+
+.admin-kpi-divider {
+    flex-shrink: 0;
+    width: var(--bdr-thin);
+    align-self: stretch;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── SVG icon ────────────────────────────────────────────── */
+
+.admin-kpi-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--bdr-r-lg);
+    background: rgba(255, 255, 255, 0.08);
+    border: var(--bdr-thin) solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.80);
+}
+
+.admin-kpi-icon svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* Tinted icon backgrounds for status variants */
+.admin-kpi-card--warn .admin-kpi-icon {
+    background: rgba(255, 195, 60, 0.14);
+    border-color: rgba(255, 195, 60, 0.28);
+    color: rgba(255, 220, 120, 0.90);
+}
+
+.admin-kpi-card--ok .admin-kpi-icon {
+    background: rgba(80, 220, 130, 0.14);
+    border-color: rgba(80, 220, 130, 0.28);
+    color: rgba(130, 240, 170, 0.90);
+}
+
+.admin-kpi-card--muted .admin-kpi-icon {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.10);
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Text body ───────────────────────────────────────────── */
+
+.admin-kpi-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    min-width: 0;
+}
+
+.admin-kpi-value {
+    font-family: var(--font-heading);
+    font-size: var(--fs-2xl);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-tighter);
+    color: var(--clr-white);
+    white-space: nowrap;
+}
+
+.admin-kpi-label {
+    font-family: var(--font-link);
+    font-size: var(--fs-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-xl);
+    line-height: var(--lh-tight);
+    color: rgba(255, 255, 255, 0.50);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+/* Tablet: two-row wrapping grid */
+@media screen and (max-width: 1100px) {
+    .admin-kpi-strip {
+        flex-wrap: wrap;
+        border-radius: var(--bdr-r-xl);
+    }
+
+    .admin-kpi-card {
+        flex: 1 1 calc(33.333% - 2px);
+        /* 3-up */
+    }
+
+    /* Hide dividers when wrapping — borders take over */
+    .admin-kpi-divider {
+        display: none;
+    }
+
+    /* Restore separation via bottom border on wrapped cards */
+    .admin-kpi-card:not(:nth-child(n+10)) {
+        border-bottom: var(--bdr-thin) solid rgba(255, 255, 255, 0.10);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .admin-kpi-strip {
+        margin-top: var(--sp-7);
+    }
+
+    .admin-kpi-card {
+        flex: 1 1 calc(50% - 1px);
+        /* 2-up */
+        padding: var(--sp-6) var(--sp-7);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .admin-kpi-card {
+        flex: 1 1 100%;
+        /* stacked */
+        border-bottom: var(--bdr-thin) solid rgba(255, 255, 255, 0.10);
+    }
+
+    .admin-kpi-card:last-of-type {
+        border-bottom: none;
+    }
+
+    .admin-kpi-value {
+        font-size: var(--fs-xl);
+    }
+}
+
+/* ============================================================
+   ADMIN DASHBOARD — KPI STRIP (inside subhero)
+   ============================================================ */
+
+.admin-kpi-strip {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-top: var(--sp-9);
+
+    background: rgba(255, 255, 255, 0.06);
+    border: var(--bdr-thin) solid rgba(255, 255, 255, 0.14);
+    border-radius: var(--bdr-r-xl);
+    backdrop-filter: blur(var(--blur-lg));
+    -webkit-backdrop-filter: blur(var(--blur-lg));
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+    /* clip child borders to pill shape */
+}
+
+/* ── Individual KPI card ─────────────────────────────────── */
+
+.admin-kpi-card {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
+    padding: var(--sp-7) var(--sp-8);
+    transition: background var(--ease-smooth);
+    min-width: 0;
+}
+
+.admin-kpi-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* Status tint variants */
+.admin-kpi-card--warn {
+    background: rgba(255, 195, 60, 0.07);
+}
+
+.admin-kpi-card--warn:hover {
+    background: rgba(255, 195, 60, 0.12);
+}
+
+.admin-kpi-card--ok {
+    background: rgba(80, 220, 130, 0.07);
+}
+
+.admin-kpi-card--ok:hover {
+    background: rgba(80, 220, 130, 0.12);
+}
+
+.admin-kpi-card--muted {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-kpi-card--muted:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+/* ── Thin vertical rule between cards ───────────────────── */
+
+.admin-kpi-divider {
+    flex-shrink: 0;
+    width: var(--bdr-thin);
+    align-self: stretch;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── SVG icon ────────────────────────────────────────────── */
+
+.admin-kpi-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--bdr-r-lg);
+    background: rgba(255, 255, 255, 0.08);
+    border: var(--bdr-thin) solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.80);
+}
+
+.admin-kpi-icon svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* Tinted icon backgrounds for status variants */
+.admin-kpi-card--warn .admin-kpi-icon {
+    background: rgba(255, 195, 60, 0.14);
+    border-color: rgba(255, 195, 60, 0.28);
+    color: rgba(255, 220, 120, 0.90);
+}
+
+.admin-kpi-card--ok .admin-kpi-icon {
+    background: rgba(80, 220, 130, 0.14);
+    border-color: rgba(80, 220, 130, 0.28);
+    color: rgba(130, 240, 170, 0.90);
+}
+
+.admin-kpi-card--muted .admin-kpi-icon {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.10);
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Text body ───────────────────────────────────────────── */
+
+.admin-kpi-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    min-width: 0;
+}
+
+.admin-kpi-value {
+    font-family: var(--font-heading);
+    font-size: var(--fs-2xl);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-tighter);
+    color: var(--clr-white);
+    white-space: nowrap;
+}
+
+.admin-kpi-label {
+    font-family: var(--font-link);
+    font-size: var(--fs-2xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: var(--ls-xl);
+    line-height: var(--lh-tight);
+    color: rgba(255, 255, 255, 0.50);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+
+/* Tablet: two-row wrapping grid */
+@media screen and (max-width: 1100px) {
+    .admin-kpi-strip {
+        flex-wrap: wrap;
+        border-radius: var(--bdr-r-xl);
+    }
+
+    .admin-kpi-card {
+        flex: 1 1 calc(33.333% - 2px);
+        /* 3-up */
+    }
+
+    /* Hide dividers when wrapping — borders take over */
+    .admin-kpi-divider {
+        display: none;
+    }
+
+    /* Restore separation via bottom border on wrapped cards */
+    .admin-kpi-card:not(:nth-child(n+10)) {
+        border-bottom: var(--bdr-thin) solid rgba(255, 255, 255, 0.10);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .admin-kpi-strip {
+        margin-top: var(--sp-7);
+    }
+
+    .admin-kpi-card {
+        flex: 1 1 calc(50% - 1px);
+        /* 2-up */
+        padding: var(--sp-6) var(--sp-7);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .admin-kpi-card {
+        flex: 1 1 100%;
+        /* stacked */
+        border-bottom: var(--bdr-thin) solid rgba(255, 255, 255, 0.10);
+    }
+
+    .admin-kpi-card:last-of-type {
+        border-bottom: none;
+    }
+
+    .admin-kpi-value {
+        font-size: var(--fs-xl);
     }
 }
