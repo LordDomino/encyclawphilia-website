@@ -46,10 +46,18 @@ if ($loggedIn && $ordinance_id > 0) {
     $userReaction = $reactionRow !== false ? $reactionRow['reaction_type'] : null;
 }
 
-$commentModel = new CommentModel($pdo);
-$comments = $commentModel->getOrdinanceComments($ordinance_id);
+$commentModel   = new CommentModel($pdo);
+$comments       = $commentModel->getOrdinanceComments($ordinance_id);
 
-echo "<script>console.log(" . json_encode($ordinance) . ")</script>";
+// Bulk-fetch the logged-in user's reactions for all comments in one query
+$commentReactions = [];
+if ($loggedIn && !empty($comments)) {
+    $commentIds       = array_column($comments, 'comment_id');
+    $commentReactions = $commentModel->getUserReactionsForComments(
+        (int) $_SESSION['user_id'],
+        $commentIds
+    );
+}
 
 // Fix presentation of ordinance infos
 $ordinance['summary']           = $ordinance['summary']             ?? 'No summary available.';
@@ -281,29 +289,41 @@ require VIEWS_ROOT . '/head.php';
             </div>
 
             <!-- Comment compose box -->
-            <div class="ord-comment-compose">
-                <div class="ord-comment-compose-avatar" aria-hidden="true">?</div>
-                <div class="ord-comment-compose-body">
-                    <textarea
-                        class="ord-comment-textarea"
-                        id="comment-input"
-                        placeholder="Share your perspective on this ordinance..."
-                        rows="3"
-                        aria-label="Write a comment"
-                        maxlength="1000"></textarea>
-                    <div class="ord-comment-compose-footer">
-                        <span class="ord-comment-char-count" id="char-count">0 / 1000</span>
-                        <a href="/login" class="ord-comment-login-prompt">
-                            Login to post a comment
-                        </a>
-                        <!-- TODO: Replace anchor with submit button once auth is integrated:
-                        <button class="ord-comment-submit" id="comment-submit" type="button">
-                            Post Comment
-                        </button>
-                        -->
+            <form id="comment-form" method="post" action="/comments/post">
+                <div class="ord-comment-compose">
+                    <div class="ord-comment-compose-avatar" aria-hidden="true">
+                        <?php echo $loggedIn
+                            ? htmlspecialchars(strtoupper(substr($_SESSION['username'] ?? 'U', 0, 1)), ENT_QUOTES, 'UTF-8')
+                            : '?'; ?>
+                    </div>
+                    <div class="ord-comment-compose-body">
+                        <textarea
+                            class="ord-comment-textarea"
+                            id="comment-input"
+                            placeholder="Share your perspective on this ordinance..."
+                            rows="3"
+                            aria-label="Write a comment"
+                            maxlength="1000"></textarea>
+                        <div class="ord-comment-compose-footer">
+                            <span class="ord-comment-char-count" id="char-count">0 / 1000</span>
+                            <?php if ($loggedIn): ?>
+                                <button
+                                    class="ord-comment-submit"
+                                    id="comment-submit"
+                                    type="button"
+                                    data-ordinance-id="<?php echo (int)$ordinance['ordinance_id']; ?>"
+                                    disabled>
+                                    Post Comment
+                                </button>
+                            <?php else: ?>
+                                <a href="/login" class="ord-comment-login-prompt">
+                                    Login to post a comment
+                                </a>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
 
             <!-- Comment feed -->
             <div class="ord-comment-feed" id="comment-feed" role="feed" aria-label="Comments">
@@ -348,30 +368,33 @@ require VIEWS_ROOT . '/head.php';
 
                                 <div class="ord-comment-footer">
                                     <div class="ord-comment-reactions">
+                                        <?php
+                                        $cid          = (int) $comment['comment_id'];
+                                        $userCReaction = $commentReactions[$cid] ?? null;
+                                        ?>
                                         <button
-                                            class="ord-comment-react-btn ord-comment-react-btn--like"
+                                            class="ord-comment-react-btn ord-comment-react-btn--like<?php echo $userCReaction === 'like' ? ' ord-comment-react-btn--active' : ''; ?>"
                                             aria-label="Like comment by <?php echo htmlspecialchars($comment['username'], ENT_QUOTES, 'UTF-8'); ?>"
-                                            data-comment-id="<?php echo (int)$comment['comment_id']; ?>">
+                                            aria-pressed="<?php echo $userCReaction === 'like' ? 'true' : 'false'; ?>"
+                                            data-comment-id="<?php echo $cid; ?>">
                                             <span aria-hidden="true">▲</span>
                                             <span class="ord-comment-react-count">
                                                 <?php echo htmlspecialchars($comment['like_count'], ENT_QUOTES, 'UTF-8'); ?>
                                             </span>
                                         </button>
                                         <button
-                                            class="ord-comment-react-btn ord-comment-react-btn--dislike"
+                                            class="ord-comment-react-btn ord-comment-react-btn--dislike<?php echo $userCReaction === 'dislike' ? ' ord-comment-react-btn--active' : ''; ?>"
                                             aria-label="Dislike comment by <?php echo htmlspecialchars($comment['username'], ENT_QUOTES, 'UTF-8'); ?>"
-                                            data-comment-id="<?php echo (int)$comment['comment_id']; ?>">
+                                            aria-pressed="<?php echo $userCReaction === 'dislike' ? 'true' : 'false'; ?>"
+                                            data-comment-id="<?php echo $cid; ?>">
                                             <span aria-hidden="true">▼</span>
                                             <span class="ord-comment-react-count">
                                                 <?php echo htmlspecialchars($comment['dislike_count'], ENT_QUOTES, 'UTF-8'); ?>
                                             </span>
                                         </button>
                                     </div>
-                                    <!-- <button class="ord-comment-reply-btn" aria-label="Reply to this comment">
-                                        Reply
-                                    </button> -->
-                                </footer>
-                            </div>
+                                    </footer>
+                                </div>
 
                         </article>
                     <?php endforeach; ?>
@@ -389,7 +412,9 @@ require VIEWS_ROOT . '/head.php';
 
     <?php require_once __DIR__ . '/../footer.php'; ?>
 
+    <script src="js/sanitize.js"></script>
     <script src="js/react_ordinance.js"></script>
+    <script src="js/pages/ordinance.js"></script>
 
 </body>
 

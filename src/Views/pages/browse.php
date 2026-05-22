@@ -250,16 +250,16 @@ require_once __DIR__ . '/../head.php';
 
                 <!-- Pagination bar — top -->
                 <nav class="pagination-bar" id="pagination-bar-top" aria-label="Pagination top">
-                    <!-- Populated by browse-search.js -->
+                    <!-- Populated by browse.js -->
                 </nav>
 
                 <div class="flex-grid" id="results-grid">
-                    <!-- Populated by browse-search.js -->
+                    <!-- Populated by browse.js -->
                 </div>
 
                 <!-- Pagination bar — bottom -->
                 <nav class="pagination-bar" id="pagination-bar-bottom" aria-label="Pagination bottom">
-                    <!-- Populated by browse-search.js -->
+                    <!-- Populated by browse.js -->
                 </nav>
             </section>
         </div>

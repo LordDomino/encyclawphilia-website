@@ -56,7 +56,9 @@ $router->get('/logout-submit', 'AuthController@handleLogoutSubmit');
 $router->post('/signup-submit', 'AuthController@handleSignupSubmit');
 
 $router->post('/react', 'UserController@handleOrdinanceReact');
-$router->get('/profile/{id}', 'AuthController@showProfile'); // Dynamic parameter route
+$router->post('/react-comment', 'UserController@handleCommentReact');
+
+// $router->get('/profile/{id}', 'AuthController@showProfile'); // Dynamic parameter route
 
 
 $router->get('/add-ordinance', 'PagesNavigationController@addOrdinance');
@@ -67,6 +69,7 @@ $router->post('/store-ordinance', 'DashboardController@storeOrdinance');
 $router->get('/api/ordinances/search', 'OrdinanceApiController@search');
 $router->get('/api/ordinances/meta',   'OrdinanceApiController@meta');
 
+$router->post('/comment', 'UserController@handleOrdinanceComment');
 // Catch incoming request context
 $requestUri = $_SERVER['REQUEST_URI'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
