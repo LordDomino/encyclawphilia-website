@@ -826,6 +826,7 @@ class OrdinanceModel
         bool   $hasSummary = false,
         bool   $hasFullText = false,
         bool   $hasPdf = false,
+        ?int   $barangayId = null,
         string $sortBy = 'date_enacted',
         string $sortDir = 'DESC',
         int    $limit = 20,
@@ -918,6 +919,11 @@ class OrdinanceModel
         }
         if ($hasPdf) {
             $conditions[] = "o.pdf_file IS NOT NULL AND TRIM(o.pdf_file) != ''";
+        }
+
+        if ($barangayId !== null) {
+            $conditions[] = 'o.barangay_id = :barangay_id';
+            $params[':barangay_id'] = $barangayId;
         }
 
         // Assemble WHERE Clause
@@ -1187,6 +1193,69 @@ class OrdinanceModel
             }
             throw $e;
         }
+    }
+
+    /**
+     * getAllCategories
+     *
+     * Returns every row in the Categories reference table, ordered
+     * alphabetically by name. Intended for populating filter sidebars
+     * and dropdown menus across Browse and Admin Dashboard pages.
+     *
+     * This table is treated as stable reference data: INSERT / UPDATE /
+     * DELETE are forbidden at the application level (enforced in PHP),
+     * so the result set never changes between deployments and can be
+     * safely cached on the client after the first fetch.
+     *
+     * @return array<int, array{ category_id: int, category_name: string }>
+     *     Indexed array of associative rows. Empty array when the table
+     *     contains no rows (should never occur in a seeded environment).
+     * @throws PDOException On structural or connection failure.
+     */
+    public function getAllCategories(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT category_id, category_name
+             FROM   Categories
+             ORDER  BY category_name ASC'
+        );
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Normalise types so the caller can rely on strict comparisons.
+        foreach ($rows as &$row) {
+            $row['category_id'] = (int) $row['category_id'];
+        }
+        unset($row);
+
+        return $rows;
+    }
+
+    /**
+     * getAllBarangays
+     *
+     * Returns every row in the Barangays reference table, ordered
+     * alphabetically by name. Intended for populating filter sidebars.
+     *
+     * @return array<int, array{ barangay_id: int, barangay_name: string }>
+     * @throws PDOException On structural or connection failure.
+     */
+    public function getAllBarangays(): array
+    {
+        $stmt = $this->pdo->query(
+            'SELECT barangay_id, barangay_name
+         FROM   Barangays
+         ORDER  BY barangay_name ASC'
+        );
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rows as &$row) {
+            $row['barangay_id'] = (int) $row['barangay_id'];
+        }
+        unset($row);
+
+        return $rows;
     }
 
     // ── Private helpers ──────────────────────────────────────────────────

@@ -9,4 +9,5 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/add_ordinance.css">
     <link rel="stylesheet" href="css/admin_dashboard.css">
+    <link rel="stylesheet" href="css/comment.css">
 </head>

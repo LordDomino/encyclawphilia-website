@@ -1,0 +1,18 @@
+.comment-policy-dont-show-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--clr-text-muted, #6b7280);
+    cursor: pointer;
+    user-select: none;
+}
+
+.comment-policy-dont-show-checkbox {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    accent-color: var(--clr-primary, #2563eb);
+    cursor: pointer;
+}

@@ -312,6 +312,7 @@ require VIEWS_ROOT . '/head.php';
                                     id="comment-submit"
                                     type="button"
                                     data-ordinance-id="<?php echo (int)$ordinance['ordinance_id']; ?>"
+                                    data-user-id="<?php echo (int)$_SESSION['user_id']; ?>"
                                     disabled>
                                     Post Comment
                                 </button>
@@ -407,6 +408,71 @@ require VIEWS_ROOT . '/head.php';
             </div><!-- /.ord-comment-feed -->
 
         </section><!-- /.ord-comments-section -->
+
+        </section><!-- /.ord-comments-section -->
+
+        <!-- ================================================================
+         COMMENT POLICY CONFIRMATION MODAL
+         Shown once per submit attempt before the POST is dispatched.
+    ================================================================ -->
+        <div
+            class="auth-modal-backdrop"
+            id="comment-policy-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="comment-policy-title"
+            aria-describedby="comment-policy-desc">
+
+            <div class="auth-modal">
+                <div class="auth-modal--header">
+                    <div class="modal-icon" aria-hidden="true">💬</div>
+                    <span class="modal-title" id="comment-policy-title">Public Comment Policy</span>
+                    <button
+                        class="modal-close"
+                        type="button"
+                        id="comment-policy-close"
+                        aria-label="Close">✕</button>
+                </div>
+                <div class="auth-modal--body">
+                    <p id="comment-policy-desc">
+                        You are about to post a comment on
+                        <strong>EncycLawPhilia Valenzuela</strong>, a public civic forum.
+                        Your comment will be permanently visible to all visitors and
+                        cannot be edited or removed after submission.
+                    </p>
+                    <p class="modal-sub">
+                        By proceeding, you confirm that your comment is respectful,
+                        relevant to the ordinance, and does not contain offensive,
+                        defamatory, or misleading content. Violations may result in
+                        account deactivation.
+                    </p>
+                    <label class="comment-policy-dont-show-row">
+                        <input
+                            type="checkbox"
+                            id="comment-policy-dont-show"
+                            class="comment-policy-dont-show-checkbox" />
+                        <span>Don't show this again on this device</span>
+                    </label>
+                    <div class="auth-modal--actions">
+                        <button
+                            class="btn-modal-dismiss"
+                            type="button"
+                            id="comment-policy-cancel">
+                            Cancel
+                        </button>
+                        <button
+                            class="btn-modal-retry"
+                            type="button"
+                            id="comment-policy-confirm">
+                            I Understand — Post Comment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /#comment-policy-modal -->
+
+    </main>
 
     </main>
 

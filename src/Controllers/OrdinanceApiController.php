@@ -34,6 +34,7 @@ class OrdinanceApiController
                     hasSummary: $filters['hasSummary'],
                     hasFullText: $filters['hasFullText'],
                     hasPdf: $filters['hasPdf'],
+                    barangayId: $filters['barangayId'],
                     sortBy: $filters['sortBy'],
                     sortDir: $filters['sortDir'],
                     limit: $limit,
@@ -86,6 +87,7 @@ class OrdinanceApiController
                     hasSummary: $filters['hasSummary'],
                     hasFullText: $filters['hasFullText'],
                     hasPdf: $filters['hasPdf'],
+                    barangayId: $filters['barangayId'],
                     sortBy: $filters['sortBy'],
                     sortDir: $filters['sortDir'],
                     limit: 1,   // minimum enforced by model; we only need total
@@ -99,6 +101,80 @@ class OrdinanceApiController
         ApiResponse::send(
             ApiResponse::success(
                 data: ['pagination' => $this->buildPaginationMeta($result['total'], 1, $limit)],
+                message: 'OK'
+            )
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // GET /api/categories
+    //
+    // Returns the full Categories reference list as a JSON array.
+    // Used by the filter-sidebar initialiser (filter-categories.js) to
+    // populate the category <select> element on Browse and Admin Dashboard
+    // without hard-coding values in PHP templates.
+    //
+    // Response shape:
+    // {
+    //   "ok": true,
+    //   "message": "OK",
+    //   "data": [
+    //     { "category_id": 1, "category_name": "Cultural Heritage" },
+    //     ...
+    //   ]
+    // }
+    //
+    // The endpoint is intentionally public (no auth guard) because the
+    // Categories table is stable reference data with no sensitive content.
+    // ------------------------------------------------------------------
+    public function categories(): void
+    {
+        $this->assertXhr();
+
+        try {
+            $categories = (new OrdinanceModel(
+                \App\Controllers\DatabaseController::getDatabaseConnection()
+            ))->getAllCategories();
+        } catch (PDOException $e) {
+            error_log('OrdinanceApiController::categories() failure: ' . $e->getMessage());
+            ApiResponse::send(
+                ApiResponse::error('A database error occurred. Please try again.', 500),
+                500
+            );
+        }
+
+        ApiResponse::send(
+            ApiResponse::success(
+                data: $categories,
+                message: 'OK'
+            )
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // GET /api/barangays
+    // Returns the full Barangays reference list as a JSON array.
+    // Public endpoint — Barangays is stable reference data.
+    // ------------------------------------------------------------------
+    public function barangays(): void
+    {
+        $this->assertXhr();
+
+        try {
+            $barangays = (new OrdinanceModel(
+                \App\Controllers\DatabaseController::getDatabaseConnection()
+            ))->getAllBarangays();
+        } catch (PDOException $e) {
+            error_log('OrdinanceApiController::barangays() failure: ' . $e->getMessage());
+            ApiResponse::send(
+                ApiResponse::error('A database error occurred. Please try again.', 500),
+                500
+            );
+        }
+
+        ApiResponse::send(
+            ApiResponse::success(
+                data: $barangays,
                 message: 'OK'
             )
         );
@@ -160,6 +236,12 @@ class OrdinanceApiController
             ? [(int) $rawCategory]
             : [];
 
+        // Barangay: single select:
+        $rawBarangay = $_GET['barangay_id'] ?? '';
+        $barangayId  = ($rawBarangay !== '' && ctype_digit((string) $rawBarangay))
+            ? (int) $rawBarangay
+            : null;
+
         // Date range: must be valid YYYY-MM-DD; reject anything else silently
         $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
         $dateFrom    = isset($_GET['date_from']) ? trim($_GET['date_from']) : '';
@@ -192,6 +274,7 @@ class OrdinanceApiController
 
         return compact(
             'categoryIds',
+            'barangayId',
             'dateFrom',
             'dateTo',
             'statuses',

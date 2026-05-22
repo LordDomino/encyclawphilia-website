@@ -17,7 +17,65 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ── Submit ────────────────────────────────────────────────────────────
-    submitBtn?.addEventListener('click', async () => {
+    const policyModal = document.getElementById('comment-policy-modal');
+    const policyConfirm = document.getElementById('comment-policy-confirm');
+    const policyCancel = document.getElementById('comment-policy-cancel');
+    const policyClose = document.getElementById('comment-policy-close');
+    const policyDontShow = document.getElementById('comment-policy-dont-show');
+
+    // Per-user key so the preference is scoped to this account on this device
+    const policyStorageKey = `elp_comment_policy_ack_${submitBtn?.dataset.userId ?? '0'}`;
+
+    // Step 1: intercept click — skip modal if user previously dismissed it
+    submitBtn?.addEventListener('click', () => {
+        const text = textarea.value.trim();
+        if (!text || !submitBtn.dataset.ordinanceId) return;
+
+        if (localStorage.getItem(policyStorageKey) === '1') {
+            postComment();
+        } else {
+            openPolicyModal();
+        }
+    });
+
+    // Step 2: user confirmed — persist preference if checked, then POST
+    policyConfirm?.addEventListener('click', async () => {
+        if (policyDontShow?.checked) {
+            try {
+                localStorage.setItem(policyStorageKey, '1');
+            } catch {
+                // localStorage unavailable (private browsing quota) — silently skip
+            }
+        }
+        closePolicyModal();
+        await postComment();
+    });
+
+    policyCancel?.addEventListener('click', closePolicyModal);
+    policyClose?.addEventListener('click', closePolicyModal);
+
+    policyModal?.addEventListener('click', (e) => {
+        if (e.target === policyModal) closePolicyModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && policyModal?.classList.contains('active')) {
+            closePolicyModal();
+        }
+    });
+
+    function openPolicyModal() {
+        policyModal?.classList.add('active');
+        policyConfirm?.focus();
+    }
+
+    function closePolicyModal() {
+        policyModal?.classList.remove('active');
+        if (policyDontShow) policyDontShow.checked = false;
+        submitBtn?.focus();
+    }
+
+    async function postComment() {
         const text = textarea.value.trim();
         const ordinanceId = submitBtn.dataset.ordinanceId;
 
@@ -37,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (payload.ok) {
                 textarea.value = '';
                 charCount.textContent = `0 / ${MAX_LENGTH}`;
+                charCount.classList.remove('ord-comment-char-count--warn');
                 prependComment(payload.data);
                 updateCommentCount(1);
                 submitBtn.textContent = 'Post Comment';
@@ -54,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Post Comment';
         }
-    });
+    }
 
     // ── DOM helpers ───────────────────────────────────────────────────────
     function prependComment(data) {

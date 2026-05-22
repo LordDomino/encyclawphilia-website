@@ -68,6 +68,8 @@ $router->post('/store-ordinance', 'DashboardController@storeOrdinance');
 
 $router->get('/api/ordinances/search', 'OrdinanceApiController@search');
 $router->get('/api/ordinances/meta',   'OrdinanceApiController@meta');
+$router->get('/api/categories', 'OrdinanceApiController@categories');
+$router->get('/api/barangays', 'OrdinanceApiController@barangays');
 
 $router->post('/comment', 'UserController@handleOrdinanceComment');
 // Catch incoming request context
