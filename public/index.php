@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 define('APP_ROOT', dirname(__DIR__) . '/src');
@@ -13,7 +14,7 @@ spl_autoload_register(function ($class) {
     }
 
     $prefix = 'App\\';
-    
+
     // Check if the class uses our root namespace prefix
     $len = strlen($prefix);
     if (strncmp($prefix, $class, $len) !== 0) {
@@ -24,7 +25,7 @@ spl_autoload_register(function ($class) {
 
     // Map to the file path (e.g., APP_ROOT . "/Controllers/AuthController.php")
     $file = APP_ROOT . '/' . str_replace('\\', '/', $relative_class) . '.php';
-    
+
     if (file_exists($file)) {
         require_once $file;
     }
@@ -63,6 +64,9 @@ $router->get('/add-ordinance', 'PagesNavigationController@addOrdinance');
 $router->get('/edit-ordinance', 'DashboardController@editOrdinance');
 
 $router->post('/store-ordinance', 'DashboardController@storeOrdinance');
+
+$router->get('/api/ordinances/search', 'OrdinanceApiController@search');
+$router->get('/api/ordinances/meta',   'OrdinanceApiController@meta');
 
 // Catch incoming request context
 $requestUri = $_SERVER['REQUEST_URI'];

@@ -2,43 +2,13 @@
 
 namespace App\Views\pages;
 
-use App\Models\CommentModel;
-use App\Models\OrdinanceModel;
-
 session_start();
 $loggedIn = isset($_SESSION['user_id']);
 
-// Phase 1: Ingestion and State Management
-require_once __DIR__ . '/../../Models/procedures.php'; // Import the newly decoupled data routine
-
-$search_keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
-$safe_search_keyword = htmlspecialchars($search_keyword, ENT_QUOTES, 'UTF-8');
-$results = [];
-
-// Phase 2: Delegating Database Interrogation
-if ($search_keyword !== '') {
-    // Establish network boundary context
-    $pdo = \App\Controllers\DatabaseController::getDatabaseConnection();
-    $ordinanceModel = new OrdinanceModel($pdo);
-    $results = $ordinanceModel->getOrdinancesByTitle($safe_search_keyword);
-
-    // Debugging payload output
-    //  * Refactored: Replaced 'CALL GetOrdinancesByTitle(:key)' statement compilation 
-    //  * with an explicit application routine invocation. The connection state ($pdo)
-    //  * is passed into the function context directly.
-    //  */
-    // $commentModel = new CommentModel($pdo);
-    echo "<script>console.log(" . json_encode($results) . ")</script>";
-}
-
-// HTML Assembly
-$pageTitle = "Browse | EncycLawPhilia Valenzuela";
+$pageTitle   = "Browse | EncycLawPhilia Valenzuela";
 $currentPage = "browse";
 
-require_once VIEWS_ROOT . '/head.php';
-
-use \App\Core\TemplateEngine;
-
+require_once __DIR__ . '/../head.php';
 ?>
 
 <body>
@@ -64,7 +34,7 @@ use \App\Core\TemplateEngine;
                 <div class="sidebar-content">
 
                     <!-- Mini search -->
-                    <form class="search-bar mini" action="/browse" method="get">
+                    <form class="search-bar mini" id="browse-search-form" action="/browse" method="get">
                         <input
                             type="search"
                             id="browse-pg-search-bar"
@@ -72,8 +42,16 @@ use \App\Core\TemplateEngine;
                             placeholder="Search ordinances..."
                             aria-label="Search within results"
                             autocomplete="off"
-                            inputmode="search"
-                            value="<?php echo $safe_search_keyword; ?>" />
+                            inputmode="search" />
+                        <button type="submit" class="search-submit-btn" aria-label="Search">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                width="16" height="16" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452
+                     4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </button>
                     </form>
 
                     <!-- Filters heading -->
@@ -269,62 +247,23 @@ use \App\Core\TemplateEngine;
             </aside>
             <section class="results-content" id="browse-all-ordinances">
                 <div class="results-header">
-                    <h2 class="results-header-title">Search Results for <?php echo $safe_search_keyword; ?></h2>
-                    <span class="result-count" id="result-count">(<?php echo count($results); ?> results)</span>
+                    <h2 class="results-header-title">All Ordinances</h2>
+                    <span class="result-count" id="result-count"></span>
                 </div>
+
+                <!-- Pagination bar — top -->
+                <nav class="pagination-bar" id="pagination-bar-top" aria-label="Pagination top">
+                    <!-- Populated by browse-search.js -->
+                </nav>
+
                 <div class="flex-grid" id="results-grid">
-                    <?php if (!empty($results)): ?>
-                        <?php foreach ($results as $row): ?>
-                            <div class="content-card">
-                                <div class="content-card-header">
-                                    <div class="card-label-group">
-                                        <span class="card-type">City Ordinance</span>
-                                        <span class="numeral-and-series">
-                                            No. <?php echo htmlspecialchars($row['ordinance_number'], ENT_QUOTES, 'UTF-8'); ?>
-                                            s. <?php echo htmlspecialchars($row['series_year'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                    </div>
-                                    <div class="date">
-                                        <span class="date-day"><?php echo htmlspecialchars($row['enactment_day'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                        <div class="date-meta">
-                                            <span class="date-month"><?php echo htmlspecialchars($row['enactment_month'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                            <span class="date-year"><?php echo htmlspecialchars($row['enactment_year'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="preview-container">
-                                    <div class="preview-text">
-                                        <?php echo htmlspecialchars($row['title'], ENT_QUOTES, 'UTF-8'); ?>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <div class="card-engagement">
-                                        <span class="engagement-item likes">
-                                            <span class="engagement-icon">▲</span>
-                                            <span class="engagement-count">
-                                                <?php echo htmlspecialchars($row['like_count'], ENT_QUOTES, 'UTF-8'); ?>
-                                            </span>
-                                        </span>
-                                        <span class="engagement-divider"></span>
-                                        <span class="engagement-item dislikes">
-                                            <span class="engagement-icon">▼</span>
-                                            <span class="engagement-count">
-                                                <?php echo htmlspecialchars($row['dislike_count'], ENT_QUOTES, 'UTF-8'); ?>
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <?php
-                                    $injectedCardHTML = TemplateEngine::compile('partials/ord_link', ['ordinance_id' => $row['ordinance_id']]);
-                                    echo $injectedCardHTML;
-                                    ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="no-results">
-                            <p>No matching items found. Try adjusting your keywords.</p>
-                        </div>
-                    <?php endif; ?>
+                    <!-- Populated by browse-search.js -->
                 </div>
+
+                <!-- Pagination bar — bottom -->
+                <nav class="pagination-bar" id="pagination-bar-bottom" aria-label="Pagination bottom">
+                    <!-- Populated by browse-search.js -->
+                </nav>
             </section>
         </div>
         <button class="back-to-top" id="back-to-top" aria-label="Back to top">↑</button>
@@ -413,66 +352,157 @@ use \App\Core\TemplateEngine;
     // ============================================================
     // ACTIVE FILTERS DISPLAY
     // ============================================================
-    const categoryFilter = document.getElementById('category-filter');
-    const yearFilter = document.getElementById('year-filter');
-    const statusFilters = document.querySelectorAll('select[id="status-filter"]');
+    const activeFiltersContainer = document.getElementById('active-filters');
     const filterChips = document.getElementById('filter-chips');
-    const clearFiltersBtn = document.getElementById('clear-filters');
+
+    /**
+     * Collects all currently active filter states across every
+     * filter control in the sidebar and returns a flat array of
+     * { label, id, reset } descriptor objects.
+     */
+    function collectActiveFilters() {
+        const active = [];
+
+        // ── Category (single select) ─────────────────────────
+        const categoryEl = document.getElementById('filter-category');
+        if (categoryEl && categoryEl.value !== '') {
+            active.push({
+                label: categoryEl.options[categoryEl.selectedIndex].text,
+                id: 'category',
+                reset: () => {
+                    categoryEl.value = '';
+                }
+            });
+        }
+
+        // ── Date range ───────────────────────────────────────
+        const dateFrom = document.getElementById('filter-date-from');
+        const dateTo = document.getElementById('filter-date-to');
+        if (dateFrom && dateFrom.value) {
+            active.push({
+                label: `From ${dateFrom.value}`,
+                id: 'date_from',
+                reset: () => {
+                    dateFrom.value = '';
+                }
+            });
+        }
+        if (dateTo && dateTo.value) {
+            active.push({
+                label: `To ${dateTo.value}`,
+                id: 'date_to',
+                reset: () => {
+                    dateTo.value = '';
+                }
+            });
+        }
+
+        // ── Status (multi-checkbox) ──────────────────────────
+        document.querySelectorAll('#filter-status-group .filter-checkbox:checked').forEach(cb => {
+            active.push({
+                label: cb.value,
+                id: `status_${cb.value}`,
+                reset: () => {
+                    cb.checked = false;
+                }
+            });
+        });
+
+        // ── Content flags (multi-checkbox) ──────────────────
+        const flagLabels = {
+            has_summary: 'Has summary',
+            has_full_text: 'Has full text',
+            has_pdf: 'Has PDF file'
+        };
+        document.querySelectorAll('[data-filter-key^="has_"]:checked').forEach(cb => {
+            active.push({
+                label: flagLabels[cb.name] ?? cb.name,
+                id: `flag_${cb.name}`,
+                reset: () => {
+                    cb.checked = false;
+                }
+            });
+        });
+
+        // ── Sort (only surface when non-default) ────────────
+        const sortEl = document.getElementById('filter-sort-by');
+        const sortDir = document.querySelector('.filter-radio:checked');
+        const defaultSort = 'date_enacted';
+        const defaultDir = 'desc';
+        if (sortEl && (sortEl.value !== defaultSort || (sortDir && sortDir.value !== defaultDir))) {
+            const dirLabel = sortDir ? (sortDir.value === 'asc' ? '↑' : '↓') : '';
+            active.push({
+                label: `${sortEl.options[sortEl.selectedIndex].text} ${dirLabel}`.trim(),
+                id: 'sort',
+                reset: () => {
+                    sortEl.value = defaultSort;
+                    const descRadio = document.querySelector('.filter-radio[value="desc"]');
+                    if (descRadio) descRadio.checked = true;
+                }
+            });
+        }
+
+        return active;
+    }
 
     function updateActiveFilters() {
-        const activeFilters = [];
+        const active = collectActiveFilters();
 
-        if (categoryFilter.value !== 'All Categories') {
-            activeFilters.push({
-                label: categoryFilter.value,
-                id: 'category'
-            });
-        }
-        if (yearFilter.value !== 'All Years') {
-            activeFilters.push({
-                label: yearFilter.value,
-                id: 'year'
-            });
-        }
-        if (statusFilters[0].value !== 'All Statuses') {
-            activeFilters.push({
-                label: statusFilters[0].value,
-                id: 'status'
-            });
-        }
-
-        if (activeFilters.length > 0) {
+        if (active.length > 0) {
             activeFiltersContainer.style.display = 'block';
-            filterChips.innerHTML = activeFilters.map(filter =>
-                `<span class="chip" data-filter="${filter.id}">${filter.label} ✕</span>`
+            filterChips.innerHTML = active.map(f =>
+                `<span class="chip" data-filter="${f.id}">${f.label} ✕</span>`
             ).join('');
 
-            // Add click handlers to remove individual filters
-            document.querySelectorAll('.chip').forEach(chip => {
+            // Bind removal to each chip's reset function
+            filterChips.querySelectorAll('.chip').forEach(chip => {
+                const descriptor = active.find(f => f.id === chip.dataset.filter);
                 chip.addEventListener('click', () => {
-                    const filterId = chip.dataset.filter;
-                    if (filterId === 'category') categoryFilter.value = 'All Categories';
-                    if (filterId === 'year') yearFilter.value = 'All Years';
-                    if (filterId === 'status') statusFilters[0].value = 'All Statuses';
+                    descriptor?.reset();
                     updateActiveFilters();
                 });
             });
         } else {
             activeFiltersContainer.style.display = 'none';
+            filterChips.innerHTML = '';
         }
     }
 
-    categoryFilter.addEventListener('change', updateActiveFilters);
-    yearFilter.addEventListener('change', updateActiveFilters);
-    statusFilters[0].addEventListener('change', updateActiveFilters);
+    // ── Attach change listeners to all filter controls ────────
+    document.getElementById('filter-category')
+        ?.addEventListener('change', updateActiveFilters);
 
-    clearFiltersBtn.addEventListener('click', () => {
-        categoryFilter.value = 'All Categories';
-        yearFilter.value = 'All Years';
-        statusFilters[0].value = 'All Statuses';
-        statusFilters[1].value = 'All Statuses';
-        updateActiveFilters();
-    });
+    document.getElementById('filter-date-from')
+        ?.addEventListener('change', updateActiveFilters);
+
+    document.getElementById('filter-date-to')
+        ?.addEventListener('change', updateActiveFilters);
+
+    document.querySelectorAll('#filter-status-group .filter-checkbox')
+        .forEach(cb => cb.addEventListener('change', updateActiveFilters));
+
+    document.querySelectorAll('[data-filter-key^="has_"]')
+        .forEach(cb => cb.addEventListener('change', updateActiveFilters));
+
+    document.getElementById('filter-sort-by')
+        ?.addEventListener('change', updateActiveFilters);
+
+    document.querySelectorAll('.filter-radio')
+        .forEach(r => r.addEventListener('change', updateActiveFilters));
+
+    // ── Clear-all wired to the new sidebar button ────────────
+    document.getElementById('filter-clear-all')
+        ?.addEventListener('click', () => {
+            collectActiveFilters().forEach(f => f.reset());
+            updateActiveFilters();
+        });
+
+    // ── Legacy clear-all button in the active-filters band ───
+    document.getElementById('clear-filters')
+        ?.addEventListener('click', () => {
+            collectActiveFilters().forEach(f => f.reset());
+            updateActiveFilters();
+        });
 
     // ============================================================
     // CARD ENTRANCE ANIMATIONS (Intersection Observer)
@@ -499,6 +529,7 @@ use \App\Core\TemplateEngine;
         observer.observe(card);
     });
 </script>
+<script src="js/browse-search.js"></script>
 
 </html>
 </body>

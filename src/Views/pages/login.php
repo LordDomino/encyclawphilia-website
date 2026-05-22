@@ -4,12 +4,7 @@ session_start();
 $pageTitle   = "Login - EncycLawPhilia Valenzuela";
 $currentPage = "login";
 
-// Consume the flash message and determine which tab to activate
-$authError  = $_SESSION['auth_error'] ?? null;
-$activeTab  = $authError['tab'] ?? 'login';
-unset($_SESSION['auth_error']);   // clear it so it doesn't persist on refresh
-
-require __DIR__ . '/../head.php';
+require_once __DIR__ . '/../head.php';
 ?>
 
 <body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>">
@@ -23,34 +18,18 @@ require __DIR__ . '/../head.php';
             <div class="flex-column">
                 <section class="auth-hero">
                     <div class="auth-container">
-                        <!-- Tab Navigation -->
+
                         <div class="auth-tabs">
-                            <button class="tab-button <?= $activeTab === 'login'  ? 'active' : '' ?>" data-tab="login">
-                                <span>Login</span>
-                            </button>
-                            <button class="tab-button <?= $activeTab === 'signup' ? 'active' : '' ?>" data-tab="signup">
-                                <span>Sign Up</span>
-                            </button>
+                            <button class="tab-button active" data-tab="login"><span>Login</span></button>
+                            <button class="tab-button"        data-tab="signup"><span>Sign Up</span></button>
                         </div>
 
                         <!-- Login Form -->
-                        <form class="auth-form <?= $activeTab === 'login'  ? 'active' : '' ?>"
-                            id="login-form"
-                            action="/login-submit"
-                            method="POST"
+                        <form class="auth-form active" id="login-form"
+                            action="/login-submit" method="POST"
                             data-form="login">
 
-                            <?php if ($authError && $authError['tab'] === 'login'): ?>
-                                <div class="auth-message-bar auth-message-bar--<?= htmlspecialchars($authError['type'], ENT_QUOTES, 'UTF-8') ?>"
-                                    role="alert" aria-live="assertive">
-                                    <div class="bar-text">
-                                        <span class="bar-title"><?= htmlspecialchars($authError['title'], ENT_QUOTES, 'UTF-8') ?></span>
-                                        <span class="bar-body"><?= htmlspecialchars($authError['body'],  ENT_QUOTES, 'UTF-8') ?></span>
-                                    </div>
-                                    <button class="bar-close" type="button" aria-label="Dismiss"
-                                        onclick="this.parentElement.remove()">✕</button>
-                                </div>
-                            <?php endif; ?>
+                            <!-- Message bar is injected here by JS based on API response -->
 
                             <div class="form-group">
                                 <label for="login-email">Email Address</label>
@@ -80,7 +59,7 @@ require __DIR__ . '/../head.php';
                                 <a href="#" class="forgot-password">Forgot password?</a>
                             </div>
 
-                            <button type="submit" class="auth-button primary">
+                            <button type="submit" class="auth-button primary" id="login-submit">
                                 Login
                             </button>
 
@@ -91,23 +70,8 @@ require __DIR__ . '/../head.php';
                         </form>
 
                         <!-- Sign Up Form -->
-                        <form class="auth-form <?= $activeTab === 'signup'  ? 'active' : '' ?>"
-                            id="signup-form"
-                            action="/signup-submit"
-                            method="POST"
-                            data-form="signup">
-
-                            <?php if ($authError && $authError['tab'] === 'signup'): ?>
-                                <div class="auth-message-bar auth-message-bar--<?= htmlspecialchars($authError['type'], ENT_QUOTES, 'UTF-8') ?>"
-                                    role="alert" aria-live="assertive">
-                                    <div class="bar-text">
-                                        <span class="bar-title"><?= htmlspecialchars($authError['title'], ENT_QUOTES, 'UTF-8') ?></span>
-                                        <span class="bar-body"><?= htmlspecialchars($authError['body'],  ENT_QUOTES, 'UTF-8') ?></span>
-                                    </div>
-                                    <button class="bar-close" type="button" aria-label="Dismiss"
-                                        onclick="this.parentElement.remove()">✕</button>
-                                </div>
-                            <?php endif; ?>
+                        <form class="auth-form" id="signup-form" action="/signup-submit"
+                            method="POST" data-form="signup">
 
                             <div class="form-group">
                                 <label for="signup-name">Username</label>
@@ -189,5 +153,7 @@ require __DIR__ . '/../head.php';
         });
     });
 </script>
+
+<script src="js/login.js"></script>
 
 </html>

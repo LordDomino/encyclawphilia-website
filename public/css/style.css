@@ -1442,6 +1442,125 @@ section.browse {
     color: var(--ink-light);
 }
 
+/* Skeleton loading state */
+.content-card--skeleton {
+    pointer-events: none;
+}
+
+.skeleton-line {
+    display: block;
+    height: 0.85em;
+    margin-bottom: 0.4em;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--color-surface-alt, #e0e0e0) 25%, var(--color-surface, #f0f0f0) 50%, var(--color-surface-alt, #e0e0e0) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite;
+}
+
+.skeleton-block {
+    height: 2.5rem;
+    width: 2.5rem;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--color-surface-alt, #e0e0e0) 25%, var(--color-surface, #f0f0f0) 50%, var(--color-surface-alt, #e0e0e0) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ── Pagination bar ────────────────────────────────────────────────── */
+.pagination-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.75rem 0;
+    min-height: 2.75rem; /* reserves space while empty during fetch */
+}
+
+.pg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    padding: 0 0.65rem;
+    border: 1px solid var(--color-border, #ccc);
+    border-radius: 5px;
+    background: transparent;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    white-space: nowrap;
+}
+
+.pg-btn:hover:not(.pg-current):not(.pg-disabled) {
+    background: var(--color-accent, #1a1a1a);
+    color: var(--color-on-accent, #fff);
+    border-color: var(--color-accent, #1a1a1a);
+}
+
+.pg-btn.pg-current {
+    background: var(--color-accent, #1a1a1a);
+    color: var(--color-on-accent, #fff);
+    border-color: var(--color-accent, #1a1a1a);
+    cursor: default;
+}
+
+.pg-btn.pg-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pg-ellipsis {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.875rem;
+    color: var(--color-muted, #777);
+    user-select: none;
+}
+
+/* ── Search bar with submit button ────────────────────────────────── */
+.search-bar.mini {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.search-bar.mini input[type="search"] {
+    flex: 1;
+    border-right: none;
+    border-radius: 5px 0 0 5px;
+}
+
+.search-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;          /* matches input height */
+    padding: 0 0.75rem;
+    border: 1px solid var(--color-border, #ccc);
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+    background: var(--color-surface-alt, #f5f5f5);
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.search-submit-btn:hover {
+    background: var(--color-accent, #1a1a1a);
+    color: var(--color-on-accent, #fff);
+    border-color: var(--color-accent, #1a1a1a);
+}
+
 
 /* ============================================================
    CAROUSELS

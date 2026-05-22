@@ -14,61 +14,57 @@ class AuthController
         return new AuthService(new UserModel($pdo));
     }
 
-    // ── POST /login-submit ────────────────────────────────────────────────
     public function handleLoginSubmit(): void
     {
         session_start();
 
+        // Guard: method
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /login');
-            ApiResponse::send(
-                ApiResponse::error('Request method invalid.', 401),
-                401
-            );
-            exit;
+            ApiResponse::send(ApiResponse::error('Method not allowed.', 405), 405);
         }
 
+        // Guard: required fields
         $email    = trim($_POST['email']    ?? '');
         $password =      $_POST['password'] ?? '';
 
-        $result = $this->makeAuthService()->login($email, $password);
-
-        if ($result['ok']) {
-            session_regenerate_id(true);
-            $user = $result['user'];
-
-            $_SESSION['user_id']  = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role_id']  = $user['role_id'];
-            $_SESSION['is_admin'] = ($user['role_id'] === 1);
-
-            header('Location: /home');
-            // ApiResponse::send(
-            //     ApiResponse::success(
-            //         data: [
-            //             'action'       => $result['action'],       // 'added'|'removed'|'switched'
-            //             'userReaction' => $result['userReaction'], // 'like'|'dislike'|null
-            //             'likes'        => $result['likes'],
-            //             'dislikes'     => $result['dislikes'],
-            //         ],
-            //         message: match ($result['action']) {
-            //             'added'    => 'Reaction recorded.',
-            //             'removed'  => 'Reaction removed.',
-            //             'switched' => 'Reaction updated.',
-            //         }
-            //     ),
-            //     httpStatus: 200
-            // );
-            exit;
+        if ($email === '' || $password === '') {
+            ApiResponse::send(
+                ApiResponse::error('Email and password are required.'),
+                200   // <-- application error, not an HTTP error
+            );
         }
 
-        // $this->flashError($result['message'], 'Login failed', 'login');
-        header('Location: /login');
+        // Delegate to service layer
+        $result = $this->makeAuthService()->login($email, $password);
+
+        if (!$result['ok']) {
+            ApiResponse::send(
+                ApiResponse::error($result['message'] ?? 'Incorrect email or password.'),
+                200   // <-- still 200; the payload carries the failure signal
+            );
+        }
+
+        // Success path
+        session_regenerate_id(true);
+
+        $user = $result['user'];
+        $_SESSION['user_id']  = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role_id']  = $user['role_id'];
+        $_SESSION['is_admin'] = ($user['role_id'] === 1);
+
         ApiResponse::send(
-            ApiResponse::error('Login failed', 401),
-            401
+            ApiResponse::success(
+                data: [
+                    'user_id'  => $user['id'],
+                    'username' => $user['username'],
+                    'role_id'  => $user['role_id'],
+                    'is_admin' => $_SESSION['is_admin'],
+                ],
+                message: 'Login successful.'
+            ),
+            200
         );
-        exit;
     }
 
     // ── POST /signup-submit ───────────────────────────────────────────────

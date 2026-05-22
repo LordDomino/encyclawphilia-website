@@ -390,86 +390,114 @@ class OrdinanceModel
             throw $e;
         }
     }
-
     /**
-     * Resolves a collection of ordinances matching a specific title sequence, 
-     * appending pre-aggregated behavioral metrics.
+     * Retrieves a paginated slice of ordinances matching an optional title keyword,
+     * ordered by enactment date descending.
      *
-     * @param PDO    $pdo           An active database connection layer.
-     * @param string $searchKeyword The un-wildcarded string provided by the runtime consumer.
-     * @return array                A multi-dimensional array of normalized ordinance records.
-     * @throws PDOException         If structural validation or connection boundaries fail.
+     * When $searchKeyword is empty, all active ordinances are returned (default browse).
+     * When $searchKeyword is provided, results are filtered by title LIKE match.
+     *
+     * @param PDO    $pdo            Active database connection.
+     * @param string $searchKeyword  Raw (un-wildcarded) keyword. Empty string = no filter.
+     * @param int    $limit          Rows per page.
+     * @param int    $offset         Row offset for the current page.
+     * @return array{rows: array, total: int}
+     *     rows  — Normalized ordinance records for the requested slice.
+     *     total — Total matching rows across all pages (for pagination math).
+     * @throws PDOException On structural or connection failure.
      */
-    public function getOrdinancesByTitle(string $searchKeyword): array
-    {
-        $sql = "
+    public function getOrdinancesByTitle(
+        string $searchKeyword = '',
+        int    $limit         = 20,
+        int    $offset        = 0
+    ): array {
+        $hasKeyword     = $searchKeyword !== '';
+        $whereKeyword   = $hasKeyword ? 'AND ord.title LIKE :search_pattern' : '';
+
+        // ── Total count (for pagination) ──────────────────────────────────
+        $countSql = "
+        SELECT COUNT(*) AS total
+        FROM   Ordinances ord
+        WHERE  ord.archived_at IS NULL
+        {$whereKeyword}
+        ";
+
+        $countStmt = $this->pdo->prepare($countSql);
+        if ($hasKeyword) {
+            $countStmt->bindValue(':search_pattern', '%' . $searchKeyword . '%');
+        }
+        $countStmt->execute();
+        $total = (int) $countStmt->fetchColumn();
+
+        // When limit is 0, the caller only wants the total count
+        if ($limit === 0) {
+            return ['rows' => [], 'total' => $total];
+        }
+
+        // ── Paginated result slice ─────────────────────────────────────────
+        $dataSql = "
         WITH MetricAggregations AS (
-            SELECT 
+            SELECT
                 rel.ordinance_id,
-                SUM(CASE WHEN rel.reaction_type = 'like' THEN 1 ELSE 0 END) AS total_likes,
+                SUM(CASE WHEN rel.reaction_type = 'like'    THEN 1 ELSE 0 END) AS total_likes,
                 SUM(CASE WHEN rel.reaction_type = 'dislike' THEN 1 ELSE 0 END) AS total_dislikes
-            FROM 
-                Ordinance_Reactions rel
-            GROUP BY 
-                rel.ordinance_id
+            FROM Ordinance_Reactions rel
+            GROUP BY rel.ordinance_id
         )
-        SELECT 
+        SELECT
             ord.ordinance_id,
-            SUBSTRING(ord.ordinance_number, 5) AS ordinance_number,
+            SUBSTRING(ord.ordinance_number, 5)              AS ordinance_number,
             ord.title,
             ord.series_year,
-            IFNULL(DAY(ord.date_enacted), '') AS enactment_day,
-            IFNULL(MONTHNAME(ord.date_enacted), '') AS enactment_month,
+            IFNULL(DAY(ord.date_enacted),       '')         AS enactment_day,
+            IFNULL(MONTHNAME(ord.date_enacted), '')         AS enactment_month,
             IFNULL(YEAR(ord.date_enacted), ord.series_year) AS enactment_year,
             ord.status,
-            COALESCE(metrics.total_likes, 0) AS like_count,
-            COALESCE(metrics.total_dislikes, 0) AS dislike_count
-        FROM 
-            Ordinances ord
-        LEFT JOIN 
-            MetricAggregations metrics ON ord.ordinance_id = metrics.ordinance_id
-        WHERE 
-            ord.title LIKE :search_pattern
-            AND ord.archived_at IS NULL
-        ORDER BY 
-            ord.date_enacted DESC, 
-            ord.ordinance_id DESC;
+            COALESCE(metrics.total_likes,    0)             AS like_count,
+            COALESCE(metrics.total_dislikes, 0)             AS dislike_count
+        FROM Ordinances ord
+        LEFT JOIN MetricAggregations metrics
+               ON metrics.ordinance_id = ord.ordinance_id
+        WHERE  ord.archived_at IS NULL
+        {$whereKeyword}
+        ORDER BY ord.date_enacted DESC,
+                 ord.ordinance_id  DESC
+        LIMIT  :limit
+        OFFSET :offset
     ";
 
-        try {
-            $stmt = $this->pdo->prepare($sql);
-
-            // Inject SQL wildcard markers directly into the parameter context
-            $searchPattern = '%' . $searchKeyword . '%';
-            $stmt->execute([':search_pattern' => $searchPattern]);
-
-            $rawResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            $normalizedResults = [];
-
-            // Type normalization phase to enforce strict application-layer typing
-            foreach ($rawResults as $row) {
-                $normalizedResults[] = [
-                    'ordinance_id'     => (int)$row['ordinance_id'],
-                    'ordinance_number' => $row['ordinance_number'],
-                    'title'            => $row['title'],
-                    'series_year'      => (int)$row['series_year'],
-                    'enactment_day'    => $row['enactment_day'] !== '' ? (int)$row['enactment_day'] : '--',
-                    'enactment_month'  => $row['enactment_month'] !== '' ? $row['enactment_month'] : 'Pending',
-                    'enactment_year'   => (int)$row['enactment_year'],
-                    'status'           => $row['status'],
-                    'like_count'       => (int)$row['like_count'],
-                    'dislike_count'    => (int)$row['dislike_count']
-                ];
-            }
-
-            return $normalizedResults;
-        } catch (PDOException $e) {
-            // Log query state tracking locally for maintenance forensics
-            error_log("Database execution error within getOrdinancesByTitle: " . $e->getMessage());
-            throw $e;
+        $dataStmt = $this->pdo->prepare($dataSql);
+        if ($hasKeyword) {
+            $dataStmt->bindValue(':search_pattern', '%' . $searchKeyword . '%');
         }
-    }
+        $dataStmt->bindValue(':limit',  $limit,  PDO::PARAM_INT);
+        $dataStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $dataStmt->execute();
 
+        $rawResults = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // ── Type normalization ─────────────────────────────────────────────
+        $normalized = [];
+        foreach ($rawResults as $row) {
+            $normalized[] = [
+                'ordinance_id'     => (int) $row['ordinance_id'],
+                'ordinance_number' => $row['ordinance_number'],
+                'title'            => $row['title'],
+                'series_year'      => (int) $row['series_year'],
+                'enactment_day'    => $row['enactment_day'] !== '' ? (int) $row['enactment_day'] : null,
+                'enactment_month'  => $row['enactment_month'],
+                'enactment_year'   => (int) $row['enactment_year'],
+                'status'           => $row['status'],
+                'like_count'       => (int) $row['like_count'],
+                'dislike_count'    => (int) $row['dislike_count'],
+            ];
+        }
+
+        return [
+            'rows'  => $normalized,
+            'total' => $total,
+        ];
+    }
     /**
      * searchOrdinancesByCategory
      *
