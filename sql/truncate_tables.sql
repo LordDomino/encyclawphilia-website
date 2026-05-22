@@ -2,15 +2,15 @@ USE if0_41928864_encyclawphilia_db;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-TRUNCATE TABLE `comment_reactions`;
-TRUNCATE TABLE `ordinance_reactions`;
-TRUNCATE TABLE `comments`;
-TRUNCATE TABLE `ordinance_tags`;
-TRUNCATE TABLE `tags`;
-TRUNCATE TABLE `ordinances`;
-TRUNCATE TABLE `categories`;
-TRUNCATE TABLE `barangays`;
-TRUNCATE TABLE `users`;
-TRUNCATE TABLE `roles`;
+TRUNCATE TABLE `Comment_Reactions`;
+TRUNCATE TABLE `Ordinance_Reactions`;
+TRUNCATE TABLE `Comments`;
+TRUNCATE TABLE `Ordinance_Tags`;
+TRUNCATE TABLE `Tags`;
+TRUNCATE TABLE `Ordinances`;
+TRUNCATE TABLE `Categories`;
+TRUNCATE TABLE `Barangays`;
+TRUNCATE TABLE `Users`;
+TRUNCATE TABLE `Roles`;
 
 SET FOREIGN_KEY_CHECKS = 1;
