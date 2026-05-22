@@ -91,7 +91,7 @@ require VIEWS_ROOT . '/head.php';
         <div class="subhero ordinance-subhero">
             <div class="subhero-content">
                 <nav class="breadcrumb" aria-label="Breadcrumb">
-                    <a href="index.php">Home</a>
+                    <a href="/home">Home</a>
                     <span class="separator" aria-hidden="true">›</span>
                     <a href="/browse">Ordinances</a>
                     <span class="separator" aria-hidden="true">›</span>

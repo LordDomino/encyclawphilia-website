@@ -1845,6 +1845,15 @@ body.home .site-header .header-content {
     border-left: var(--bdr-normal) solid var(--bdr-clr-divider);
 }
 
+.results-content#browse-all-ordinances {
+    scroll-margin-top: var(--header-height);
+    width: 100%;
+    padding: calc(var(--pad-md) - var(--pad-sm)) 0;
+    padding-left: var(--pad-md);
+    margin: var(--pad-sm) 0;
+    border-left: var(--bdr-normal) solid var(--bdr-clr-divider);
+}
+
 .results-content h1 {
     color: var(--ink-primary);
     margin: 0 0 var(--sp-7);
