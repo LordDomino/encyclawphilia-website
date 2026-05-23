@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="/css/admin_dashboard.css">
     <link rel="stylesheet" href="/css/comment.css">
     
+<link rel="stylesheet" href="/css/comment.css">
 
+<!-- add this line -->
+<script src="/js/components/nav-toggle.js" defer></script>
 
 </head>

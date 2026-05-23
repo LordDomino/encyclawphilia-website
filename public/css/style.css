@@ -1943,7 +1943,6 @@ ul.carousel li {
     display: flex;
     align-items: center;
     transition: all var(--ease);
-    overflow-x: scroll;
 }
 
 body.home .site-header {
@@ -6553,5 +6552,101 @@ section.auth-hero {
 
     .date-day {
         font-size: 2rem;
+    }
+}
+
+/* ============================================================
+   SITE HEADER — RESPONSIVE / MOBILE
+============================================================ */
+
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    /* Keeps it vertically centered with the brand title */
+    align-self: center;
+    /* Pushes it to the far right of the header */
+    margin-left: auto;
+}
+
+.nav-toggle-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 2px;
+    background-color: currentColor;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Animate bars into an X when open */
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+    opacity: 0;
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 768px) {
+
+    /* Prevent the header itself from scrolling horizontally */
+    .site-header {
+        overflow: visible;
+    }
+
+    .header-content {
+        flex-wrap: wrap;
+        position: relative;
+    }
+
+    /* Show the hamburger button */
+    .nav-toggle {
+        display: flex;
+    }
+
+    /* Nav becomes a full-width dropdown below the header bar */
+    .main-nav {
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        /* Sits flush below the brand + toggle row */
+        order: 3;
+        gap: 0;
+        padding: 0.5rem 0 0.75rem;
+        border-top: 1px solid currentColor;
+        opacity: 0.08; /* reuse existing border color without hardcoding */
+    }
+
+    /* Override the opacity trick — use a real separator */
+    .main-nav {
+        border-top: 1px solid rgba(128, 128, 128, 0.2);
+        opacity: 1;
+    }
+
+    .main-nav.is-open {
+        display: flex;
+    }
+
+    .main-nav a,
+    .main-nav .button {
+        width: 100%;
+        padding: 0.65rem 0.25rem;
+        border-radius: 0;
+        text-align: left;
+    }
+
+    /* Google Translate widget — full width on mobile */
+    #google_translate_element {
+        width: 100%;
+        padding: 0.5rem 0.25rem 0;
+        list-style: none;
     }
 }
