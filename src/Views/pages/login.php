@@ -9,10 +9,9 @@ require_once __DIR__ . '/../head.php';
 
 <body class="<?php echo isset($currentPage) ? htmlspecialchars($currentPage) : 'default'; ?>">
     <main class="auth-page">
-        <div class="login-hero">
+        <div class="login-hero" style="{ flex-direction: column }">
             <div class="flex-column" id="login-hero">
                 <?php require_once __DIR__ . '/../brand_title.php'; ?>
-                <p>Just want anonymous browsing? <a href="/home" class="clickable emphasis">Go back to home page.</a></p>
             </div>
             <div class="flex-column">
                 <section class="auth-hero">
@@ -129,6 +128,9 @@ require_once __DIR__ . '/../head.php';
                     </div>
                 </section>
             </div>
+            <div class="flex=column">
+                <p>Just want anonymous browsing? <a href="/home" class="clickable emphasis">Go back to home page.</a></p>
+</div>
         </div>
     </main>
 </body>
