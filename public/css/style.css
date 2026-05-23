@@ -1943,6 +1943,7 @@ ul.carousel li {
     display: flex;
     align-items: center;
     transition: all var(--ease);
+    overflow-x: scroll;
 }
 
 body.home .site-header {
