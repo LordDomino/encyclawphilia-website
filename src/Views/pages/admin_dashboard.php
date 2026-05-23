@@ -82,7 +82,7 @@ require_once VIEWS_ROOT . '/head.php';
                             </svg>
                         </span>
                         <div class="admin-kpi-body">
-                            <span class="admin-kpi-value" id="kpi-total-ordinances">—</span>
+                            <span class="admin-kpi-value" id="kpi-total-ordinances">12</span>
                             <span class="admin-kpi-label">Total Ordinances</span>
                         </div>
                     </div>
@@ -102,7 +102,7 @@ require_once VIEWS_ROOT . '/head.php';
                             </svg>
                         </span>
                         <div class="admin-kpi-body">
-                            <span class="admin-kpi-value" id="kpi-pending">—</span>
+                            <span class="admin-kpi-value" id="kpi-pending">0</span>
                             <span class="admin-kpi-label">Pending</span>
                         </div>
                     </div>
@@ -120,7 +120,7 @@ require_once VIEWS_ROOT . '/head.php';
                             </svg>
                         </span>
                         <div class="admin-kpi-body">
-                            <span class="admin-kpi-value" id="kpi-active">—</span>
+                            <span class="admin-kpi-value" id="kpi-active">9</span>
                             <span class="admin-kpi-label">Active</span>
                         </div>
                     </div>
@@ -139,7 +139,7 @@ require_once VIEWS_ROOT . '/head.php';
                             </svg>
                         </span>
                         <div class="admin-kpi-body">
-                            <span class="admin-kpi-value" id="kpi-repealed">—</span>
+                            <span class="admin-kpi-value" id="kpi-repealed">0</span>
                             <span class="admin-kpi-label">Repealed</span>
                         </div>
                     </div>
@@ -159,7 +159,7 @@ require_once VIEWS_ROOT . '/head.php';
                             </svg>
                         </span>
                         <div class="admin-kpi-body">
-                            <span class="admin-kpi-value" id="kpi-total-users">—</span>
+                            <span class="admin-kpi-value" id="kpi-total-users">248</span>
                             <span class="admin-kpi-label">Registered Users</span>
                         </div>
                     </div>
@@ -176,7 +176,7 @@ require_once VIEWS_ROOT . '/head.php';
                             </svg>
                         </span>
                         <div class="admin-kpi-body">
-                            <span class="admin-kpi-value" id="kpi-total-comments">—</span>
+                            <span class="admin-kpi-value" id="kpi-total-comments">0</span>
                             <span class="admin-kpi-label">Comments</span>
                         </div>
                     </div>
