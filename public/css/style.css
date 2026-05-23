@@ -4491,6 +4491,11 @@ section.auth-hero {
     border-radius: var(--bdr-r-md);
     transition: all var(--ease-fast);
     background-color: #071e95;
+    height: 40px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .ord-pdf-download:hover {
@@ -6446,5 +6451,106 @@ section.auth-hero {
     .features-container,
     .steps-container {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   ORDINANCE PAGE — RESPONSIVE / MOBILE
+   Breakpoints:
+     ≤ 900px  : collapse split layout, stack columns
+     ≤ 600px  : tighten spacing, full-width elements
+============================================================ */
+
+@media (max-width: 900px) {
+
+    /* Stack the info column above the PDF viewer */
+    .ordinance-split {
+        flex-direction: column;
+    }
+
+    .ordinance-info-col,
+    .ordinance-pdf-col {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    /* Give the PDF iframe a sensible fixed height on mobile
+       instead of inheriting a tall desktop height */
+    .ord-pdf-frame {
+        height: 480px;
+    }
+
+    /* Subhero meta: stack ordinance ID block and status badge */
+    .ordinance-subhero-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+
+    /* Ordinance numeral: smaller type so it doesn't overflow */
+    .ordinance-numeral {
+        font-size: 1.25rem;
+    }
+
+    /* Reaction buttons: allow wrapping if labels are wide */
+    .ord-reaction-buttons {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .ord-reaction-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+
+    /* Divider between like/dislike is visual noise when wrapped */
+    .ord-reaction-divider {
+        display: none;
+    }
+
+    /* PDF frame: shorter on small phones */
+    .ord-pdf-frame {
+        height: 360px;
+    }
+
+    /* Comment compose: stack avatar above the textarea block */
+    .ord-comment-compose {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ord-comment-compose-avatar {
+        align-self: flex-start;
+    }
+
+    /* Comment card: stack avatar above the comment body */
+    .ord-comment-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Comment meta row: allow author + time to wrap */
+    .ord-comment-meta {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    /* Comment footer reactions: ensure buttons don't overflow */
+    .ord-comment-reactions {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    /* Date block: tighten the large day numeral */
+    .ord-date-block {
+        gap: 0.5rem;
+    }
+
+    .date-day {
+        font-size: 2rem;
     }
 }
