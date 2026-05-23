@@ -4484,12 +4484,13 @@ section.auth-hero {
     letter-spacing: var(--ls-md);
     line-height: var(--lh-tight);
     text-transform: uppercase;
-    color: var(--ink-accent);
+    color: var(--ink-on-dark);
     text-decoration: none;
     padding: var(--sp-2) var(--sp-5);
     border: var(--bdr-thin) solid var(--glass-ink-vivid);
     border-radius: var(--bdr-r-md);
     transition: all var(--ease-fast);
+    background-color: #071e95;
 }
 
 .ord-pdf-download:hover {
