@@ -63,7 +63,6 @@ $router->post('/react-comment', 'UserController@handleCommentReact');
 
 // $router->get('/profile/{id}', 'AuthController@showProfile'); // Dynamic parameter route
 
-
 $router->get('/add-ordinance', 'PagesNavigationController@addOrdinance');
 $router->get('/edit-ordinance', 'DashboardController@editOrdinance');
 
@@ -73,6 +72,7 @@ $router->get('/api/ordinances/search', 'OrdinanceApiController@search');
 $router->get('/api/ordinances/meta',   'OrdinanceApiController@meta');
 $router->get('/api/categories', 'OrdinanceApiController@categories');
 $router->get('/api/barangays', 'OrdinanceApiController@barangays');
+$router->get('/api/get-kpi-metrics', 'DashboardController@getKPIMetrics');
 
 $router->post('/comment', 'UserController@handleOrdinanceComment');
 // Catch incoming request context

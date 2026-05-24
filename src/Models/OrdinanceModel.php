@@ -1116,6 +1116,35 @@ class OrdinanceModel
         return $row !== false ? $row : null;
     }
 
+    public function getKPIMetrics()
+    {
+        $sql = "
+        SELECT
+            COUNT(ordinance_id) AS 'total_ordinances',
+            (SELECT COUNT(ordinance_id) FROM Ordinances WHERE status = 'pending') AS 'pending_ordinances',
+            (SELECT COUNT(ordinance_id) FROM Ordinances WHERE status = 'active') AS 'active_ordinances',
+            (SELECT COUNT(ordinance_id) FROM Ordinances WHERE status = 'repealed') AS 'repealed_ordinances',
+            (SELECT COUNT(user_id) FROM Users WHERE role_id IN (4, 5) AND deleted_at IS NULL) AS 'registered_users',
+            (SELECT COUNT(comment_id) FROM Comments) AS 'comments'
+        FROM Ordinances
+        WHERE status IN ('pending', 'active', 'repealed') AND archived_at IS NULL
+    ";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $row !== false ? $row : null;
+        } catch (PDOException $e) {
+            // Intercept standard State 23000 (Integrity Constraint Violation / Duplication)
+            if ($e->getCode() === '23000' || str_contains($e->getMessage(), '1062')) {
+                throw new PDOException("Data Integrity Fault: The ordinance identifier code already exists within the system.", 23000, $e);
+            }
+            throw $e;
+        }
+    }
+
 
     /**
      * Executes a single-trip database insertion for a new ordinance record.

@@ -155,4 +155,55 @@ class DashboardController
             exit;
         }
     }
+
+    public function getKPIMetrics(): void
+    {
+        session_start();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            http_response_code(405);
+            echo 'Method not allowed';
+            exit;
+        }
+
+        $sessionRoleId = (int)($_SESSION['role_id'] ?? 0);
+        if (empty($_SESSION['user_id']) || $sessionRoleId !== 1) {
+            header('Location: /login');
+            exit;
+        }
+
+        try {
+            $pdo = \App\Controllers\DatabaseController::getDatabaseConnection();
+            $repository = new OrdinanceModel($pdo);
+            
+            $result = $repository->getKPIMetrics();
+
+            $total              = $result['total_ordinances'];
+            $pending            = $result['pending_ordinances'];
+            $active             = $result['active_ordinances'];
+            $repealed           = $result['repealed_ordinances'];
+            $registeredUsers    = $result['registered_users'];
+            $comments           = $result['comments'];
+
+            ApiResponse::send(
+                ApiResponse::success(
+                    data: [
+                        'total'             => $total,
+                        'pending'           => $pending,
+                        'active'            => $active,
+                        'repealed'          => $repealed,
+                        'registered_users'  => $registeredUsers,
+                        'comments'          => $comments,
+                    ],
+                    message: 'KPI metrics successfully retrieved.'
+                ),
+                200
+            );
+            exit;
+        } catch (\PDOException $e) {
+            error_log('KPI retrieval failed: ' . $e->getMessage());
+            ApiResponse::send(ApiResponse::error('Unable to retrieve KPI metrics.', 400), 400);
+            exit;
+        }
+    }
 }

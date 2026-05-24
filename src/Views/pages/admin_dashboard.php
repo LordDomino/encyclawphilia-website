@@ -160,7 +160,7 @@ require_once VIEWS_ROOT . '/head.php';
                         </span>
                         <div class="admin-kpi-body">
                             <span class="admin-kpi-value" id="kpi-total-users">—</span>
-                            <span class="admin-kpi-label">Registered Users</span>
+                            <span class="admin-kpi-label">Active Users</span>
                         </div>
                     </div>
 

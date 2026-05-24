@@ -14,6 +14,37 @@ document.addEventListener('DOMContentLoaded', () => {
         return STATUS_MAP[status?.toLowerCase()] ?? { label: status ?? 'Unknown', cls: 'pending' };
     }
 
+    function updateKPIMetrics() {
+        
+        try {
+            fetch(`/api/get-kpi-metrics`).then(res => {
+                return res.json();
+                
+            }).then(kpiData => {
+                const total = document.getElementById('kpi-total-ordinances');
+                const pending = document.getElementById('kpi-pending');
+                const active = document.getElementById('kpi-active');
+                const repealed = document.getElementById('kpi-repealed');
+                const totalUsers = document.getElementById('kpi-total-users');
+                const totalComments = document.getElementById('kpi-total-comments');
+                total.textContent           = kpiData['data']['total'];
+                pending.textContent         = kpiData['data']['pending'];
+                active.textContent          = kpiData['data']['active'];
+                repealed.textContent        = kpiData['data']['repealed'];
+                totalUsers.textContent      = kpiData['data']['registered_users'];
+                totalComments.textContent   = kpiData['data']['comments'];
+                
+            })
+
+        } catch (err) {
+            console.error('[Dashboard Error]:', err);
+            grid.innerHTML = `<div class="no-results"><p>No matching ordinances found.</p></div>`;
+        } finally {
+            isFetching = false;
+        }
+
+    }
+
     function renderAdminCard(row) {
         const sd = statusDisplay(row.status);
         const missing = [];
@@ -158,4 +189,5 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
     });
+    updateKPIMetrics();
 });
