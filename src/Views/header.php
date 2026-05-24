@@ -7,7 +7,20 @@
                 <h1>EncycLawPhilia | <span class="title-city">Valenzuela</span></h1>
             </div>
         </a>
-        <nav class="main-nav">
+
+        <!-- Hamburger toggle — visible only on mobile via CSS -->
+        <button
+            class="nav-toggle"
+            id="nav-toggle"
+            aria-label="Toggle navigation"
+            aria-expanded="false"
+            aria-controls="main-nav">
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+
+        <nav class="main-nav" id="main-nav">
             <a href="/browse" class="clickable">Ordinances</a>
             <a href="/about" class="clickable">About</a>
             <?php if (isset($_SESSION['user_id'])): ?>
@@ -27,11 +40,12 @@
             <?php endif; ?>
             <li id="google_translate_element" style=""></li>
         </nav>
+
         <script type="text/javascript">
             function googleTranslateElementInit() {
                 new google.translate.TranslateElement({
-                    pageLanguage: 'en', // Your website's default language
-                    includedLanguages: 'en,tl', // Restrict to English and Tagalog (add more if needed)
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,tl',
                     layout: google.translate.TranslateElement.InlineLayout.SIMPLE
                 }, 'google_translate_element');
             }
