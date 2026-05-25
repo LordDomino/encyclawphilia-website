@@ -3,18 +3,20 @@
    ============================================================ */
 
 footer {
+    display: flex;
+    flex-direction: column;
     background: linear-gradient(135deg, var(--clr-navy), var(--clr-ink));
     backdrop-filter: blur(var(--blur-lg));
     -webkit-backdrop-filter: blur(var(--blur-lg));
     color: var(--ink-on-dark);
-    padding: var(--sp-10) var(--sp-7) var(--sp-9);
+    padding: var(--sp-10) var(--page-side-margin) var(--sp-9);
     border-top: var(--bdr-thin) solid var(--bdr-clr-divider);
+    align-items: center;
 
     .footer-content {
         display: flex;
         gap: var(--sp-10);
         max-width: 1000px;
-        margin: 0 auto;
         align-items: flex-start;
         justify-content: space-between;
         transition: margin var(--ease-smooth-lg);
@@ -94,20 +96,6 @@ footer {
     color: var(--clr-footer-note);
 }
 
-@media screen and (min-width: 1440px) {
-    footer .footer-content {
-        margin: 0 auto;
-        max-width: 1200px;
-    }
-}
-
-@media screen and (max-width: 1440px) and (min-width: 1024px) {
-    footer .footer-content {
-        margin: 0 var(--page-side-margin);
-        max-width: none;
-    }
-}
-
 @media screen and (max-width: 1024px) {
     footer .footer-content {
         flex-direction: column;
@@ -135,12 +123,12 @@ footer {
 
 @media screen and (max-width: 425px) {
     footer .footer-content {
-        margin: 0 5vw;
+        /* margin: 0 5vw; */
     }
 }
 
 @media screen and (max-width: 368px) {
-       footer {
+    footer {
         padding: var(--sp-9) var(--sp-6) var(--sp-7);
     }
 
