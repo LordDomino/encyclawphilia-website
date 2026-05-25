@@ -1,41 +1,41 @@
 /* ============================================================
    FOOTER
    ============================================================ */
-
+ 
 footer {
     background: linear-gradient(135deg, var(--clr-navy), var(--clr-ink));
     backdrop-filter: blur(var(--blur-lg));
     -webkit-backdrop-filter: blur(var(--blur-lg));
     color: var(--ink-on-dark);
-    padding: var(--sp-10) var(--sp-7) var(--sp-9);
+    padding: var(--sp-6) var(--sp-7) var(--sp-5);
     border-top: var(--bdr-thin) solid var(--bdr-clr-divider);
-
+ 
     .footer-content {
         display: flex;
-        gap: var(--sp-10);
+        gap: var(--sp-6);
         max-width: 1000px;
         margin: 0 auto;
         align-items: flex-start;
         justify-content: space-between;
         transition: margin var(--ease-smooth-lg);
-
+ 
         &:hover {
             filter: brightness(1.05);
         }
     }
-
+ 
     .footer-brand {
         flex: 1 1 auto;
         min-width: 200px;
-
+ 
         h1 {
             font-size: clamp(var(--fs-xl), 2vw, var(--fs-2xl));
             line-height: var(--lh-snug);
             letter-spacing: var(--ls-tighter);
         }
-
+ 
         p {
-            margin: var(--sp-8) 0 0;
+            margin: var(--sp-4) 0 0;
             max-width: 420px;
             line-height: var(--lh-loose);
             font-size: var(--fs-base);
@@ -43,18 +43,18 @@ footer {
         }
     }
 }
-
+ 
 .footer-links {
     flex: 1 1 auto;
     min-width: 200px;
     display: flex;
     justify-content: space-between;
-    gap: var(--sp-10);
+    gap: var(--sp-6);
 }
-
+ 
 .footer-column {
     h3 {
-        margin: 0 0 var(--sp-7);
+        margin: 0 0 var(--sp-4);
         font-family: var(--font-link);
         font-size: var(--fs-sm);
         font-weight: 700;
@@ -63,10 +63,10 @@ footer {
         text-transform: uppercase;
         color: var(--ink-link);
     }
-
+ 
     a {
         display: block;
-        margin-bottom: var(--sp-4);
+        margin-bottom: var(--sp-2);
         color: var(--ink-on-dark);
         text-decoration: none;
         font-size: var(--fs-base);
@@ -74,7 +74,7 @@ footer {
         transition: all var(--ease-fast);
         padding: var(--sp-1) var(--sp-2);
         border-radius: var(--bdr-r-lg);
-
+ 
         &:hover {
             color: var(--ink-link);
             background: var(--glass-sky-soft);
@@ -84,91 +84,91 @@ footer {
         }
     }
 }
-
+ 
 .footer-note {
-    margin: var(--sp-10) auto 0;
+    margin: var(--sp-6) auto 0;
     max-width: 1200px;
     text-align: center;
     font-size: var(--fs-xs);
     line-height: var(--lh-relaxed);
     color: var(--clr-footer-note);
 }
-
+ 
 @media screen and (min-width: 1440px) {
     footer .footer-content {
         margin: 0 auto;
         max-width: 1200px;
     }
 }
-
+ 
 @media screen and (max-width: 1440px) and (min-width: 1024px) {
     footer .footer-content {
         margin: 0 var(--page-side-margin);
         max-width: none;
     }
 }
-
+ 
 @media screen and (max-width: 1024px) {
     footer .footer-content {
         flex-direction: column;
-
+ 
         .footer-brand p {
             max-width: unset;
         }
     }
 }
-
+ 
 @media screen and (max-width: 768px) {
-
+ 
     footer .footer-links {
         flex-direction: column;
     }
-
+ 
     footer .footer-brand {
         min-width: 0;
     }
-
+ 
     footer .footer-brand p {
         max-width: unset;
     }
 }
-
+ 
 @media screen and (max-width: 425px) {
     footer .footer-content {
         margin: 0 5vw;
     }
 }
-
+ 
 @media screen and (max-width: 368px) {
-       footer {
-        padding: var(--sp-9) var(--sp-6) var(--sp-7);
+    footer {
+        padding: var(--sp-5) var(--sp-6) var(--sp-4);
     }
-
+ 
     footer .footer-content {
-        gap: var(--sp-7);
+        gap: var(--sp-4);
     }
-
+ 
     footer .footer-brand h2 {
         font-size: var(--fs-lg);
     }
-
+ 
     footer .footer-brand p {
         font-size: var(--fs-sm);
         line-height: var(--lh-relaxed);
     }
-
+ 
     footer .footer-column h3 {
         font-size: var(--fs-xs);
-        margin-bottom: var(--sp-3);
+        margin-bottom: var(--sp-2);
     }
-
+ 
     footer .footer-column a {
         font-size: var(--fs-sm);
-        margin-bottom: var(--sp-3);
+        margin-bottom: var(--sp-2);
     }
-
+ 
     .footer-note {
         font-size: var(--fs-xs);
-        margin-top: var(--sp-7);
+        margin-top: var(--sp-5);
     }
 }
