@@ -17,6 +17,7 @@ require_once __DIR__ . '/../head.php';
     <main class="browse">
         <div class="subhero" id="browse-subhero">
             <div class="subhero-content">
+                <p id="ordinances"></p>
                 <h1>Valenzuela City Ordinances</h1>
                 <p>Browse the latest ordinances in Valenzuela City.</p>
             </div>

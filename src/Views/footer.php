@@ -9,12 +9,12 @@
             <div class="footer-column">
                 <h3>About</h3>
                 <a href="/about">About Us</a>
-                <a href="#mission">Our Mission</a>
+                <a href="/about#Offers">Offers</a>
             </div>
             <div class="footer-column">
                 <h3>Quick Links</h3>
-                <a href="#browse-latest">Latest Ordinances</a>
-                <a href="#browse-category">Browse by Category</a>
+                <a href="/home#latest-ordinances">Latest Ordinances</a>
+                <a href="/browse#ordinances">Browse by Category</a>
             </div>
             <div class="footer-column">
                 <h3>Contact</h3>

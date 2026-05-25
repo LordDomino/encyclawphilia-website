@@ -69,6 +69,7 @@ require_once __DIR__ . '/../head.php';
 
         <section class="about-features">
             <div class="about-section-inner">
+                <p id="Offers"></p>
                 <h2>What We Offer</h2>
                 <div class="features-container">
                     <div class="feature-item">
