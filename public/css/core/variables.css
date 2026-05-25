@@ -1,0 +1,141 @@
+/* ============================================================
+   FONT FACES
+   ============================================================ */
+
+@font-face { font-family: "Aleo";             src: url("/css/fonts/Aleo-VariableFont_wght.ttf");                font-style: normal; }
+@font-face { font-family: "Aleo";             src: url("/css/fonts/Aleo-Italic-VariableFont_wght.ttf");         font-style: italic; }
+@font-face { font-family: "Besley";           src: url("/css/fonts/Besley-VariableFont_wght.ttf");              font-style: normal; }
+@font-face { font-family: "Besley";           src: url("/css/fonts/Besley-Italic-VariableFont_wght.ttf");       font-style: italic; }
+@font-face { font-family: "Montserrat";       src: url("/css/fonts/Montserrat-VariableFont_wght.ttf");          font-style: normal; }
+@font-face { font-family: "Montserrat";       src: url("/css/fonts/Montserrat-Italic-VariableFont_wght.ttf");   font-style: italic; }
+@font-face { font-family: "Lexend";           src: url("/css/fonts/Lexend-VariableFont_wght.ttf"); }
+@font-face { font-family: "Lexend Exa";       src: url("/css/fonts/LexendExa-VariableFont_wght.ttf"); }
+@font-face { font-family: "Playfair Display"; src: url("/css/fonts/PlayfairDisplay-VariableFont_wght.ttf");     font-style: normal; }
+@font-face { font-family: "Playfair Display"; src: url("/css/fonts/PlayfairDisplay-Italic-VariableFont_wght.ttf"); font-style: italic; }
+
+
+/* ============================================================
+   CSS CUSTOM PROPERTIES
+   ============================================================ */
+
+:root {
+    color-scheme: light dark;
+
+    --font-title:    "Playfair Display", "Georgia", serif;
+    --font-subtitle: "Lexend Exa", sans-serif;
+    --font-heading:  "Playfair Display", "Georgia", serif;
+    --font-link:     "Lexend Exa", sans-serif;
+    --font-body:     "Aleo", "Arial", sans-serif;
+    --font-ui:       "Lexend", sans-serif;
+    --font-label:    "Besley", serif;
+
+    --fs-2xs: 0.70rem; --fs-xs: 0.75rem; --fs-sm: 0.85rem; --fs-base: 0.95rem;
+    --fs-md:  1.00rem; --fs-lg: 1.20rem; --fs-xl: 1.50rem; --fs-2xl: 1.80rem;
+    --fs-3xl: 2.00rem; --fs-4xl: 2.20rem; --fs-5xl: 2.50rem; --fs-6xl: 2.80rem;
+    --fs-7xl: 3.00rem;
+
+    --lh-tight: 1.1; --lh-snug: 1.3; --lh-normal: 1.5; --lh-relaxed: 1.6; --lh-loose: 1.8;
+
+    --ls-tighter: -0.075rem; --ls-tight: -0.04rem; --ls-none: 0;
+    --ls-xs: 0.04rem; --ls-sm: 0.05rem; --ls-md: 0.10rem; --ls-lg: 0.14rem;
+    --ls-xl: 0.18rem; --ls-2xl: 0.22rem; --ls-3xl: 0.25rem; --ls-4xl: 0.35rem;
+
+    --clr-navy: #0e004d; --clr-ink: #071e95; --clr-sky: #4c9aff;
+    --clr-white: #ffffff; --clr-black: #000000;
+    --clr-text-dark: #202020; --clr-text-mid: #444444; --clr-text-muted: #555555;
+    --clr-text-light: #666666; --clr-text-faint: #888888;
+
+    --clr-ok-bg:   #d4edda; --clr-ok-ink:   #155724; --clr-ok-bdr:   #c3e6cb;
+    --clr-warn-bg: #fff3cd; --clr-warn-ink: #856404; --clr-warn-bdr: #ffeaa7;
+    --clr-err-bg:  #f8d7da; --clr-err-ink:  #721c24; --clr-err-bdr:  #f5c6cb;
+    --clr-info-bg: #d1ecf1; --clr-info-ink: #0c5460; --clr-info-bdr: #bee5eb;
+
+    --clr-danger: #c81e1e; --clr-danger-ink: #a01010;
+    --clr-footer-body: #dfe7ff; --clr-footer-note: #c9d5ff;
+    --clr-warn-amber: #c05000;
+
+    --ink-primary:   var(--clr-navy);  --ink-accent:    var(--clr-ink);
+    --ink-link:      var(--clr-sky);   --ink-body:      var(--clr-text-dark);
+    --ink-mid:       var(--clr-text-mid); --ink-muted:  var(--clr-text-muted);
+    --ink-light:     var(--clr-text-light); --ink-faint: var(--clr-text-faint);
+    --ink-on-dark:   var(--clr-white); --ink-on-accent: var(--clr-white);
+
+    --bg-page:         light-dark(var(--clr-white), var(--clr-navy));
+    --bg-hero:         var(--clr-navy);
+    --bg-surface-soft: rgba(248, 249, 255, 0.60);
+    --bg-surface-mid:  rgba(240, 243, 255, 0.40);
+    --bg-card-light:   rgba(255, 255, 255, 0.70);
+    --bg-card-medium:  rgba(255, 255, 255, 0.60);
+    --bg-card-dark:    rgba(14, 0, 77, 0.80);
+    --bg-overlay-navy: rgba(14, 0, 77, 0.90);
+    --bg-overlay-sky:  rgba(76, 154, 255, 0.90);
+    --bg-overlay-ink:  rgba(7, 30, 149, 0.90);
+    --bg-navbar:       var(--bg-overlay-navy);
+    --search-bg:          rgba(255, 255, 255, 0.08);
+    --search-bg-focus:    rgba(255, 255, 255, 0.15);
+    --search-ink:         var(--clr-white);
+    --search-placeholder: var(--clr-sky);
+    --search-border-btm:  var(--clr-white);
+
+    --glass-sky-faint:  rgba(76, 154, 255, 0.08);  --glass-sky-soft:   rgba(76, 154, 255, 0.12);
+    --glass-sky-mid:    rgba(76, 154, 255, 0.20);  --glass-sky-strong: rgba(76, 154, 255, 0.40);
+    --glass-sky-vivid:  rgba(76, 154, 255, 0.60);
+    --glass-navy-faint: rgba(14, 0, 77, 0.05);  --glass-navy-soft:  rgba(14, 0, 77, 0.08);
+    --glass-navy-mid:   rgba(14, 0, 77, 0.12);  --glass-navy-hover: rgba(14, 0, 77, 0.18);
+    --glass-ink-faint:  rgba(7, 30, 149, 0.05); --glass-ink-soft:   rgba(7, 30, 149, 0.08);
+    --glass-ink-mid:    rgba(7, 30, 149, 0.12); --glass-ink-strong: rgba(7, 30, 149, 0.20);
+    --glass-ink-vivid:  rgba(7, 30, 149, 0.40);
+    --glass-danger-soft:   rgba(200, 30, 30, 0.08);
+    --glass-danger-mid:    rgba(200, 30, 30, 0.14);
+    --glass-danger-border: rgba(200, 30, 30, 0.25);
+    --glass-white-faint: rgba(255, 255, 255, 0.10); --glass-white-soft:  rgba(255, 255, 255, 0.20);
+    --glass-white-mid:   rgba(255, 255, 255, 0.40); --glass-white-strong: rgba(255, 255, 255, 0.60);
+
+    --op-02: 0.02; --op-05: 0.05; --op-08: 0.08; --op-10: 0.10;
+    --op-12: 0.12; --op-15: 0.15; --op-20: 0.20; --op-25: 0.25;
+    --op-30: 0.30; --op-35: 0.35; --op-40: 0.40; --op-50: 0.50;
+    --op-60: 0.60; --op-70: 0.70; --op-75: 0.75; --op-80: 0.80;
+    --op-85: 0.85; --op-88: 0.88; --op-90: 0.90; --op-95: 0.95;
+
+    --bdr-thin: 1px; --bdr-normal: 2px; --bdr-thick: 4px;
+    --bdr-r-xs: 2px; --bdr-r-sm: 3px;  --bdr-r-md: 4px;  --bdr-r-lg: 6px;
+    --bdr-r-xl: 8px; --bdr-r-pill: 20px; --bdr-r-full: 50%;
+    --bdr-clr-soft:    var(--glass-sky-mid);   --bdr-clr-mid:     var(--glass-sky-strong);
+    --bdr-clr-strong:  var(--glass-sky-vivid); --bdr-clr-ink:     var(--clr-ink);
+    --bdr-clr-card:    rgba(76, 154, 255, 0.75);
+    --bdr-clr-divider: rgba(76, 154, 255, 0.20);
+    --bdr-clr-result:  rgba(76, 154, 255, 0.30);
+    --bdr-clr-neutral: rgba(0, 0, 0, 0.10);
+    --bdr-clr-white30: var(--glass-white-mid);
+    --bdr-clr-white60: var(--glass-white-strong);
+
+    --sp-1: 2px;  --sp-2: 4px;   --sp-3: 8px;   --sp-4: 10px;
+    --sp-5: 12px; --sp-6: 15px;  --sp-7: 20px;  --sp-8: 25px;
+    --sp-9: 30px; --sp-10: 40px; --sp-11: 50px;
+    --sp-rel-xs: 1vw; --sp-rel-sm: 2vw; --sp-rel-md: 5vw;
+    --sp-rel-lg: 10vw; --sp-rel-xl: 15vw;
+    --header-height: 80px; --sidebar-width: 20vw;
+    --cards-padding: var(--sp-5);
+    --page-side-margin: var(--sp-rel-lg);
+    --scroll-margin: calc(var(--cards-padding) / 2);
+    --pad-sm: max(10px, 1vw); --pad-md: 2vw;
+    --pad-lg: var(--sp-rel-lg); --pad-xl: 20vw;
+
+    --blur-xs: 4px; --blur-sm: 6px; --blur-md: 8px; --blur-lg: 10px;
+    --shadow-sm:       0 1px  4px  rgba(0,0,0,.06);
+    --shadow-md:       0 2px  8px  rgba(0,0,0,.08);
+    --shadow-lg:       0 4px  12px rgba(0,0,0,.10);
+    --shadow-xl:       0 6px  16px rgba(0,0,0,.15);
+    --shadow-glass-sm: 0 2px  8px  rgba(0,0,0,.10);
+    --shadow-glass-md: 0 4px  12px rgba(125,181,255,.20);
+    --shadow-glass-lg: 0 6px  16px rgba(125,181,255,.15);
+    --shadow-glass-xl: 0 8px  24px rgba(125,181,255,.20);
+    --shadow-title:    0 0    40px var(--clr-navy);
+    --shadow-focus:    0 0 0  3px  rgba(125,181,255,.12);
+    --ease:           0.25s ease;
+    --ease-fast:      0.10s ease;
+    --ease-slow:      0.40s ease;
+    --ease-spring:    0.30s cubic-bezier(0.34,1.56,0.64,1);
+    --ease-smooth:    0.20s cubic-bezier(0.4,0,0.2,1);
+    --ease-smooth-lg: 0.30s cubic-bezier(0.4,0,0.2,1);
+}

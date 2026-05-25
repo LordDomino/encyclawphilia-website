@@ -1,0 +1,58 @@
+.ord-reaction-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+}
+
+.ord-reaction-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-4) var(--sp-7);
+    border-radius: var(--bdr-r-xl);
+    border: var(--bdr-normal) solid transparent;
+    background: transparent;
+    font-family: var(--font-link);
+    cursor: pointer;
+    transition: all var(--ease-smooth-lg);
+    user-select: none;
+
+    &.ord-reaction-btn--like {
+        color: var(--ink-accent);
+        border-color: var(--glass-ink-mid);
+        background: var(--glass-ink-faint);
+
+        &:hover,
+        &.ord-reaction-btn--active {
+            background: var(--glass-ink-soft);
+            border-color: var(--glass-ink-vivid);
+            transform: translateY(calc(var(--sp-1)*-1));
+            box-shadow: 0 var(--sp-2) var(--sp-5) var(--glass-ink-mid);
+        }
+
+        &.ord-reaction-btn--active {
+            background: var(--glass-ink-strong);
+            font-weight: 700;
+        }
+    }
+
+    &.ord-reaction-btn--dislike {
+        color: var(--ink-faint);
+        border-color: var(--bdr-clr-neutral);
+        background: rgba(0, 0, 0, var(--op-02));
+
+        &:hover,
+        &.ord-reaction-btn--active {
+            background: var(--glass-danger-soft);
+            border-color: var(--glass-danger-border);
+            color: var(--clr-danger-ink);
+            transform: translateY(calc(var(--sp-1)*-1));
+            box-shadow: 0 var(--sp-2) var(--sp-5) var(--glass-danger-soft);
+        }
+
+        &.ord-reaction-btn--active {
+            background: var(--glass-danger-mid);
+            font-weight: 700;
+        }
+    }
+}

@@ -1,0 +1,62 @@
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0; padding: 0;
+    font-family: var(--font-body);
+    font-size: var(--fs-base);
+    line-height: var(--lh-normal);
+    color: var(--ink-body);
+    background-color: var(--bg-hero);
+    &.home { scroll-behavior: smooth; }
+}
+
+h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 3rem, 4rem);
+    font-weight: 550;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-tighter);
+    margin: 0;
+    text-wrap: balance;
+    &.sticky {
+        position: sticky;
+        top: calc(var(--header-height) - var(--sp-9));
+        z-index: 2;
+        background-color: var(--bg-hero);
+        color: var(--ink-on-dark);
+        padding: var(--sp-3) var(--page-side-margin);
+        padding-top: var(--sp-9);
+    }
+}
+h2 {
+    font-family: var(--font-label);
+    font-size: clamp(1.5rem, 2rem, 3rem);
+    font-weight: 650;
+    line-height: var(--lh-snug);
+    letter-spacing: var(--ls-tighter);
+    margin: 0;
+    text-wrap: balance;
+}
+
+a.clickable { text-decoration: none; color: inherit; }
+a.emphasis {
+    color: var(--ink-link); font-weight: 600; transition: color var(--ease-fast);
+    &:hover { text-decoration: underline; }
+}
+
+.brand-title :is(h1,h2,h3,h4,h5,h6) {
+    margin: 0; padding: 0;
+    font-family: var(--font-title); font-weight: 400; font-style: normal;
+    letter-spacing: var(--ls-tighter); line-height: var(--lh-tight); text-wrap: balance;
+    & span { font-style: italic; }
+}
+span.numeral-and-series { font-family: var(--font-label); }
+p.link {
+    margin: 0; font-family: var(--font-link); font-size: var(--fs-sm);
+    font-weight: 700; letter-spacing: var(--ls-3xl); line-height: var(--lh-normal);
+    text-align: right; text-transform: uppercase; color: var(--ink-accent);
+}

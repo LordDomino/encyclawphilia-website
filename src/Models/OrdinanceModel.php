@@ -1127,7 +1127,7 @@ class OrdinanceModel
             (SELECT COUNT(user_id) FROM Users WHERE role_id IN (4, 5) AND deleted_at IS NULL) AS 'registered_users',
             (SELECT COUNT(comment_id) FROM Comments) AS 'comments'
         FROM Ordinances
-        WHERE status IN ('pending', 'active', 'repealed') AND archived_at IS NULL
+        WHERE status IN ('pending', 'active', 'repealed', 'amended') AND archived_at IS NULL
     ";
         try {
             $stmt = $this->pdo->prepare($sql);
@@ -1148,7 +1148,7 @@ class OrdinanceModel
 
     /**
      * Executes a single-trip database insertion for a new ordinance record.
-     * Enforces schema defaults and protects data integrity under the 
+     * Enforces schema defaults and protects data integrity under the
      * "Write Once, Transparent Forever" architecture.
      *
      * @param PDO   $pdo  An active PDO connection instance configured with error-reporting attributes.
