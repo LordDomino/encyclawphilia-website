@@ -2,19 +2,19 @@
     <div class="footer-content">
         <div class="footer-brand">
             <?php include 'brand_title.php'; ?>
-            <p>Essential references for Valenzuela’s city ordinance portal, with fast access to About Us, policy
-                browsing, and contact lines.</p>
+            <p>is a comprehensive digital repository of ordinances enacted within Valenzuela City.
+                making local legislation easily accessible to residents, officials, and researchers.</p>
         </div>
         <div class="footer-links">
             <div class="footer-column">
                 <h3>About</h3>
                 <a href="/about">About Us</a>
-                <a href="#mission">Our Mission</a>
+                <a href="/about#Offers">Offers</a>
             </div>
             <div class="footer-column">
                 <h3>Quick Links</h3>
-                <a href="#browse-latest">Latest Ordinances</a>
-                <a href="#browse-category">Browse by Category</a>
+                <a href="/home#latest-ordinances">Latest Ordinances</a>
+                <a href="/browse#ordinances">Browse by Category</a>
             </div>
             <div class="footer-column">
                 <h3>Contact</h3>

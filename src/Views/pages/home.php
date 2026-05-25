@@ -154,6 +154,7 @@ require_once __DIR__ . '/../head.php';
                 </a>
             </div>
             <div class="flex-column">
+                <p id="latest-ordinances"></p>
                 <h1>Latest City Ordinances in Valenzuela</h1>
                 <p>Browse the latest city ordinances in Valenzuela.</p>
                 <div class="vertical-carousel-frame">
