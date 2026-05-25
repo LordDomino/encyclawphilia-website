@@ -7,7 +7,7 @@
     <meta name="google-site-verification" content="Aj0rwC2OO3km5QpsVYiFonJkqjfOrn7ZIgnHu_O5oew" />
     <title><?php echo $pageTitle; ?></title>
 
-    <link rel="stylesheet" href="/css/core/variables.css">
+    <link rel="stylesheet" href="/css/core/variables-variant-red.css">
     <link rel="stylesheet" href="/css/core/base.css">
     <link rel="stylesheet" href="/css/core/layout.css">
     <link rel="stylesheet" href="/css/new/style.css">

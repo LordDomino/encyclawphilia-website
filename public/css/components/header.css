@@ -83,6 +83,98 @@ nav li {
     list-style-type: none;
 }
 
+/* ============================================================
+   GOOGLE TRANSLATE WIDGET
+   Resets Google's injected styles and aligns the widget with
+   the .main-nav link aesthetic.
+   ============================================================ */
+
+#google_translate_element {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Strip the outer gadget wrapper of all Google defaults */
+#google_translate_element .goog-te-gadget,
+#google_translate_element .goog-te-gadget-simple {
+    font-family: var(--font-link) !important;
+    font-size: var(--fs-md) !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    white-space: nowrap;
+    line-height: var(--lh-normal) !important;
+}
+
+/* Hide the "Powered by Google" attribution bar */
+#google_translate_element .goog-te-gadget>span,
+#google_translate_element .goog-logo-link,
+#google_translate_element .goog-te-gadget-simple .VIpgJd-ZVi9od-xl07Ob-lTBxed {
+    display: none !important;
+}
+
+/* The simplified widget anchor — style it like a nav link */
+#google_translate_element .goog-te-gadget-simple a.goog-te-menu-value {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-link) !important;
+    font-size: var(--fs-md) !important;
+    font-weight: 400;
+    letter-spacing: var(--ls-xs);
+    color: var(--ink-on-dark) !important;
+    text-decoration: none !important;
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--bdr-r-lg);
+    border: none !important;
+    background: transparent !important;
+    transition: color var(--ease-fast), background var(--ease-fast);
+    cursor: pointer;
+}
+
+#google_translate_element .goog-te-gadget-simple a.goog-te-menu-value:hover {
+    color: var(--ink-link) !important;
+    background: var(--glass-sky-soft) !important;
+    backdrop-filter: blur(var(--blur-xs));
+    -webkit-backdrop-filter: blur(var(--blur-xs));
+}
+
+/* Language label spans inside the anchor */
+#google_translate_element .goog-te-gadget-simple a.goog-te-menu-value span {
+    color: inherit !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+    border: none !important;
+}
+
+/* Hide the small globe/flag icon Google injects before the text */
+#google_translate_element .goog-te-gadget-simple img {
+    display: none !important;
+}
+
+/* The dropdown arrow span — keep it but normalise its style */
+#google_translate_element .goog-te-gadget-simple a.goog-te-menu-value span:last-child {
+    font-size: var(--fs-xs);
+    opacity: 0.75;
+}
+
+/* Mobile: expand to full width like the other nav links */
+@media screen and (max-width: 768px) {
+    #google_translate_element {
+        width: 100%;
+    }
+
+    #google_translate_element .goog-te-gadget-simple a.goog-te-menu-value {
+        width: 100%;
+        padding: var(--sp-5) var(--sp-2);
+        border-radius: 0;
+    }
+}
+
 @media screen and (max-width: 768px) {
     .site-header {
         overflow: visible;
