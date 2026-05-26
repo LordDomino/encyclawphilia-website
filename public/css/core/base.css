@@ -2,7 +2,10 @@
    RESET & BASE
    ============================================================ */
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+    text-decoration: none;
+}
 
 body {
     margin: 0; padding: 0;
