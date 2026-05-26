@@ -156,6 +156,129 @@ class DashboardController
         }
     }
 
+    public function updateOrdinance(): void
+{
+    session_start();
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        http_response_code(405);
+        exit;
+    }
+
+    $sessionRoleId = (int)($_SESSION['role_id'] ?? 0);
+    if (empty($_SESSION['user_id']) || $sessionRoleId !== 1) {
+        header('Location: /login');
+        exit;
+    }
+
+    $ordinanceId = (int)($_POST['ordinance_id'] ?? 0);
+    if ($ordinanceId < 1) {
+        header('Location: /dashboard');
+        exit;
+    }
+
+    // Mutable fields
+    $data = [
+        'category_id' => $_POST['category_id'] ?? '',
+        'status'      => trim($_POST['status'] ?? ''),
+    ];
+
+    // Validate status
+    $allowedStatuses = ['Pending', 'Active', 'Repealed', 'Amended'];
+    if (!in_array($data['status'], $allowedStatuses, true)) {
+        $_SESSION['admin_flash'] = [
+            'type'  => 'error',
+            'title' => 'Invalid status',
+            'body'  => 'The selected status is not valid.',
+        ];
+        header("Location: /edit-ordinance?id={$ordinanceId}");
+        exit;
+    }
+
+    // Once-after-null fields
+    $data['barangay_id']   = filter_var($_POST['barangay_id'] ?? null, FILTER_VALIDATE_INT) ?: null;
+    $data['date_enacted']  = trim($_POST['date_enacted'] ?? '') ?: null;
+    $data['summary']       = trim($_POST['summary'] ?? '') ?: null;
+    $data['full_text']     = trim($_POST['full_text'] ?? '') ?: null;
+
+    // PDF upload
+    $data['pdf_file'] = null;
+    if (!empty($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] === UPLOAD_ERR_OK) {
+        $file = $_FILES['pdf_file'];
+
+        if ($file['size'] > 20 * 1024 * 1024) {
+            $_SESSION['admin_flash'] = [
+                'type'  => 'error',
+                'title' => 'Upload failed',
+                'body'  => 'PDF file must be 20 MB or smaller.',
+            ];
+            header("Location: /edit-ordinance?id={$ordinanceId}");
+            exit;
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        if ($finfo->file($file['tmp_name']) !== 'application/pdf') {
+            $_SESSION['admin_flash'] = [
+                'type'  => 'error',
+                'title' => 'Upload failed',
+                'body'  => 'Only PDF files are accepted.',
+            ];
+            header("Location: /edit-ordinance?id={$ordinanceId}");
+            exit;
+        }
+
+        $uploadDir = realpath(__DIR__ . '/../../public') . '/uploads';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $safeName    = preg_replace('/[^A-Za-z0-9._-]/', '_', basename($file['name']));
+        $destination = $uploadDir . '/' . uniqid('ordinance_', true) . '_' . $safeName;
+
+        if (!move_uploaded_file($file['tmp_name'], $destination)) {
+            $_SESSION['admin_flash'] = [
+                'type'  => 'error',
+                'title' => 'Upload failed',
+                'body'  => 'Unable to store the PDF file on the server.',
+            ];
+            header("Location: /edit-ordinance?id={$ordinanceId}");
+            exit;
+        }
+
+        $data['pdf_file'] = '/uploads/' . basename($destination);
+    }
+
+    try {
+        $pdo        = \App\Controllers\DatabaseController::getDatabaseConnection();
+        $repository = new \App\Models\OrdinanceModel($pdo);
+        $success    = $repository->updateOrdinance($ordinanceId, $data);
+
+        if (!$success) {
+            $_SESSION['admin_flash'] = [
+                'type'  => 'error',
+                'title' => 'Update failed',
+                'body'  => 'Ordinance not found or has been archived.',
+            ];
+        } else {
+            $_SESSION['admin_flash'] = [
+                'type'  => 'success',
+                'title' => 'Record updated',
+                'body'  => 'The ordinance was saved successfully.',
+            ];
+        }
+    } catch (\PDOException $e) {
+        error_log('updateOrdinance failed: ' . $e->getMessage());
+        $_SESSION['admin_flash'] = [
+            'type'  => 'error',
+            'title' => 'Database error',
+            'body'  => 'Unable to save changes. Please try again.',
+        ];
+    }
+
+    header("Location: /edit-ordinance?id={$ordinanceId}");
+    exit;
+}
+
     public function getKPIMetrics(): void
     {
         session_start();

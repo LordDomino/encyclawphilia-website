@@ -389,7 +389,7 @@ require_once __DIR__ . '/../head.php';
                 <form
                     class="add-ord-form edit-ord-form"
                     id="edit-ordinance-form"
-                    action="/admin/ordinances/update"
+                    action="/api/ordinances/update"
                     method="POST"
                     enctype="multipart/form-data"
                     novalidate
@@ -542,9 +542,7 @@ require_once __DIR__ . '/../head.php';
                                         <?php echo $dateEnactedDisplay; ?>
                                     </div>
                                     <input type="hidden" name="date_enacted" value="<?php echo htmlspecialchars($dateEnactedValue, ENT_QUOTES, 'UTF-8'); ?>">
-                                    <span class="add-ord-field-hint" id="date-hint">
-                                        This field has already been set and is permanently locked.
-                                    </span>
+                                    <span class="add-ord-field-hint" id="date-hint">This field has already been set and is permanently locked.</span>
                                 <?php endif; ?>
                             </div>
 

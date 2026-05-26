@@ -1224,6 +1224,62 @@ class OrdinanceModel
         }
     }
 
+    public function updateOrdinance(int $ordinanceId, array $data): bool
+{
+    // Fetch current state to enforce write-once-after-null policy
+    $stmt = $this->pdo->prepare("
+        SELECT category_id, status, barangay_id, date_enacted,
+               pdf_file, summary, full_text
+        FROM   Ordinances
+        WHERE  ordinance_id = :id AND archived_at IS NULL
+        LIMIT  1
+    ");
+    $stmt->execute([':id' => $ordinanceId]);
+    $current = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+    if (!$current) {
+        return false;
+    }
+
+    $sets  = [];
+    $binds = [':id' => $ordinanceId];
+
+    // Always mutable
+    if (isset($data['category_id'])) {
+        $sets[] = 'category_id = :category_id';
+        $binds[':category_id'] = $data['category_id'] !== '' ? (int) $data['category_id'] : null;
+    }
+    if (isset($data['status'])) {
+        $sets[] = 'status = :status';
+        $binds[':status'] = $data['status'];
+    }
+
+    // Once-after-null: only apply when current value IS NULL
+    $onceAfterNull = ['barangay_id', 'date_enacted', 'pdf_file', 'summary', 'full_text'];
+    foreach ($onceAfterNull as $field) {
+        if (array_key_exists($field, $data)
+            && ($current[$field] === null || $current[$field] === '')
+            && $data[$field] !== null
+            && $data[$field] !== ''
+        ) {
+            $sets[]           = "{$field} = :{$field}";
+            $binds[":{$field}"] = $data[$field];
+        }
+    }
+
+    if (empty($sets)) {
+        return true; // nothing to update
+    }
+
+    $sql = "UPDATE Ordinances SET " . implode(', ', $sets)
+         . " WHERE ordinance_id = :id AND archived_at IS NULL";
+
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute($binds);
+
+    return $stmt->rowCount() >= 0;
+}
+
     /**
      * getAllCategories
      *

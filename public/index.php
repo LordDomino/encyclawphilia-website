@@ -67,6 +67,7 @@ $router->get('/add-ordinance', 'PagesNavigationController@addOrdinance');
 $router->get('/edit-ordinance', 'DashboardController@editOrdinance');
 
 $router->post('/store-ordinance', 'DashboardController@storeOrdinance');
+$router->post('/api/ordinances/update', 'DashboardController@updateOrdinance');
 
 $router->get('/api/ordinances/search', 'OrdinanceApiController@search');
 $router->get('/api/ordinances/meta',   'OrdinanceApiController@meta');
