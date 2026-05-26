@@ -15,13 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             s. ${escapeHtml(row.series_year)}
                         </span>
                     </div>
-                    <div class="date">
-                        <span class="date-day">${escapeHtml(day)}</span>
-                        <div class="date-meta">
-                            <span class="date-month">${escapeHtml(month)}</span>
-                            <span class="date-year">${escapeHtml(year)}</span>
-                        </div>
-                    </div>
+                    <div class="enactment-date">
+                                                    Enacted ${escapeHtml(row.enactment_day ?? '')}
+                                                    ${escapeHtml(row.enactment_month ?? '')}
+                                                    ${escapeHtml(row.enactment_year ?? '')}
+                                                </div>
                 </div>
                 <div class="preview-container">
                     <div class="preview-text">${escapeHtml(row.title)}</div>

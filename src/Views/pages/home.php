@@ -163,7 +163,7 @@ require_once __DIR__ . '/../head.php';
                             <?php if (!empty($results_latest)): ?>
                                 <?php foreach ($results_latest as $row): ?>
                                     <div class="content-wrapper">
-                                        <div class="card-banner">
+                                        <div class="content-card">
                                             <div class="card-header">
                                                 <div class="card-label-group">
                                                     <span class="card-type">City Ordinance</span>

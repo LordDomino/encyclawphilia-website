@@ -162,7 +162,7 @@ section.browse {
         scroll-snap-align: start;
         scroll-snap-stop: always;
 
-        .card-banner {
+        .content-card, .card-banner {
             height: 100%;
         }
     }
