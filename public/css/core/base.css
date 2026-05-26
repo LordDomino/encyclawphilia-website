@@ -59,7 +59,19 @@ a.emphasis {
 }
 span.numeral-and-series { font-family: var(--font-label); }
 p.link {
-    margin: 0; font-family: var(--font-link); font-size: var(--fs-sm);
-    font-weight: 700; letter-spacing: var(--ls-3xl); line-height: var(--lh-normal);
-    text-align: right; text-transform: uppercase; color: var(--ink-accent);
+    margin: 0;
+    font-family: var(--font-link);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    letter-spacing: var(--ls-3xl);
+    line-height: var(--lh-normal);
+    text-align: right;
+    text-transform: uppercase;
+    color: white;
+    background-color: rgba(219, 32, 32, 0.973);
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--bdr-r-md);
+    width: fit-content;
+    margin-left: auto;
+    margin-top: var(--sp-4);
 }

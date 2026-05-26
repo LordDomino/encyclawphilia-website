@@ -1747,7 +1747,7 @@ section.auth-hero {
     border: var(--bdr-thin) solid var(--glass-ink-vivid);
     border-radius: var(--bdr-r-md);
     transition: all var(--ease-fast);
-    background-color: var(--clr-ink);
+    background-color: rgba(219, 32, 32, 0.973);
     height: 40px;
     text-align: center;
     display: flex;
@@ -2008,7 +2008,7 @@ section.auth-hero {
     line-height: var(--lh-tight);
     text-transform: uppercase;
     color: var(--ink-on-accent);
-    background: var(--ink-accent);
+    background: rgba(219, 32, 32, 0.973);
     border: none;
     padding: var(--sp-4) var(--sp-8);
     border-radius: var(--bdr-r-md);
