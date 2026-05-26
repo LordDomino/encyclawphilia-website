@@ -249,37 +249,97 @@ nav li {
     }
 }
 
+.nav-inner-wrapper {
+    display: contents;
+}
+
 @media screen and (max-width: 768px) {
+    .nav-inner-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        overflow: hidden;
+        padding: var(--sp-3) 0 var(--sp-5);
+    }
+
     .site-header {
         overflow: visible;
+        height: auto;
+        min-height: var(--header-height);
     }
 
     .header-content {
         flex-wrap: wrap;
         position: relative;
+        align-items: center;
+        padding: var(--sp-4) 0;
+        border-bottom: none;
+    }
+
+    .nav-toggle {
+        display: flex;
+        order: 2;
+        margin-right: auto;
+        margin-left: auto;
+        color: var(--ink-on-dark);
+        flex-shrink: 0;
     }
 
     .main-nav {
-        display: none;
-        flex-direction: column;
-        align-items: flex-start;
+        /* Hidden state — collapsed */
+        display: grid;
+        grid-template-rows: 0fr;
         width: 100%;
         order: 3;
-        gap: 0;
-        padding: var(--sp-4) 0 var(--sp-5);
-        border-top: 1px solid rgba(128, 128, 128, .2);
-        opacity: 1;
+        overflow: hidden;
+        transition:
+            grid-template-rows var(--ease-smooth-lg),
+            border-top-color var(--ease-smooth-lg);
+        border-top: var(--bdr-thin) solid transparent;
+
+        /* Wrapper needed for grid row animation trick */
+        &>* {
+            min-height: 0;
+        }
 
         &.is-open {
-            display: flex;
+            grid-template-rows: 1fr;
+            border-top-color: oklch(100% 0 0 / 12%);
         }
 
         a,
         .button {
-            width: 100%;
-            padding: var(--sp-5) var(--sp-2);
+            /* width: 100%; */
+            padding: var(--sp-5) var(--sp-4);
             border-radius: 0;
             text-align: left;
+            font-size: var(--fs-base);
+
+            &::after {
+                display: none;
+            }
+        }
+
+        .button {
+            background: none;
+            box-shadow: none;
+            color: var(--ink-on-dark);
+            border-radius: 0;
+            text-align: left;
+            justify-content: flex-start;
+
+            &:hover {
+                background: var(--glass-sky-soft);
+                transform: none;
+                box-shadow: none;
+                filter: none;
+            }
+        }
+
+        li#google_translate_element {
+            width: 100%;
+            padding: var(--sp-2) var(--sp-4) var(--sp-5);
+            list-style: none;
         }
     }
 }
