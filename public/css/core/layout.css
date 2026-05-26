@@ -1,0 +1,25 @@
+.flex-grid-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: calc(var(--cards-padding)*.75);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        scroll-margin-top: var(--scroll-margin);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+
+        &:first-child {
+            padding-top: var(--scroll-margin);
+            scroll-margin: 0;
+        }
+
+        &:last-child {
+            padding-bottom: var(--scroll-margin);
+            scroll-margin: 0;
+            scroll-snap-align: end;
+        }
+    }
+}

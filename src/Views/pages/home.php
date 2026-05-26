@@ -145,13 +145,13 @@ require_once __DIR__ . '/../head.php';
                             <div class="card-featured-reaction-fill" style="width: <?php echo $f_like_pct; ?>%"></div>
                         </div>
 
+                        <a href="/ordinance?id=<?= $featured_ordinance['ordinance_id'] ?>">
+                            <p class="link">Read More</p>
+                        </a>
                     </div>
                 <?php else: ?>
                     <p class="card-featured-empty">No featured ordinance available.</p>
                 <?php endif; ?>
-                <a href="/ordinance?id=<?= $featured_ordinance['ordinance_id'] ?>">
-                    <p class="link">Read More</p>
-                </a>
             </div>
             <div class="flex-column">
                 <p id="latest-ordinances"></p>
@@ -159,10 +159,10 @@ require_once __DIR__ . '/../head.php';
                 <p>Browse the latest city ordinances in Valenzuela.</p>
                 <div class="vertical-carousel-frame">
                     <div class="vertical-carousel-wrapper">
-                        <ul class="vertical-carousel">
+                        <div class="flex-grid">
                             <?php if (!empty($results_latest)): ?>
                                 <?php foreach ($results_latest as $row): ?>
-                                    <li>
+                                    <div class="content-wrapper">
                                         <div class="card-banner">
                                             <div class="card-header">
                                                 <div class="card-label-group">
@@ -172,18 +172,10 @@ require_once __DIR__ . '/../head.php';
                                                         s. <?php echo htmlspecialchars($row['series_year'], ENT_QUOTES, 'UTF-8'); ?>
                                                     </span>
                                                 </div>
-                                                <div class="date">
-                                                    <span class="date-day">
-                                                        <?php echo htmlspecialchars($row['enactment_day'], ENT_QUOTES, 'UTF-8'); ?>
-                                                    </span>
-                                                    <div class="date-meta">
-                                                        <span class="date-month">
-                                                            <?php echo htmlspecialchars($row['enactment_month'], ENT_QUOTES, 'UTF-8'); ?>
-                                                        </span>
-                                                        <span class="date-year">
-                                                            <?php echo htmlspecialchars($row['enactment_year'], ENT_QUOTES, 'UTF-8'); ?>
-                                                        </span>
-                                                    </div>
+                                                <div class="enactment-date">
+                                                    Enacted <?php echo htmlspecialchars($row['enactment_day'], ENT_QUOTES, 'UTF-8'); ?>
+                                                    <?php echo htmlspecialchars($row['enactment_month'], ENT_QUOTES, 'UTF-8'); ?>
+                                                    <?php echo htmlspecialchars($row['enactment_year'], ENT_QUOTES, 'UTF-8'); ?>
                                                 </div>
                                             </div>
                                             <div class="preview-container">
@@ -213,14 +205,14 @@ require_once __DIR__ . '/../head.php';
                                                 ?>
                                             </div>
                                         </div>
-                                    </li>
+                                    </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <div class="no-results">
                                     <p>There are no latest ordinances.</p>
                                 </div>
                             <?php endif; ?>
-                        </ul>
+                        </div>
                     </div>
                 </div>
             </div>
