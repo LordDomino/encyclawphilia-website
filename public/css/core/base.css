@@ -68,7 +68,7 @@ p.link {
     text-align: right;
     text-transform: uppercase;
     color: white;
-    background-color: rgb(219, 32, 32);
+    background-color: rgba(219, 32, 32, 0.973);
     padding: var(--sp-2) var(--sp-4);
     border-radius: var(--bdr-r-md);
     width: fit-content;

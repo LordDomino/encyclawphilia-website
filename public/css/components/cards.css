@@ -181,7 +181,7 @@
     font-size: var(--fs-xs);
     color: white;
     letter-spacing: var(--ls-3xl);
-    background-color: rgb(219, 32, 32);
+    background-color: rgba(219, 32, 32, 0.973);
     padding: var(--sp-2);
     cursor: pointer;
     border-radius: var(--bdr-r-md);
@@ -409,7 +409,7 @@
 #featured>a>p.link {
     color: white;
     margin-top: var(--sp-2);
-    background-color: rgb(219, 32, 32);
+    background-color: rgba(219, 32, 32, 0.973);
     padding: var(--sp-2) var(--sp-4);
     cursor: pointer;
     border-radius: var(--bdr-r-md);
