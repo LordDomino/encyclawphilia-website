@@ -272,6 +272,39 @@ require VIEWS_ROOT . '/head.php';
         </div><!-- /.ordinance-split -->
 
         <!-- ====================================================
+             FULL TEXT SECTION
+             ==================================================== -->
+        <?php if (!empty($ordinance['full_text'])): ?>
+            <section class="ord-fulltext-section" aria-labelledby="fulltext-heading">
+                <div class="ord-fulltext-inner">
+                    <div class="ord-fulltext-header">
+                        <h2 id="fulltext-heading" class="ord-section-label ord-fulltext-heading">
+                            Full Text
+                        </h2>
+                        <button
+                            class="ord-fulltext-toggle"
+                            id="fulltext-toggle"
+                            type="button"
+                            aria-expanded="false"
+                            aria-controls="fulltext-body">
+                            <span class="ord-fulltext-toggle-label">Show Full Text</span>
+                            <span class="ord-fulltext-toggle-icon" aria-hidden="true">▾</span>
+                        </button>
+                    </div>
+                    <div
+                        class="ord-fulltext-body"
+                        id="fulltext-body"
+                        role="region"
+                        aria-label="Full legislative text"
+                        tabindex="0"
+                        hidden>
+                        <?php echo nl2br(htmlspecialchars($ordinance['full_text'], ENT_QUOTES, 'UTF-8')); ?>
+                    </div>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <!-- ====================================================
              COMMENTS SECTION
         ==================================================== -->
         <section class="ord-comments-section" id="comments" aria-labelledby="comments-heading">
@@ -481,6 +514,21 @@ require VIEWS_ROOT . '/head.php';
     <script src="js/sanitize.js"></script>
     <script src="js/react_ordinance.js"></script>
     <script src="js/pages/ordinance.js"></script>
+    <script>
+        (() => {
+            const toggle = document.getElementById('fulltext-toggle');
+            const body = document.getElementById('fulltext-body');
+            if (!toggle || !body) return;
+
+            toggle.addEventListener('click', () => {
+                const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+                toggle.setAttribute('aria-expanded', String(!isExpanded));
+                toggle.querySelector('.ord-fulltext-toggle-label').textContent =
+                    isExpanded ? 'Show Full Text' : 'Hide Full Text';
+                body.hidden = isExpanded;
+            });
+        })();
+    </script>
 
 </body>
 
