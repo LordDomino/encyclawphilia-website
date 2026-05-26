@@ -4490,7 +4490,7 @@ section.auth-hero {
     border: var(--bdr-thin) solid var(--glass-ink-vivid);
     border-radius: var(--bdr-r-md);
     transition: all var(--ease-fast);
-    background-color: #071e95;
+    background-color: rgb(219, 32, 32);
     height: 40px;
     text-align: center;
     display: flex;
