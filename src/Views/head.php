@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="/css/pages/admin-dashboard.css">
     <link rel="stylesheet" href="/css/pages/ordinance-form.css">
     <link rel="stylesheet" href="/css/pages/ordinance-detail.css">
+    <link rel="stylesheet" href="/css/add_ordinance.css">
 
     <!-- add this line -->
     <script src="/js/components/nav-toggle.js" defer></script>
