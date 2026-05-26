@@ -1,5 +1,3 @@
-
-
 <header class="site-header">
     <div class="header-content">
         <a href="/home#top" class="clickable">
@@ -25,10 +23,12 @@
             <a href="/about" class="clickable">About</a>
             <?php if (isset($_SESSION['user_id'])): ?>
                 <?php if ($_SESSION['is_admin']): ?>
-                    <a href="/dashboard" class="clickable button">Dashboard</a>
+                    <a href="/dashboard" class="clickable">Dashboard</a>
                 <?php endif; ?>
-                <a href="/account" class="clickable button">My Account</a>
-                <a href="/logout-submit" class="clickable button">Logout</a>
+                <a href="/account" class="ord-comment-compose-avatar">
+                    <?php echo htmlspecialchars(strtoupper(substr($_SESSION['username'] ?? 'U', 0, 1)), ENT_QUOTES, 'UTF-8'); ?>
+                </a>
+                <!-- <a href="/logout-submit" class="clickable button">Logout</a> -->
             <?php else: ?>
                 <a href="/login" class="clickable button">
                     <?php if (isset($_SESSION['username'])) {

@@ -150,6 +150,12 @@ nav li {
     transition: transform .2s ease, opacity .2s ease;
 }
 
+@media screen and (max-width: 1440px) {
+    .main-nav {
+        gap: 2vw;
+    }
+}
+
 
 /* ============================================================
    GOOGLE TRANSLATE WIDGET

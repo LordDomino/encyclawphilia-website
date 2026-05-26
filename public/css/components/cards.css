@@ -896,3 +896,10 @@
     padding-top: var(--sp-4);
     border-top: var(--bdr-thin) solid var(--bdr-clr-divider);
 }
+
+@media screen and (max-width: 425px) {
+    .card-featured-topbar {
+        flex-direction: column-reverse;
+        align-items: baseline;
+    }
+}

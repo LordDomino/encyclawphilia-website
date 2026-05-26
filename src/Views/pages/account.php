@@ -138,6 +138,8 @@ require_once __DIR__ . '/../head.php';
                     </div>
                 </div>
 
+                <a href="/logout-submit" class="logout">Logout</a>
+
             </aside>
 
             <!-- ── RIGHT: Edit panel ─────────────────────────────── -->
