@@ -178,7 +178,18 @@
 .card-footer p.link {
     margin: 0;
     font-size: var(--fs-xs);
+    color: white;
     letter-spacing: var(--ls-3xl);
+    background-color: rgb(219, 32, 32);
+    padding: var(--sp-2);
+    cursor: pointer;
+    border-radius: var(--bdr-r-md);
+}
+
+.card-footer p.link a {
+    display: block;
+    color: white;
+    text-decoration: none;
 }
 
 
@@ -395,8 +406,16 @@
 }
 
 #featured>a>p.link {
-    color: var(--ink-link);
+    color: white;
     margin-top: var(--sp-2);
+    background-color: rgb(219, 32, 32);
+    padding: var(--sp-2) var(--sp-4);
+    cursor: pointer;
+    border-radius: var(--bdr-r-md);
+    display: block;
+    text-align: right;
+    width: fit-content;
+    margin-left: auto;
 }
 
 .card-featured-empty {

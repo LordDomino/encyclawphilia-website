@@ -3,5 +3,5 @@
 ?>
 
 <a href="/ordinance?id=<?php echo htmlspecialchars($ordinance_id) ?>">
-    <p class="link">Read More</p>
+    <p class="link"><font color="White">Read More</font></p>
 </a>
