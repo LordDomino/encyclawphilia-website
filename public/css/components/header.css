@@ -13,12 +13,14 @@
     z-index: 5;
     display: flex;
     align-items: center;
-    transition: all var(--ease);
+    transition: background-color var(--ease-smooth), backdrop-filter var(--ease-smooth);
+    border-bottom: var(--bdr-thin) solid oklch(100% 0 0 / 8%);
 
     body.home & {
         background-color: transparent;
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
+        border-bottom-color: transparent;
     }
 }
 
@@ -61,12 +63,29 @@
         transition: all var(--ease-fast);
         padding: var(--sp-1) var(--sp-3);
         border-radius: var(--bdr-r-lg);
+        position: relative;
+
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            right: 50%;
+            height: 1px;
+            background: var(--clr-sky);
+            transition: left var(--ease-smooth), right var(--ease-smooth);
+        }
 
         &:hover {
             color: var(--ink-link);
             background: var(--glass-sky-soft);
             backdrop-filter: blur(var(--blur-xs));
             -webkit-backdrop-filter: blur(var(--blur-xs));
+        }
+
+        &:hover::after {
+            left: var(--sp-3);
+            right: var(--sp-3);
         }
     }
 
@@ -76,12 +95,61 @@
         color: var(--ink-accent);
         padding: var(--sp-2) var(--sp-3);
         border-radius: var(--bdr-r-lg);
+        transition: all var(--ease-smooth);
+        box-shadow: var(--shadow-glass-sm);
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glass-md);
+            filter: brightness(1.1);
+        }
+
+        &::after {
+            display: none;
+        }
     }
 }
 
 nav li {
     list-style-type: none;
 }
+
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--sp-2);
+    align-self: center;
+    margin-left: auto;
+
+    &[aria-expanded="true"] {
+        .nav-toggle-bar:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .nav-toggle-bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .nav-toggle-bar:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+    }
+}
+
+.nav-toggle-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    border-radius: 2px;
+    background-color: currentColor;
+    transition: transform .2s ease, opacity .2s ease;
+}
+
 
 /* ============================================================
    GOOGLE TRANSLATE WIDGET

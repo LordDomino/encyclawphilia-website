@@ -26,6 +26,11 @@
     <link rel="stylesheet" href="/css/pages/ordinance-form.css">
     <link rel="stylesheet" href="/css/pages/ordinance-detail.css">
     <link rel="stylesheet" href="/css/components/comments.css">
+<!-- 
+    <link rel="stylesheet" href="/css/new/comment-2.css">
+    <link rel="stylesheet" href="/css/new/style-2.css">
+    <link rel="stylesheet" href="/css/new/admin_dashboard-2.css">
+    <link rel="stylesheet" href="/css/new/add_ordinance-2.css"> -->
 
     <!-- add this line -->
     <script src="/js/components/nav-toggle.js" defer></script>

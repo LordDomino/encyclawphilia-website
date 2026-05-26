@@ -149,7 +149,7 @@
    --ink-on-dark: var(--clr-white);
    --ink-on-accent: var(--clr-white);
 
-   --bg-page: light-dark(var(--clr-white), var(--clr-navy));
+   --bg-page: var(--clr-white);
    --bg-hero: var(--clr-navy);
    --bg-surface-soft: rgba(248, 249, 255, 0.60);
    --bg-surface-mid: rgba(240, 243, 255, 0.40);
