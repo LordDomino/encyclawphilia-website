@@ -176,19 +176,20 @@ nav li {
 #google_translate_element .goog-te-gadget-simple {
     font-family: var(--font-link) !important;
     font-size: var(--fs-md) !important;
-    background: transparent !important;
+    background: var(--bg-overlay-sky) !important;
     border: none !important;
     padding: 0 !important;
     margin: 0 !important;
     white-space: nowrap;
     line-height: var(--lh-normal) !important;
+    border-radius: var(--bdr-r-lg);
 }
 
 /* Hide the "Powered by Google" attribution bar */
 #google_translate_element .goog-te-gadget>span,
 #google_translate_element .goog-logo-link,
 #google_translate_element .goog-te-gadget-simple .VIpgJd-ZVi9od-xl07Ob-lTBxed {
-    display: none !important;
+    /* display: none !important; */
 }
 
 /* The simplified widget anchor — style it like a nav link */
